@@ -1,0 +1,24 @@
+{
+  "name": "sidus/admin-bundle",
+  "description": "Simple and extendable action-based admin management with built-in routing generation",
+  "keywords": [ "admin", "action" ],
+  "homepage": "https://github.com/VincentChalnot/SidusAdminBundle",
+  "type": "library",
+  "license": "GPL-2.0",
+  "authors": [
+    {
+      "name": "Vincent Chalnot",
+      "email": "vincent@sidus.fr",
+      "homepage": "http://chalnot.fr",
+      "role": "Developer"
+    }
+  ],
+  "target-dir": "Sidus/AdminBundle",
+  "autoload": {
+    "psr-0": { "Sidus\\AdminBundle": "" }
+  },
+  "require": {
+    "php": ">=5.4",
+    "symfony/symfony": "~2.7.4|~2.8.1"
+  }
+}

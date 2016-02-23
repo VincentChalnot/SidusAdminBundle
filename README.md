@@ -1,0 +1,4 @@
+SidusAdminBundle
+================
+
+Work in progress.

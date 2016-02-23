@@ -1,0 +1,43 @@
+parameters:
+    sidus_admin.routing.route_loader.class: Sidus\AdminBundle\Routing\AdminRouteLoader
+    sidus_admin.configuration.admin.handler.class: Sidus\AdminBundle\Configuration\AdminConfigurationHandler
+    sidus_admin.twig.extension.admin.class: Sidus\AdminBundle\Twig\AdminExtension
+    sidus_admin.entity.matcher.class: Sidus\AdminBundle\Entity\AdminEntityMatcher
+    sidus_admin.routing.admin_router.class: Sidus\AdminBundle\Routing\AdminRouter
+    sidus_admin.kernel.event.controller_injecter.class: Sidus\AdminBundle\Event\AdminControllerInjecter
+
+services:
+    sidus_admin.configuration.admin.handler:
+        class: %sidus_admin.configuration.admin.handler.class%
+
+    sidus_admin.routing.route_loader:
+        class: %sidus_admin.routing.route_loader.class%
+        arguments: [@sidus_admin.configuration.admin.handler]
+        tags:
+            - { name: routing.loader }
+
+    sidus_admin.routing.admin_router:
+        class: %sidus_admin.routing.admin_router.class%
+        arguments:
+            - @sidus_admin.configuration.admin.handler
+            - @sidus_admin.entity.matcher
+            - @router
+
+    sidus_admin.twig.extension.admin:
+        class: %sidus_admin.twig.extension.admin.class%
+        arguments:
+            - @sidus_admin.configuration.admin.handler
+            - @sidus_admin.entity.matcher
+            - @sidus_admin.routing.admin_router
+        tags:
+            - { name: twig.extension }
+
+    sidus_admin.entity.matcher:
+        class: %sidus_admin.entity.matcher.class%
+        arguments: [@sidus_admin.configuration.admin.handler]
+
+    sidus_admin.kernel.event.controller_injecter:
+        class: %sidus_admin.kernel.event.controller_injecter.class%
+        arguments: [@sidus_admin.configuration.admin.handler, @twig]
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
