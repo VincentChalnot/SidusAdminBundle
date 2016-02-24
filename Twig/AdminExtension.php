@@ -2,11 +2,13 @@
 
 namespace Sidus\AdminBundle\Twig;
 
+use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
 use Sidus\AdminBundle\Routing\AdminRouter;
 use Twig_Extension;
 use Twig_SimpleFunction;
+use UnexpectedValueException;
 
 class AdminExtension extends Twig_Extension
 {
@@ -40,8 +42,21 @@ class AdminExtension extends Twig_Extension
             new Twig_SimpleFunction('admin_path', [$this->adminRouter, 'generateAdminPath']),
             new Twig_SimpleFunction('entity_path', [$this->adminRouter, 'generateEntityPath']),
             new Twig_SimpleFunction('entity_admin', [$this->adminEntityMatcher, 'getAdminForEntity']),
-            new Twig_SimpleFunction('admin', [$this->adminConfigurationHandler, 'getAdmin']),
+            new Twig_SimpleFunction('admin', [$this, 'getAdmin']),
         ];
+    }
+
+    /**
+     * @param string $code
+     * @return Admin
+     * @throws UnexpectedValueException
+     */
+    public function getAdmin($code)
+    {
+        if ($code instanceof Admin) {
+            return $code;
+        }
+        return $this->adminConfigurationHandler->getAdmin($code);
     }
 
     /**

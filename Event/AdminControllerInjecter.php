@@ -48,6 +48,7 @@ class AdminControllerInjecter
                 'attribute in your route definition or use the admin configuration');
         }
         $admin = $this->adminConfigurationHandler->getAdmin($event->getRequest()->attributes->get('_admin'));
+        $admin->setCurrentAction(substr($action, 0, -strlen('Action')));
         $controller->setAdmin($admin);
         $this->twig->addGlobal('admin', $admin);
         $this->adminConfigurationHandler->setCurrentAdmin($admin);

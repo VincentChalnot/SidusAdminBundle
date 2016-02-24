@@ -15,17 +15,24 @@ class Action
     /** @var Admin */
     protected $admin;
 
+    /** @var mixed */
+    protected $formType;
+
+    /** @var string */
+    protected $template;
+
     /**
      * @param string $code
      * @param Admin $admin
-     * @param $configuration
+     * @param array $c
      */
-    public function __construct($code, Admin $admin, array $configuration)
+    public function __construct($code, Admin $admin, array $c)
     {
         $this->code = $code;
         $this->admin = $admin;
+        $this->formType = $c['form_type'];
+        $this->template = $c['template'];
 
-        $c = $configuration;
         $defaults = array_merge([
             '_controller' => $admin->getController() . ':' . $code,
             '_admin' => $admin->getCode(),
@@ -69,5 +76,13 @@ class Action
     public function getAdmin()
     {
         return $this->admin;
+    }
+
+    public function getFormType()
+    {
+        if (null === $this->formType) {
+            return $this->admin->getDefaultFormType();
+        }
+        return $this->formType;
     }
 }

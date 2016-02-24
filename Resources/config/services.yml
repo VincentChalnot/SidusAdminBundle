@@ -5,6 +5,7 @@ parameters:
     sidus_admin.entity.matcher.class: Sidus\AdminBundle\Entity\AdminEntityMatcher
     sidus_admin.routing.admin_router.class: Sidus\AdminBundle\Routing\AdminRouter
     sidus_admin.kernel.event.controller_injecter.class: Sidus\AdminBundle\Event\AdminControllerInjecter
+    sidus_admin.templating.template_resolver.class: Sidus\AdminBundle\Twig\TemplateResolver
 
 services:
     sidus_admin.configuration.admin.handler:
@@ -41,3 +42,7 @@ services:
         arguments: [@sidus_admin.configuration.admin.handler, @twig]
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    sidus_admin.templating.template_resolver:
+        class: %sidus_admin.templating.template_resolver.class%
+        arguments: [@sidus_admin.configuration.admin.handler, @twig, %sidus_admin.templating.fallback_template%]

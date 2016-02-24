@@ -22,6 +22,15 @@ class Admin
     /** @var string */
     protected $entity;
 
+    /** @var string */
+    protected $currentAction;
+
+    /** @var mixed */
+    protected $defaultFormType;
+
+    /** @var string */
+    protected $baseTemplate;
+
     /**
      * Admin constructor.
      * @param string $code
@@ -35,6 +44,8 @@ class Admin
         $actionClass = $adminConfiguration['action_class'];
         $this->entity = $adminConfiguration['entity'];
         $this->options = $adminConfiguration['options'];
+        $this->defaultFormType = $adminConfiguration['default_form_type'];
+        $this->baseTemplate = $adminConfiguration['base_template'];
         foreach ($adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
             $this->actions[$actionCode] = new $actionClass($actionCode, $this, $actionConfiguration);
         }
@@ -102,5 +113,71 @@ class Admin
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param $option
+     * @param mixed $default
+     * @return array
+     */
+    public function getOption($option, $default = null)
+    {
+        if (!$this->hasOption($option)) {
+            return $default;
+        }
+        return $this->options[$option];
+    }
+
+    /**
+     * @param string $option
+     * @return bool
+     */
+    public function hasOption($option)
+    {
+        return array_key_exists($option, $this->options);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefaultFormType()
+    {
+        return $this->defaultFormType;
+    }
+
+    /**
+     * @return Action
+     */
+    public function getCurrentAction()
+    {
+        return $this->currentAction;
+    }
+
+    /**
+     * @param string|Action $action
+     * @throws \UnexpectedValueException
+     */
+    public function setCurrentAction($action)
+    {
+        if (!$action instanceof Action) {
+            $action = $this->getAction($action);
+        }
+        $this->currentAction = $action;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseTemplate()
+    {
+        return $this->baseTemplate;
     }
 }

@@ -40,6 +40,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('admin_class')->defaultValue('Sidus\AdminBundle\Admin\Admin')->end()
                 ->scalarNode('action_class')->defaultValue('Sidus\AdminBundle\Admin\Action')->end()
+                ->scalarNode('fallback_template')->defaultNull()->end()
                 ->append($this->getAdminConfigTreeBuilder())
             ->end();
 
@@ -78,6 +79,8 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('prefix')->isRequired()->end()
             ->scalarNode('entity')->isRequired()->end()
             ->scalarNode('action_class')->end()
+            ->scalarNode('default_form_type')->defaultNull()->end()
+            ->scalarNode('base_template')->defaultNull()->end()
             ->variableNode('options')->defaultValue([])->end()
             ->arrayNode('actions')
                 ->useAttributeAsKey('code')
@@ -98,6 +101,11 @@ class Configuration implements ConfigurationInterface
     protected function appendActionDefinition(NodeBuilder $actionDefinition)
     {
         $actionDefinition
+            // Custom parameters
+            ->scalarNode('form_type')->defaultNull()->end()
+            ->scalarNode('template')->defaultNull()->end()
+
+            // Default route parameters
             ->scalarNode('path')->isRequired()->end()
             ->scalarNode('defaults')->defaultValue([])->end()
             ->scalarNode('requirements')->defaultValue([])->end()
