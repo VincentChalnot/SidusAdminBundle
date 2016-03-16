@@ -7,6 +7,7 @@ use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -69,8 +70,16 @@ class AdminRouter
         $action = $admin->getAction($actionCode);
 
         $accessor = PropertyAccess::createPropertyAccessor();
-        foreach ($this->computeMissingRouteParameters($action->getRoute(), $parameters) as $missingParam) {
-            $parameters[$missingParam] = $accessor->getValue($entity, $missingParam);
+        $missingParams = $this->computeMissingRouteParameters($action->getRoute(), $parameters);
+        foreach ($missingParams as $missingParam) {
+            try {
+                $parameters[$missingParam] = $accessor->getValue($entity, $missingParam);
+            } catch (\Exception $e) {
+                $contextParam = $this->router->getContext()->getParameter($missingParam);
+                if (null !== $contextParam) {
+                    $parameters[$missingParam] = $contextParam;
+                }
+            }
         }
         return $this->router->generate($action->getRouteName(), $parameters, $referenceType);
     }
