@@ -49,7 +49,7 @@ class TemplateResolver
         if (!$action) {
             $action = $admin->getCurrentAction();
         }
-        $templateType = 'html'; // @todo inject type from Request ?
+        $templateType = 'html'; // Inject type from Request ?
 
         $customTemplate = "{$admin->getController()}:{$action->getCode()}.{$templateType}.twig";
         try {

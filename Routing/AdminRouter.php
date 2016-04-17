@@ -7,7 +7,6 @@ use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;

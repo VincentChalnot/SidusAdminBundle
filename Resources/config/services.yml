@@ -9,40 +9,40 @@ parameters:
 
 services:
     sidus_admin.configuration.admin.handler:
-        class: %sidus_admin.configuration.admin.handler.class%
+        class: '%sidus_admin.configuration.admin.handler.class%'
 
     sidus_admin.routing.route_loader:
-        class: %sidus_admin.routing.route_loader.class%
-        arguments: [@sidus_admin.configuration.admin.handler]
+        class: '%sidus_admin.routing.route_loader.class%'
+        arguments: ['@sidus_admin.configuration.admin.handler']
         tags:
             - { name: routing.loader }
 
     sidus_admin.routing.admin_router:
-        class: %sidus_admin.routing.admin_router.class%
+        class: '%sidus_admin.routing.admin_router.class%'
         arguments:
-            - @sidus_admin.configuration.admin.handler
-            - @sidus_admin.entity.matcher
-            - @router
+            - '@sidus_admin.configuration.admin.handler'
+            - '@sidus_admin.entity.matcher'
+            - '@router'
 
     sidus_admin.twig.extension.admin:
-        class: %sidus_admin.twig.extension.admin.class%
+        class: '%sidus_admin.twig.extension.admin.class%'
         arguments:
-            - @sidus_admin.configuration.admin.handler
-            - @sidus_admin.entity.matcher
-            - @sidus_admin.routing.admin_router
+            - '@sidus_admin.configuration.admin.handler'
+            - '@sidus_admin.entity.matcher'
+            - '@sidus_admin.routing.admin_router'
         tags:
             - { name: twig.extension }
 
     sidus_admin.entity.matcher:
-        class: %sidus_admin.entity.matcher.class%
-        arguments: [@sidus_admin.configuration.admin.handler]
+        class: '%sidus_admin.entity.matcher.class%'
+        arguments: ['@sidus_admin.configuration.admin.handler']
 
     sidus_admin.kernel.event.controller_injecter:
-        class: %sidus_admin.kernel.event.controller_injecter.class%
-        arguments: [@sidus_admin.configuration.admin.handler, @twig]
+        class: '%sidus_admin.kernel.event.controller_injecter.class%'
+        arguments: ['@sidus_admin.configuration.admin.handler', '@twig']
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
     sidus_admin.templating.template_resolver:
-        class: %sidus_admin.templating.template_resolver.class%
-        arguments: [@sidus_admin.configuration.admin.handler, @twig, %sidus_admin.templating.fallback_template%]
+        class: '%sidus_admin.templating.template_resolver.class%'
+        arguments: ['@sidus_admin.configuration.admin.handler', '@twig', '%sidus_admin.templating.fallback_template%']
