@@ -23,6 +23,7 @@ services:
             - '@sidus_admin.configuration.admin.handler'
             - '@sidus_admin.entity.matcher'
             - '@router'
+            - '@property_accessor'
 
     sidus_admin.twig.extension.admin:
         class: '%sidus_admin.twig.extension.admin.class%'
