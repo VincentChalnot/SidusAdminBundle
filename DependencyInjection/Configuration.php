@@ -107,12 +107,12 @@ class Configuration implements ConfigurationInterface
 
             // Default route parameters
             ->scalarNode('path')->isRequired()->end()
-            ->scalarNode('defaults')->defaultValue([])->end()
-            ->scalarNode('requirements')->defaultValue([])->end()
-            ->scalarNode('options')->defaultValue([])->end()
+            ->variableNode('defaults')->defaultValue([])->end()
+            ->variableNode('requirements')->defaultValue([])->end()
+            ->variableNode('options')->defaultValue([])->end()
             ->scalarNode('host')->defaultValue('')->end()
-            ->scalarNode('schemes')->defaultValue([])->end()
-            ->scalarNode('methods')->defaultValue([])->end()
+            ->variableNode('schemes')->defaultValue([])->end()
+            ->variableNode('methods')->defaultValue([])->end()
             ->scalarNode('condition')->defaultNull()->end();
     }
 }
