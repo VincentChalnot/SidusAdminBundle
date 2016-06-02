@@ -2,6 +2,8 @@
 
 namespace Sidus\AdminBundle\DependencyInjection;
 
+use Sidus\AdminBundle\Admin\Action;
+use Sidus\AdminBundle\Admin\Admin;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -38,8 +40,8 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('admin_class')->defaultValue('Sidus\AdminBundle\Admin\Admin')->end()
-                ->scalarNode('action_class')->defaultValue('Sidus\AdminBundle\Admin\Action')->end()
+                ->scalarNode('admin_class')->defaultValue(Admin::class)->end()
+                ->scalarNode('action_class')->defaultValue(Action::class)->end()
                 ->scalarNode('fallback_template')->defaultNull()->end()
                 ->append($this->getAdminConfigTreeBuilder())
             ->end();
@@ -66,6 +68,7 @@ class Configuration implements ConfigurationInterface
         $adminDefinition->end()
                 ->end()
             ->end();
+
         return $node;
     }
 

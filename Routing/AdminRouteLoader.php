@@ -6,6 +6,11 @@ use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Loads all routes contained in actions
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class AdminRouteLoader extends Loader
 {
     /** @var bool */
@@ -23,6 +28,12 @@ class AdminRouteLoader extends Loader
         $this->adminConfigurationHandler = $adminConfigurationHandler;
     }
 
+    /**
+     * @param mixed $resource
+     * @param null  $type
+     * @return RouteCollection
+     * @throws \RuntimeException
+     */
     public function load($resource, $type = null)
     {
         if (true === $this->loaded) {
@@ -38,9 +49,15 @@ class AdminRouteLoader extends Loader
         }
 
         $this->loaded = true;
+
         return $routes;
     }
 
+    /**
+     * @param mixed  $resource
+     * @param string $type
+     * @return bool
+     */
     public function supports($resource, $type = null)
     {
         return 'sidus_admin' === $type;

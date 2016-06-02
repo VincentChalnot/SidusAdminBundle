@@ -2,7 +2,6 @@
 
 namespace Sidus\AdminBundle\Routing;
 
-
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
@@ -11,6 +10,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Generated path for admins and actions
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class AdminRouter
 {
     /** @var AdminConfigurationHandler */
@@ -71,10 +75,10 @@ class AdminRouter
     }
 
     /**
-     * @param mixed $entity
+     * @param mixed  $entity
      * @param string $actionCode
-     * @param array $parameters
-     * @param int $referenceType
+     * @param array  $parameters
+     * @param int    $referenceType
      * @return string
      * @throws \Exception
      */

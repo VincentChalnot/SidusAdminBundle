@@ -19,6 +19,6 @@
   },
   "require": {
     "php": ">=5.4",
-    "symfony/symfony": "~2.7.4|~2.8.1"
+    "symfony/symfony": "~2.7.4|~2.8.6"
   }
 }

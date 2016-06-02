@@ -2,10 +2,14 @@
 
 namespace Sidus\AdminBundle\Entity;
 
-
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 
+/**
+ * Used to match an admin against a Doctrine entity, will return the first one matching
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class AdminEntityMatcher
 {
     /** @var AdminConfigurationHandler */

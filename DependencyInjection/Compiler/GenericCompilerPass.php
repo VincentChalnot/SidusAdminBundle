@@ -7,6 +7,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Generic compiler pass to add tagged services to another service
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class GenericCompilerPass implements CompilerPassInterface
 {
     /** @var string */

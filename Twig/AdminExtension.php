@@ -10,6 +10,11 @@ use Twig_Extension;
 use Twig_SimpleFunction;
 use UnexpectedValueException;
 
+/**
+ * Adds a few useful routing functions to twig templates
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class AdminExtension extends Twig_Extension
 {
     /** @var AdminConfigurationHandler */
@@ -23,11 +28,14 @@ class AdminExtension extends Twig_Extension
 
     /**
      * @param AdminConfigurationHandler $adminConfigurationHandler
-     * @param AdminEntityMatcher $adminEntityMatcher
-     * @param AdminRouter $adminRouter
+     * @param AdminEntityMatcher        $adminEntityMatcher
+     * @param AdminRouter               $adminRouter
      */
-    public function __construct(AdminConfigurationHandler $adminConfigurationHandler, AdminEntityMatcher $adminEntityMatcher, AdminRouter $adminRouter)
-    {
+    public function __construct(
+        AdminConfigurationHandler $adminConfigurationHandler,
+        AdminEntityMatcher $adminEntityMatcher,
+        AdminRouter $adminRouter
+    ) {
         $this->adminConfigurationHandler = $adminConfigurationHandler;
         $this->adminEntityMatcher = $adminEntityMatcher;
         $this->adminRouter = $adminRouter;
@@ -56,6 +64,7 @@ class AdminExtension extends Twig_Extension
         if ($code instanceof Admin) {
             return $code;
         }
+
         return $this->adminConfigurationHandler->getAdmin($code);
     }
 

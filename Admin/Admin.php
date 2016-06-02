@@ -2,6 +2,11 @@
 
 namespace Sidus\AdminBundle\Admin;
 
+/**
+ * The admin serves as an action holder and is attached to a Doctrine entity
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class Admin
 {
     /** @var string */
@@ -33,8 +38,9 @@ class Admin
 
     /**
      * Admin constructor.
+     *
      * @param string $code
-     * @param array $adminConfiguration
+     * @param array  $adminConfiguration
      */
     public function __construct($code, array $adminConfiguration)
     {
@@ -46,6 +52,7 @@ class Admin
         $this->options = $adminConfiguration['options'];
         $this->defaultFormType = $adminConfiguration['default_form_type'];
         $this->baseTemplate = $adminConfiguration['base_template'];
+
         foreach ($adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
             $this->actions[$actionCode] = new $actionClass($actionCode, $this, $actionConfiguration);
         }
@@ -84,7 +91,7 @@ class Admin
     }
 
     /**
-     * @param $code
+     * @param string $code
      * @return Action
      * @throws \UnexpectedValueException
      */
@@ -93,11 +100,12 @@ class Admin
         if (empty($this->actions[$code])) {
             throw new \UnexpectedValueException("No action with code: '{$code}' for admin '{$this->getCode()}'");
         }
+
         return $this->actions[$code];
     }
 
     /**
-     * @param $route
+     * @param string $route
      * @return bool
      */
     public function hasRoute($route)
@@ -107,9 +115,13 @@ class Admin
                 return true;
             }
         }
+
         return false;
     }
 
+    /**
+     * @return string
+     */
     public function getEntity()
     {
         return $this->entity;
@@ -124,8 +136,8 @@ class Admin
     }
 
     /**
-     * @param $option
-     * @param mixed $default
+     * @param string $option
+     * @param mixed  $default
      * @return array
      */
     public function getOption($option, $default = null)
@@ -133,6 +145,7 @@ class Admin
         if (!$this->hasOption($option)) {
             return $default;
         }
+
         return $this->options[$option];
     }
 

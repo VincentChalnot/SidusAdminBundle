@@ -5,6 +5,11 @@ namespace Sidus\AdminBundle\Configuration;
 use Sidus\AdminBundle\Admin\Admin;
 use UnexpectedValueException;
 
+/**
+ * Keep tracks of all services tagged as admins
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class AdminConfigurationHandler
 {
     /** @var Admin[] */
@@ -39,6 +44,7 @@ class AdminConfigurationHandler
         if (empty($this->admins[$code])) {
             throw new UnexpectedValueException("No admin with code: {$code}");
         }
+
         return $this->admins[$code];
     }
 

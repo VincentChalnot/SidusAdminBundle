@@ -2,11 +2,15 @@
 
 namespace Sidus\AdminBundle\Twig;
 
-
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 
+/**
+ * Resolve templates based on admin configuration
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class TemplateResolver
 {
     /** @var AdminConfigurationHandler */
@@ -20,9 +24,10 @@ class TemplateResolver
 
     /**
      * TemplateResolver constructor.
+     *
      * @param AdminConfigurationHandler $adminConfigurationHandler
-     * @param \Twig_Environment $twig
-     * @param string $fallbackTemplate
+     * @param \Twig_Environment         $twig
+     * @param string                    $fallbackTemplate
      */
     public function __construct(
         AdminConfigurationHandler $adminConfigurationHandler,
@@ -36,7 +41,7 @@ class TemplateResolver
 
 
     /**
-     * @param Admin $admin
+     * @param Admin  $admin
      * @param Action $action
      * @return \Twig_Template
      * @throws \Twig_Error_Syntax|\Twig_Error_Loader|\UnexpectedValueException
@@ -54,10 +59,16 @@ class TemplateResolver
         $customTemplate = "{$admin->getController()}:{$action->getCode()}.{$templateType}.twig";
         try {
             return $this->twig->loadTemplate($customTemplate);
-        } catch (\Twig_Error_Loader $e) {}
+        } catch (\Twig_Error_Loader $mainError) {
+        }
 
-        $fallbackTemplate = "{$this->getFallbackTemplate()}:{$action->getCode()}.html.twig";
-        return $this->twig->loadTemplate($fallbackTemplate);
+        $fallbackTemplate = "{$this->getFallbackTemplate()}:{$action->getCode()}.{$templateType}.twig";
+
+        try {
+            return $this->twig->loadTemplate($fallbackTemplate);
+        } catch (\Twig_Error_Loader $fallbackError) {
+            throw $mainError; // We don't throw the fallback error because usually you want to debug your real template
+        }
     }
 
     /**
@@ -67,9 +78,11 @@ class TemplateResolver
     public function getFallbackTemplate()
     {
         if (!$this->fallbackTemplate) {
-            throw new \UnexpectedValueException("Missing option 'fallback_template' in global admin configuration, ".
-            'you must either specify or create a template for each action or set the fallback_template option');
+            $m = "Missing option 'fallback_template' in global admin configuration, ";
+            $m .= 'you must either specify or create a template for each action or set the fallback_template option';
+            throw new \UnexpectedValueException($m);
         }
+
         return $this->fallbackTemplate;
     }
 }

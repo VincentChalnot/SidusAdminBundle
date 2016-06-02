@@ -2,12 +2,16 @@
 
 namespace Sidus\AdminBundle\Event;
 
-
 use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
-use Sidus\AdminBundle\Controller\AdminInjectable;
+use Sidus\AdminBundle\Controller\AdminInjectableInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Twig_Environment;
 
+/**
+ * Injects the active admin in the controller
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class AdminControllerInjecter
 {
     /** @var AdminConfigurationHandler */
@@ -18,7 +22,7 @@ class AdminControllerInjecter
 
     /**
      * @param AdminConfigurationHandler $adminConfigurationHandler
-     * @param Twig_Environment $twig
+     * @param Twig_Environment          $twig
      */
     public function __construct(AdminConfigurationHandler $adminConfigurationHandler, Twig_Environment $twig)
     {
@@ -38,14 +42,16 @@ class AdminControllerInjecter
         }
 
         list($controller, $action) = $controller;
-        if (!$controller instanceof AdminInjectable) {
+        if (!$controller instanceof AdminInjectableInterface) {
             return;
         }
         if (!$event->getRequest()->attributes->has('_admin')) {
             $routeName = $event->getRequest()->attributes->get('_route');
-            throw new \LogicException("Missing request attribute '_admin' for route {$routeName},".
-                'this means you declared this route outside the admin configuration, please include the _admin'.
-                'attribute in your route definition or use the admin configuration');
+
+            $m = "Missing request attribute '_admin' for route {$routeName},";
+            $m .= 'this means you declared this route outside the admin configuration, please include the _admin';
+            $m .= 'attribute in your route definition or use the admin configuration';
+            throw new \LogicException($m);
         }
         $admin = $this->adminConfigurationHandler->getAdmin($event->getRequest()->attributes->get('_admin'));
         $admin->setCurrentAction(substr($action, 0, -strlen('Action')));

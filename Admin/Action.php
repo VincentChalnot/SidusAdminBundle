@@ -4,6 +4,11 @@ namespace Sidus\AdminBundle\Admin;
 
 use Symfony\Component\Routing\Route;
 
+/**
+ * Holds information about an action and it's related route and template
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
+ */
 class Action
 {
     /** @var string */
@@ -23,8 +28,8 @@ class Action
 
     /**
      * @param string $code
-     * @param Admin $admin
-     * @param array $c
+     * @param Admin  $admin
+     * @param array  $c
      */
     public function __construct($code, Admin $admin, array $c)
     {
@@ -34,11 +39,12 @@ class Action
         $this->template = $c['template'];
 
         $defaults = array_merge([
-            '_controller' => $admin->getController() . ':' . $code,
+            '_controller' => $admin->getController().':'.$code,
             '_admin' => $admin->getCode(),
         ], $c['defaults']);
+
         $this->route = new Route(
-            $this->getAdmin()->getPrefix() . $c['path'],
+            $this->getAdmin()->getPrefix().$c['path'],
             $defaults,
             $c['requirements'],
             $c['options'],
@@ -49,6 +55,9 @@ class Action
         );
     }
 
+    /**
+     * @return string
+     */
     public function getRouteName()
     {
         return "sidus_admin.{$this->getAdmin()->getCode()}.{$this->getCode()}";
@@ -78,11 +87,15 @@ class Action
         return $this->admin;
     }
 
+    /**
+     * @return string
+     */
     public function getFormType()
     {
         if (null === $this->formType) {
             return $this->admin->getDefaultFormType();
         }
+
         return $this->formType;
     }
 }
