@@ -3,7 +3,6 @@
 namespace Sidus\AdminBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-use Elastica\Query;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\DataGridBundle\Model\DataGrid;
