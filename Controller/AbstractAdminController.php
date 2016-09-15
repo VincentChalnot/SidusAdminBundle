@@ -235,6 +235,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
 
         return new RedirectResponse($url, $status);
     }
+
     /**
      * @param Request $request
      * @param array   $parameters
