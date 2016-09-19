@@ -47,6 +47,7 @@ class AdminExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
+            new Twig_SimpleFunction('get_admins', [$this->adminConfigurationHandler, 'getAdmins']),
             new Twig_SimpleFunction('admin_path', [$this->adminRouter, 'generateAdminPath']),
             new Twig_SimpleFunction('entity_path', [$this->adminRouter, 'generateEntityPath']),
             new Twig_SimpleFunction('entity_admin', [$this->adminEntityMatcher, 'getAdminForEntity']),
