@@ -15,6 +15,9 @@ class AdminEntityMatcher
     /** @var AdminConfigurationHandler */
     protected $adminConfigurationHandler;
 
+    /** @var array */
+    protected $cache;
+
     /**
      * AdminEntityMatcher constructor.
      * @param AdminConfigurationHandler $adminConfigurationHandler
@@ -31,12 +34,20 @@ class AdminEntityMatcher
      */
     public function getAdminForEntity($entity)
     {
+        $class = get_class($entity);
+
+        if (array_key_exists($class, $this->cache)) {
+            return $this->cache[$class];
+        }
+
         foreach ($this->adminConfigurationHandler->getAdmins() as $admin) {
             if (is_a($entity, $admin->getEntity())) {
+                $this->cache[$class] = $admin;
+
                 return $admin;
             }
         }
-        $class = get_class($entity);
-        throw new \UnexpectedValueException("No admin matching for entity {$class}");
+
+        throw new \UnexpectedValueException("No admin matching for entity '{$class}'");
     }
 }
