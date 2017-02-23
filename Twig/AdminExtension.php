@@ -57,6 +57,7 @@ class AdminExtension extends Twig_Extension
 
     /**
      * @param string $code
+     *
      * @return Admin
      * @throws UnexpectedValueException
      */

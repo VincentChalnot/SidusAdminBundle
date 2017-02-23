@@ -16,10 +16,11 @@ class AdminEntityMatcher
     protected $adminConfigurationHandler;
 
     /** @var array */
-    protected $cache;
+    protected $cache = [];
 
     /**
      * AdminEntityMatcher constructor.
+     *
      * @param AdminConfigurationHandler $adminConfigurationHandler
      */
     public function __construct(AdminConfigurationHandler $adminConfigurationHandler)
@@ -29,6 +30,7 @@ class AdminEntityMatcher
 
     /**
      * @param mixed $entity
+     *
      * @return Admin
      * @throws \UnexpectedValueException
      */

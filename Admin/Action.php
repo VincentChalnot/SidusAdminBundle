@@ -38,10 +38,13 @@ class Action
         $this->formType = $c['form_type'];
         $this->template = $c['template'];
 
-        $defaults = array_merge([
-            '_controller' => $admin->getController().':'.$code,
-            '_admin' => $admin->getCode(),
-        ], $c['defaults']);
+        $defaults = array_merge(
+            [
+                '_controller' => $admin->getController().':'.$code,
+                '_admin' => $admin->getCode(),
+            ],
+            $c['defaults']
+        );
 
         $this->route = new Route(
             $this->getAdmin()->getPrefix().$c['path'],

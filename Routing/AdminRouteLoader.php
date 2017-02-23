@@ -21,6 +21,7 @@ class AdminRouteLoader extends Loader
 
     /**
      * AdminRouteLoader constructor.
+     *
      * @param AdminConfigurationHandler $adminConfigurationHandler
      */
     public function __construct(AdminConfigurationHandler $adminConfigurationHandler)
@@ -31,6 +32,7 @@ class AdminRouteLoader extends Loader
     /**
      * @param mixed $resource
      * @param null  $type
+     *
      * @return RouteCollection
      * @throws \RuntimeException
      */
@@ -56,6 +58,7 @@ class AdminRouteLoader extends Loader
     /**
      * @param mixed  $resource
      * @param string $type
+     *
      * @return bool
      */
     public function supports($resource, $type = null)

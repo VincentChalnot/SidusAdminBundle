@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * This is the class that loads and manages your bundle configuration.
  *
- * @link http://symfony.com/doc/current/cookbook/bundles/extension.html
+ * @link   http://symfony.com/doc/current/cookbook/bundles/extension.html
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
 class SidusAdminExtension extends Extension
@@ -31,12 +31,15 @@ class SidusAdminExtension extends Extension
 
         $container->setParameter('sidus_admin.templating.fallback_template', $this->globalConfig['fallback_template']);
 
-        foreach ($this->globalConfig['configurations'] as $code => $adminConfiguration) {
+        foreach ((array) $this->globalConfig['configurations'] as $code => $adminConfiguration) {
             $this->createAdminServiceDefinition($code, $adminConfiguration, $container);
         }
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
+        $loader->load('events.yml');
+        $loader->load('routing.yml');
         $loader->load('services.yml');
+        $loader->load('twig.yml');
     }
 
     /**
@@ -51,16 +54,20 @@ class SidusAdminExtension extends Extension
      * @param                  $code
      * @param array            $adminConfiguration
      * @param ContainerBuilder $container
+     *
      * @throws BadMethodCallException
      */
     protected function createAdminServiceDefinition($code, array $adminConfiguration, ContainerBuilder $container)
     {
         $adminConfiguration = $this->finalizeConfiguration($code, $adminConfiguration, $container);
 
-        $definition = new Definition($this->globalConfig['admin_class'], [
-            $code,
-            $adminConfiguration,
-        ]);
+        $definition = new Definition(
+            $this->globalConfig['admin_class'],
+            [
+                $code,
+                $adminConfiguration,
+            ]
+        );
         $definition->addTag('sidus.admin');
         $container->setDefinition('sidus_admin.admin.'.$code, $definition);
     }
@@ -69,6 +76,7 @@ class SidusAdminExtension extends Extension
      * @param                  $code
      * @param array            $adminConfiguration
      * @param ContainerBuilder $container
+     *
      * @return array
      */
     protected function finalizeConfiguration($code, array $adminConfiguration, ContainerBuilder $container)

@@ -1,0 +1,8 @@
+services:
+    sidus_admin.configuration.admin.handler:
+        class: Sidus\AdminBundle\Configuration\AdminConfigurationHandler
+
+    sidus_admin.entity.matcher:
+        class: Sidus\AdminBundle\Entity\AdminEntityMatcher
+        arguments: ['@sidus_admin.configuration.admin.handler']
+

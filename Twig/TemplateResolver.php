@@ -43,8 +43,13 @@ class TemplateResolver
     /**
      * @param Admin  $admin
      * @param Action $action
+     *
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
+     * @throws \Twig_Error_Loader
+     * @throws \UnexpectedValueException
+     *
      * @return \Twig_Template
-     * @throws \Twig_Error_Syntax|\Twig_Error_Loader|\UnexpectedValueException
      */
     public function getTemplate(Admin $admin = null, Action $action = null)
     {

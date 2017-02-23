@@ -21,6 +21,7 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Configuration constructor.
+     *
      * @param string $root
      */
     public function __construct($root = 'sidus_admin')
@@ -40,10 +41,10 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('admin_class')->defaultValue(Admin::class)->end()
-                ->scalarNode('action_class')->defaultValue(Action::class)->end()
-                ->scalarNode('fallback_template')->defaultNull()->end()
-                ->append($this->getAdminConfigTreeBuilder())
+            ->scalarNode('admin_class')->defaultValue(Admin::class)->end()
+            ->scalarNode('action_class')->defaultValue(Action::class)->end()
+            ->scalarNode('fallback_template')->defaultNull()->end()
+            ->append($this->getAdminConfigTreeBuilder())
             ->end();
 
         return $treeBuilder;
@@ -60,13 +61,13 @@ class Configuration implements ConfigurationInterface
         $adminDefinition = $node
             ->useAttributeAsKey('code')
             ->prototype('array')
-                ->performNoDeepMerging()
-                ->children();
+            ->performNoDeepMerging()
+            ->children();
 
         $this->appendAdminDefinition($adminDefinition);
 
         $adminDefinition->end()
-                ->end()
+            ->end()
             ->end();
 
         return $node;
@@ -86,15 +87,15 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('base_template')->defaultNull()->end()
             ->variableNode('options')->defaultValue([])->end()
             ->arrayNode('actions')
-                ->useAttributeAsKey('code')
-                ->prototype('array')
-                    ->performNoDeepMerging()
-                    ->children();
+            ->useAttributeAsKey('code')
+            ->prototype('array')
+            ->performNoDeepMerging()
+            ->children();
 
         $this->appendActionDefinition($actionDefinition);
 
         $actionDefinition->end()
-                    ->end()
+            ->end()
             ->end();
     }
 
@@ -107,7 +108,6 @@ class Configuration implements ConfigurationInterface
             // Custom parameters
             ->scalarNode('form_type')->defaultNull()->end()
             ->scalarNode('template')->defaultNull()->end()
-
             // Default route parameters
             ->scalarNode('path')->isRequired()->end()
             ->variableNode('defaults')->defaultValue([])->end()

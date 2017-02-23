@@ -32,6 +32,7 @@ class AdminControllerInjecter
 
     /**
      * @param FilterControllerEvent $event
+     *
      * @throws \LogicException|\UnexpectedValueException|\InvalidArgumentException
      */
     public function onKernelController(FilterControllerEvent $event)

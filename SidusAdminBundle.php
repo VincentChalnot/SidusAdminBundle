@@ -6,6 +6,9 @@ use Sidus\AdminBundle\DependencyInjection\Compiler\GenericCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * @package Sidus\AdminBundle
+ */
 class SidusAdminBundle extends Bundle
 {
     /**
@@ -15,9 +18,12 @@ class SidusAdminBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new GenericCompilerPass(
-            'sidus_admin.configuration.admin.handler',
-            'sidus.admin',
-            'addAdmin'));
+        $container->addCompilerPass(
+            new GenericCompilerPass(
+                'sidus_admin.configuration.admin.handler',
+                'sidus.admin',
+                'addAdmin'
+            )
+        );
     }
 }

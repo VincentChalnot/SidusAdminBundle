@@ -36,6 +36,7 @@ class AdminConfigurationHandler
 
     /**
      * @param string $code
+     *
      * @return Admin
      * @throws UnexpectedValueException
      */
@@ -50,6 +51,7 @@ class AdminConfigurationHandler
 
     /**
      * @param string $code
+     *
      * @return bool
      * @throws UnexpectedValueException
      */

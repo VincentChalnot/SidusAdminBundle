@@ -61,6 +61,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param DataGrid $dataGrid
      * @param Request  $request
      * @param array    $formOptions
+     *
      * @throws \Exception
      */
     protected function bindDataGridRequest(DataGrid $dataGrid, Request $request, array $formOptions = [])
@@ -79,10 +80,12 @@ abstract class AbstractAdminController extends Controller implements AdminInject
         $dataGrid->buildForm($builder);
         $dataGrid->handleRequest($request);
     }
+
     /**
      * @param Request $request
      * @param mixed   $data
      * @param array   $options
+     *
      * @return Form
      * @throws \InvalidArgumentException
      */
@@ -96,6 +99,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
 
     /**
      * @param mixed $data
+     *
      * @throws \Exception
      */
     protected function saveEntity($data)
@@ -110,6 +114,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
 
     /**
      * @param mixed $data
+     *
      * @throws \Exception
      */
     protected function deleteEntity($data)
@@ -126,6 +131,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param Request     $request
      * @param string      $dataId
      * @param Action|null $action
+     *
      * @return array
      * @throws \InvalidArgumentException
      */
@@ -148,6 +154,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     /**
      * @param Admin  $admin
      * @param Action $action
+     *
      * @return \Twig_Template
      * @throws \Exception
      */
@@ -160,6 +167,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param array       $parameters
      * @param Admin|null  $admin
      * @param Action|null $action
+     *
      * @return Response
      * @throws \Exception
      */
@@ -174,6 +182,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     /**
      * @param Request                       $request
      * @param array|ParamConverterInterface $configuration
+     *
      * @return mixed
      * @throws \Exception
      */
@@ -181,10 +190,12 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     {
         if (null === $configuration) {
             $configuration = [
-                new ParamConverter([
-                    'name' => 'data',
-                    'class' => $this->admin->getEntity(),
-                ]),
+                new ParamConverter(
+                    [
+                        'name' => 'data',
+                        'class' => $this->admin->getEntity(),
+                    ]
+                ),
             ];
         }
         $this->container->get('sensio_framework_extra.converter.manager')->apply($request, $configuration);
@@ -193,11 +204,12 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     }
 
     /**
-     * @param mixed $entity
+     * @param mixed  $entity
      * @param string $action
-     * @param array $parameters
-     * @param int $referenceType
-     * @param int $status
+     * @param array  $parameters
+     * @param int    $referenceType
+     * @param int    $status
+     *
      * @return RedirectResponse
      * @throws \Exception
      */
@@ -220,6 +232,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param array  $parameters
      * @param int    $referenceType
      * @param int    $status
+     *
      * @return RedirectResponse
      * @throws \Exception
      */
@@ -239,6 +252,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     /**
      * @param Request $request
      * @param array   $parameters
+     *
      * @return string
      * @throws \InvalidArgumentException
      */
@@ -253,6 +267,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * Alias to return the entity manager
      *
      * @param string|null $persistentManagerName
+     *
      * @return EntityManager
      * @throws \InvalidArgumentException
      * @throws \LogicException

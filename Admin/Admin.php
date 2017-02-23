@@ -53,7 +53,7 @@ class Admin
         $this->defaultFormType = $adminConfiguration['default_form_type'];
         $this->baseTemplate = $adminConfiguration['base_template'];
 
-        foreach ($adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
+        foreach ((array) $adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
             $this->actions[$actionCode] = new $actionClass($actionCode, $this, $actionConfiguration);
         }
     }
@@ -92,6 +92,7 @@ class Admin
 
     /**
      * @param string $code
+     *
      * @return Action
      * @throws \UnexpectedValueException
      */
@@ -106,6 +107,7 @@ class Admin
 
     /**
      * @param string $route
+     *
      * @return bool
      */
     public function hasRoute($route)
@@ -138,6 +140,7 @@ class Admin
     /**
      * @param string $option
      * @param mixed  $default
+     *
      * @return array
      */
     public function getOption($option, $default = null)
@@ -151,6 +154,7 @@ class Admin
 
     /**
      * @param string $option
+     *
      * @return bool
      */
     public function hasOption($option)
@@ -176,6 +180,7 @@ class Admin
 
     /**
      * @param string|Action $action
+     *
      * @throws \UnexpectedValueException
      */
     public function setCurrentAction($action)

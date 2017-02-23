@@ -1,0 +1,14 @@
+services:
+    sidus_admin.routing.route_loader:
+        class: Sidus\AdminBundle\Routing\AdminRouteLoader
+        arguments: ['@sidus_admin.configuration.admin.handler']
+        tags:
+            - { name: routing.loader }
+
+    sidus_admin.routing.admin_router:
+        class: Sidus\AdminBundle\Routing\AdminRouter
+        arguments:
+            - '@sidus_admin.configuration.admin.handler'
+            - '@sidus_admin.entity.matcher'
+            - '@router'
+            - '@property_accessor'

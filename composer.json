@@ -1,24 +1,28 @@
 {
-  "name": "sidus/admin-bundle",
-  "description": "Simple and extendable action-based admin management with built-in routing generation",
-  "keywords": [ "admin", "action" ],
-  "homepage": "https://github.com/VincentChalnot/SidusAdminBundle",
-  "type": "library",
-  "license": "GPL-2.0",
-  "authors": [
-    {
-      "name": "Vincent Chalnot",
-      "email": "vincent@sidus.fr",
-      "homepage": "http://chalnot.fr",
-      "role": "Developer"
+    "name": "sidus/admin-bundle",
+    "description": "Simple and extendable action-based admin management with built-in routing generation",
+    "keywords": [
+        "admin",
+        "action"
+    ],
+    "homepage": "https://github.com/VincentChalnot/SidusAdminBundle",
+    "type": "library",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Vincent Chalnot",
+            "email": "vincent@sidus.fr",
+            "homepage": "http://chalnot.fr",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Sidus\\AdminBundle\\": ""
+        }
+    },
+    "require": {
+        "php": ">=5.6",
+        "sidus/datagrid-bundle": "dev-v1.2.x-dev"
     }
-  ],
-  "target-dir": "Sidus/AdminBundle",
-  "autoload": {
-    "psr-0": { "Sidus\\AdminBundle": "" }
-  },
-  "require": {
-    "php": ">=5.6",
-    "sidus/datagrid-bundle": "dev-v1.2.x-dev"
-  }
 }

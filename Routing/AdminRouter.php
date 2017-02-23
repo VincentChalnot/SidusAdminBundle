@@ -54,6 +54,7 @@ class AdminRouter
      * @param string       $actionCode
      * @param array        $parameters
      * @param int          $referenceType
+     *
      * @return string
      * @throws \Exception
      */
@@ -79,6 +80,7 @@ class AdminRouter
      * @param string $actionCode
      * @param array  $parameters
      * @param int    $referenceType
+     *
      * @return string
      * @throws \Exception
      */
@@ -109,6 +111,7 @@ class AdminRouter
     /**
      * @param Route $route
      * @param array $parameters
+     *
      * @return array
      * @throws \LogicException
      */
