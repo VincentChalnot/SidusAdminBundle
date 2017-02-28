@@ -36,8 +36,10 @@ class AdminConfigurationHandler
 
     /**
      * @param string $code
-     * @return Admin
+     *
      * @throws UnexpectedValueException
+     *
+     * @return Admin
      */
     public function getAdmin($code)
     {
@@ -50,8 +52,8 @@ class AdminConfigurationHandler
 
     /**
      * @param string $code
+     *
      * @return bool
-     * @throws UnexpectedValueException
      */
     public function hasAdmin($code)
     {

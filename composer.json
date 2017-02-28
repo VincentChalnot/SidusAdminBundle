@@ -20,6 +20,6 @@
   "require": {
     "php": ">=5.4",
     "symfony/symfony": "~2.7.4|~2.8.6",
-    "sidus/datagrid-bundle": "dev-master"
+    "sidus/datagrid-bundle": "~1.1.0"
   }
 }
