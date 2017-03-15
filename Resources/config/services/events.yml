@@ -1,6 +1,6 @@
 services:
     sidus_admin.kernel.event.controller_injecter:
         class: Sidus\AdminBundle\Event\AdminControllerInjecter
-        arguments: ['@sidus_admin.configuration.admin.handler', '@twig']
+        arguments: ['@sidus_admin.configuration.admin.handler']
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }

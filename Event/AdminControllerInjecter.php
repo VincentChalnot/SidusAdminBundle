@@ -17,17 +17,12 @@ class AdminControllerInjecter
     /** @var AdminConfigurationHandler */
     protected $adminConfigurationHandler;
 
-    /** @var Twig_Environment */
-    protected $twig;
-
     /**
      * @param AdminConfigurationHandler $adminConfigurationHandler
-     * @param Twig_Environment          $twig
      */
-    public function __construct(AdminConfigurationHandler $adminConfigurationHandler, Twig_Environment $twig)
+    public function __construct(AdminConfigurationHandler $adminConfigurationHandler)
     {
         $this->adminConfigurationHandler = $adminConfigurationHandler;
-        $this->twig = $twig;
     }
 
     /**
@@ -57,7 +52,6 @@ class AdminControllerInjecter
         $admin = $this->adminConfigurationHandler->getAdmin($event->getRequest()->attributes->get('_admin'));
         $admin->setCurrentAction(substr($action, 0, -strlen('Action')));
         $controller->setAdmin($admin);
-        $this->twig->addGlobal('admin', $admin);
         $this->adminConfigurationHandler->setCurrentAdmin($admin);
     }
 }
