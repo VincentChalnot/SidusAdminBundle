@@ -98,11 +98,21 @@ class Admin
      */
     public function getAction($code)
     {
-        if (empty($this->actions[$code])) {
+        if (!$this->hasAction($code)) {
             throw new \UnexpectedValueException("No action with code: '{$code}' for admin '{$this->getCode()}'");
         }
 
         return $this->actions[$code];
+    }
+
+    /**
+     * @param string $code
+     *
+     * @return bool
+     */
+    public function hasAction($code)
+    {
+        return !empty($this->actions[$code]);
     }
 
     /**
