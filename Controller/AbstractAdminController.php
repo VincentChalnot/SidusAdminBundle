@@ -142,7 +142,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
         }
 
         return [
-            'action' => $this->getCurrentUri($request),
+            'action' => $this->getCurrentUri($request, $request->query->all()),
             'attr' => [
                 'novalidate' => 'novalidate',
                 'id' => "form_{$this->admin->getCode()}_{$action->getCode()}_{$dataId}",
