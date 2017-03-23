@@ -64,12 +64,7 @@ class AdminRouter
         array $parameters = [],
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ) {
-        if (null === $admin) {
-            $admin = $this->adminConfigurationHandler->getCurrentAdmin();
-        }
-        if (!$admin instanceof Admin) {
-            $admin = $this->adminConfigurationHandler->getAdmin($admin);
-        }
+        $admin = $this->getAdmin($admin);
         $routeName = $admin->getAction($actionCode)->getRouteName();
 
         return $this->router->generate($routeName, $parameters, $referenceType);
@@ -81,8 +76,9 @@ class AdminRouter
      * @param array  $parameters
      * @param int    $referenceType
      *
-     * @return string
      * @throws \Exception
+     *
+     * @return string
      */
     public function generateEntityPath(
         $entity,
@@ -91,6 +87,29 @@ class AdminRouter
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ) {
         $admin = $this->adminEntityMatcher->getAdminForEntity($entity);
+
+        return $this->generateAdminEntityPath($admin, $entity, $actionCode, $parameters, $referenceType);
+    }
+
+    /**
+     * @param string|Admin $admin
+     * @param mixed        $entity
+     * @param string       $actionCode
+     * @param array        $parameters
+     * @param int          $referenceType
+     *
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function generateAdminEntityPath(
+        $admin,
+        $entity,
+        $actionCode,
+        array $parameters = [],
+        $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ) {
+        $admin = $this->getAdmin($admin);
         $action = $admin->getAction($actionCode);
 
         $missingParams = $this->computeMissingRouteParameters($action->getRoute(), $parameters);
@@ -106,6 +125,25 @@ class AdminRouter
         }
 
         return $this->router->generate($action->getRouteName(), $parameters, $referenceType);
+    }
+
+    /**
+     * @param string|Admin $admin
+     *
+     * @throws \UnexpectedValueException
+     *
+     * @return Admin
+     */
+    protected function getAdmin($admin)
+    {
+        if (null === $admin) {
+            return $this->adminConfigurationHandler->getCurrentAdmin();
+        }
+        if ($admin instanceof Admin) {
+            return $admin;
+        }
+
+        return $this->adminConfigurationHandler->getAdmin($admin);
     }
 
     /**
