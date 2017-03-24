@@ -221,7 +221,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
         $status = 302
     ) {
         $url = $this->container->get('sidus_admin.routing.admin_router')
-            ->generateEntityPath($entity, $action, $parameters, $referenceType);
+            ->generateAdminEntityPath($this->admin, $entity, $action, $parameters, $referenceType);
 
         return new RedirectResponse($url, $status);
     }
