@@ -29,7 +29,10 @@ class SidusAdminExtension extends Extension
     {
         $this->globalConfig = $this->processConfiguration($this->createConfiguration(), $configs);
 
-        $container->setParameter('sidus_admin.templating.fallback_template', $this->globalConfig['fallback_template']);
+        $container->setParameter(
+            'sidus_admin.templating.fallback_template_directory',
+            $this->globalConfig['fallback_template_directory']
+        );
 
         foreach ((array) $this->globalConfig['configurations'] as $code => $adminConfiguration) {
             $this->createAdminServiceDefinition($code, $adminConfiguration, $container);

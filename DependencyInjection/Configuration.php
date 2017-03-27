@@ -43,7 +43,7 @@ class Configuration implements ConfigurationInterface
             ->children()
             ->scalarNode('admin_class')->defaultValue(Admin::class)->end()
             ->scalarNode('action_class')->defaultValue(Action::class)->end()
-            ->scalarNode('fallback_template')->defaultNull()->end()
+            ->scalarNode('fallback_template_directory')->defaultNull()->end()
             ->append($this->getAdminConfigTreeBuilder())
             ->end();
 
@@ -83,8 +83,8 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('prefix')->isRequired()->end()
             ->scalarNode('entity')->isRequired()->end()
             ->scalarNode('action_class')->end()
-            ->scalarNode('default_form_type')->defaultNull()->end()
             ->scalarNode('base_template')->defaultNull()->end()
+            ->scalarNode('fallback_template_directory')->defaultNull()->end()
             ->variableNode('options')->defaultValue([])->end()
             ->arrayNode('actions')
             ->useAttributeAsKey('code')

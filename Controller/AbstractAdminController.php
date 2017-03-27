@@ -48,8 +48,9 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     }
 
     /**
-     * @return DataGrid
      * @throws \UnexpectedValueException
+     *
+     * @return DataGrid
      */
     protected function getDataGrid()
     {
@@ -86,13 +87,19 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param mixed   $data
      * @param array   $options
      *
-     * @return Form
+     * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
+     *
+     * @return Form
      */
     protected function getForm(Request $request, $data, array $options = [])
     {
         $action = $this->admin->getCurrentAction();
-        $defaultOptions = $this->getDefaultFormOptions($request, $data ? $data->getId() : 'new');
+        if (!$action->getFormType()) {
+            throw new \UnexpectedValueException("Missing parameter 'form_type' for action '{$action->getCode()}'");
+        }
+
+        $defaultOptions = $this->getDefaultFormOptions($request, $data ? $data->getId() : null, $action);
 
         return $this->createForm($action->getFormType(), $data, array_merge($defaultOptions, $options));
     }
@@ -132,17 +139,19 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param string      $dataId
      * @param Action|null $action
      *
-     * @return array
      * @throws \InvalidArgumentException
+     *
+     * @return array
      */
     protected function getDefaultFormOptions(Request $request, $dataId, Action $action = null)
     {
         if (!$action) {
             $action = $this->admin->getCurrentAction();
         }
+        $dataId = $dataId ?: 'new';
 
         return [
-            'action' => $this->getCurrentUri($request, $request->query->all()),
+            'action' => $this->getCurrentUri($request),
             'attr' => [
                 'novalidate' => 'novalidate',
                 'id' => "form_{$this->admin->getCode()}_{$action->getCode()}_{$dataId}",
@@ -152,29 +161,34 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     }
 
     /**
-     * @param Admin  $admin
      * @param Action $action
+     * @param string $templateType
+     *
+     * @throws \Exception
      *
      * @return \Twig_Template
-     * @throws \Exception
      */
-    protected function getTemplate(Admin $admin = null, Action $action = null)
+    protected function getTemplate(Action $action = null, $templateType = 'html')
     {
-        return $this->container->get('sidus_admin.templating.template_resolver')->getTemplate($admin, $action);
+        return $this->container->get('sidus_admin.templating.template_resolver')->getTemplate(
+            $this->admin,
+            $action,
+            $templateType
+        );
     }
 
     /**
      * @param array       $parameters
-     * @param Admin|null  $admin
      * @param Action|null $action
      *
-     * @return Response
      * @throws \Exception
+     *
+     * @return Response
      */
-    protected function renderAction(array $parameters = [], Admin $admin = null, Action $action = null)
+    protected function renderAction(array $parameters = [], Action $action = null)
     {
         $response = new Response();
-        $response->setContent($this->getTemplate($admin, $action)->render($parameters));
+        $response->setContent($this->getTemplate($action)->render($parameters));
 
         return $response;
     }
@@ -183,8 +197,9 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param Request                       $request
      * @param array|ParamConverterInterface $configuration
      *
-     * @return mixed
      * @throws \Exception
+     *
+     * @return mixed
      */
     protected function getDataFromRequest(Request $request, $configuration = null)
     {
@@ -210,8 +225,9 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param int    $referenceType
      * @param int    $status
      *
-     * @return RedirectResponse
      * @throws \Exception
+     *
+     * @return RedirectResponse
      */
     protected function redirectToEntity(
         $entity,
@@ -227,24 +243,23 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     }
 
     /**
-     * @param string $admin
      * @param string $action
      * @param array  $parameters
      * @param int    $referenceType
      * @param int    $status
      *
-     * @return RedirectResponse
      * @throws \Exception
+     *
+     * @return RedirectResponse
      */
-    protected function redirectToAdmin(
-        $admin,
+    protected function redirectToAction(
         $action,
         array $parameters = [],
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
         $status = 302
     ) {
         $url = $this->container->get('sidus_admin.routing.admin_router')
-            ->generateAdminPath($admin, $action, $parameters, $referenceType);
+            ->generateAdminPath($this->admin, $action, $parameters, $referenceType);
 
         return new RedirectResponse($url, $status);
     }
@@ -253,8 +268,9 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param Request $request
      * @param array   $parameters
      *
-     * @return string
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     protected function getCurrentUri(Request $request, array $parameters = [])
     {
@@ -268,9 +284,10 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      *
      * @param string|null $persistentManagerName
      *
-     * @return EntityManager
      * @throws \InvalidArgumentException
      * @throws \LogicException
+     *
+     * @return EntityManager
      */
     protected function getManager($persistentManagerName = null)
     {

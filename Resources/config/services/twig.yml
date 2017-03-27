@@ -10,4 +10,8 @@ services:
 
     sidus_admin.templating.template_resolver:
         class: Sidus\AdminBundle\Twig\TemplateResolver
-        arguments: ['@sidus_admin.configuration.admin.handler', '@twig', '%sidus_admin.templating.fallback_template%']
+        arguments:
+            - '@sidus_admin.configuration.admin.handler'
+            - '@twig'
+            - '%sidus_admin.templating.fallback_template_directory%'
+            - '@logger'

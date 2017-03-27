@@ -95,10 +95,14 @@ class Action
      */
     public function getFormType()
     {
-        if (null === $this->formType) {
-            return $this->admin->getDefaultFormType();
-        }
-
         return $this->formType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplate()
+    {
+        return $this->template;
     }
 }

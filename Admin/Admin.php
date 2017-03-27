@@ -2,6 +2,8 @@
 
 namespace Sidus\AdminBundle\Admin;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 /**
  * The admin serves as an action holder and is attached to a Doctrine entity
  *
@@ -30,8 +32,8 @@ class Admin
     /** @var string */
     protected $currentAction;
 
-    /** @var mixed */
-    protected $defaultFormType;
+    /** @var string */
+    protected $fallbackTemplateDirectory;
 
     /** @var string */
     protected $baseTemplate;
@@ -50,7 +52,7 @@ class Admin
         $actionClass = $adminConfiguration['action_class'];
         $this->entity = $adminConfiguration['entity'];
         $this->options = $adminConfiguration['options'];
-        $this->defaultFormType = $adminConfiguration['default_form_type'];
+        $this->fallbackTemplateDirectory = $adminConfiguration['fallback_template_directory'];
         $this->baseTemplate = $adminConfiguration['base_template'];
 
         foreach ((array) $adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
@@ -173,11 +175,11 @@ class Admin
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getDefaultFormType()
+    public function getFallbackTemplateDirectory()
     {
-        return $this->defaultFormType;
+        return $this->fallbackTemplateDirectory;
     }
 
     /**
