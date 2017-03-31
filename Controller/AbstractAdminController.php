@@ -89,6 +89,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      *
      * @return Form
      */
@@ -101,7 +102,14 @@ abstract class AbstractAdminController extends Controller implements AdminInject
 
         $defaultOptions = $this->getDefaultFormOptions($request, $data ? $data->getId() : null, $action);
 
-        return $this->createForm($action->getFormType(), $data, array_merge($defaultOptions, $options));
+        $builder = $this->get('form.factory')->createNamedBuilder(
+            "form_{$this->admin->getCode()}_{$action->getCode()}",
+            $action->getFormType(),
+            $data,
+            array_merge($defaultOptions, $options)
+        );
+
+        return $builder->getForm();
     }
 
     /**

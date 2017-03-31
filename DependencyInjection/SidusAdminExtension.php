@@ -72,6 +72,7 @@ class SidusAdminExtension extends Extension
             ]
         );
         $definition->addTag('sidus.admin');
+        $definition->setPublic(false);
         $container->setDefinition('sidus_admin.admin.'.$code, $definition);
     }
 
