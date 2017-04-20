@@ -100,7 +100,8 @@ abstract class AbstractAdminController extends Controller implements AdminInject
             throw new \UnexpectedValueException("Missing parameter 'form_type' for action '{$action->getCode()}'");
         }
 
-        $defaultOptions = $this->getDefaultFormOptions($request, $data ? $data->getId() : null, $action);
+        $dataId = $data && method_exists($data, 'getId') ? $data->getId() : null;
+        $defaultOptions = $this->getDefaultFormOptions($request, $dataId, $action);
 
         $builder = $this->get('form.factory')->createNamedBuilder(
             "form_{$this->admin->getCode()}_{$action->getCode()}",
