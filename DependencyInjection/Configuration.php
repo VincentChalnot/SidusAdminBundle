@@ -107,6 +107,7 @@ class Configuration implements ConfigurationInterface
         $actionDefinition
             // Custom parameters
             ->scalarNode('form_type')->defaultNull()->end()
+            ->variableNode('form_options')->defaultValue([])->end()
             ->scalarNode('template')->defaultNull()->end()
             // Default route parameters
             ->scalarNode('path')->isRequired()->end()

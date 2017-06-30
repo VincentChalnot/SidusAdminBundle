@@ -159,14 +159,17 @@ abstract class AbstractAdminController extends Controller implements AdminInject
         }
         $dataId = $dataId ?: 'new';
 
-        return [
-            'action' => $this->getCurrentUri($request),
-            'attr' => [
-                'novalidate' => 'novalidate',
-                'id' => "form_{$this->admin->getCode()}_{$action->getCode()}_{$dataId}",
-            ],
-            'method' => 'post',
-        ];
+        return array_merge(
+            $action->getFormOptions(),
+            [
+                'action' => $this->getCurrentUri($request),
+                'attr' => [
+                    'novalidate' => 'novalidate',
+                    'id' => "form_{$this->admin->getCode()}_{$action->getCode()}_{$dataId}",
+                ],
+                'method' => 'post',
+            ]
+        );
     }
 
     /**

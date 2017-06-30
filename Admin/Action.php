@@ -23,6 +23,9 @@ class Action
     /** @var mixed */
     protected $formType;
 
+    /** @var array */
+    protected $formOptions;
+
     /** @var string */
     protected $template;
 
@@ -36,6 +39,7 @@ class Action
         $this->code = $code;
         $this->admin = $admin;
         $this->formType = $c['form_type'];
+        $this->formOptions = $c['form_options'];
         $this->template = $c['template'];
 
         $defaults = array_merge(
@@ -96,6 +100,14 @@ class Action
     public function getFormType()
     {
         return $this->formType;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFormOptions()
+    {
+        return $this->formOptions;
     }
 
     /**
