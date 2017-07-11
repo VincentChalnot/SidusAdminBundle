@@ -2,8 +2,6 @@
 
 namespace Sidus\AdminBundle\Admin;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 /**
  * The admin serves as an action holder and is attached to a Doctrine entity
  *
