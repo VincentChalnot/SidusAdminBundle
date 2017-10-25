@@ -27,7 +27,7 @@ class Admin
     /** @var string */
     protected $entity;
 
-    /** @var string */
+    /** @var Action */
     protected $currentAction;
 
     /** @var string */
@@ -93,8 +93,9 @@ class Admin
     /**
      * @param string $code
      *
-     * @return Action
      * @throws \UnexpectedValueException
+     *
+     * @return Action
      */
     public function getAction($code)
     {
@@ -151,7 +152,7 @@ class Admin
      * @param string $option
      * @param mixed  $default
      *
-     * @return array
+     * @return mixed
      */
     public function getOption($option, $default = null)
     {
