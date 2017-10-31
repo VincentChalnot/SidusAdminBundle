@@ -117,9 +117,14 @@ class AdminRouter
             try {
                 $parameters[$missingParam] = $this->accessor->getValue($entity, $missingParam);
             } catch (\Exception $e) {
-                $contextParam = $this->router->getContext()->getParameter($missingParam);
-                if (null !== $contextParam) {
-                    $parameters[$missingParam] = $contextParam;
+                try {
+                    // Fallback to array syntax
+                    $parameters[$missingParam] = $this->accessor->getValue($entity, "[{$missingParam}]");
+                } catch (\Exception $e) {
+                    $contextParam = $this->router->getContext()->getParameter($missingParam);
+                    if (null !== $contextParam) {
+                        $parameters[$missingParam] = $contextParam;
+                    }
                 }
             }
         }
