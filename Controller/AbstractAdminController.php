@@ -54,7 +54,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function getDataGrid()
     {
-        return $this->get('sidus_data_grid.datagrid_configuration.handler')
+        return $this->get('sidus_data_grid.registry.datagrid')
             ->getDataGrid($this->getDataGridConfigCode());
     }
 
