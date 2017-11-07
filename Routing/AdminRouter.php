@@ -63,11 +63,19 @@ class AdminRouter
         $actionCode,
         array $parameters = [],
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
-    ) {
+    ): string {
         $admin = $this->getAdmin($admin);
-        $routeName = $admin->getAction($actionCode)->getRouteName();
+        $action = $admin->getAction($actionCode);
 
-        return $this->router->generate($routeName, $parameters, $referenceType);
+        $missingParams = $this->computeMissingRouteParameters($action->getRoute(), $parameters);
+        foreach ($missingParams as $missingParam) {
+            $contextParam = $this->router->getContext()->getParameter($missingParam);
+            if (null !== $contextParam) {
+                $parameters[$missingParam] = $contextParam;
+            }
+        }
+
+        return $this->router->generate($action->getRouteName(), $parameters, $referenceType);
     }
 
     /**
@@ -85,7 +93,7 @@ class AdminRouter
         $actionCode,
         array $parameters = [],
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
-    ) {
+    ): string {
         $admin = $this->adminEntityMatcher->getAdminForEntity($entity);
 
         return $this->generateAdminEntityPath($admin, $entity, $actionCode, $parameters, $referenceType);
@@ -108,7 +116,7 @@ class AdminRouter
         $actionCode,
         array $parameters = [],
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
-    ) {
+    ): string {
         $admin = $this->getAdmin($admin);
         $action = $admin->getAction($actionCode);
 
@@ -139,7 +147,7 @@ class AdminRouter
      *
      * @return Admin
      */
-    protected function getAdmin($admin)
+    protected function getAdmin($admin): Admin
     {
         if (null === $admin) {
             return $this->adminConfigurationHandler->getCurrentAdmin();
@@ -155,10 +163,11 @@ class AdminRouter
      * @param Route $route
      * @param array $parameters
      *
-     * @return array
      * @throws \LogicException
+     *
+     * @return array
      */
-    protected function computeMissingRouteParameters(Route $route, array $parameters)
+    protected function computeMissingRouteParameters(Route $route, array $parameters): array
     {
         $compiledRoute = $route->compile();
         $variables = array_flip($compiledRoute->getVariables());

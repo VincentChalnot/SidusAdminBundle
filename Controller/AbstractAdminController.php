@@ -36,7 +36,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     /**
      * @return string
      */
-    protected function getDataGridConfigCode()
+    protected function getDataGridConfigCode(): string
     {
         // Check if datagrid code is set in options
         $datagridCode = $this->admin->getOption('datagrid');
@@ -49,10 +49,14 @@ abstract class AbstractAdminController extends Controller implements AdminInject
 
     /**
      * @throws \UnexpectedValueException
+     * @throws \Sidus\FilterBundle\Exception\MissingQueryHandlerFactoryException
+     * @throws \Sidus\FilterBundle\Exception\MissingQueryHandlerException
+     * @throws \Sidus\FilterBundle\Exception\MissingFilterException
+     * @throws \Symfony\Component\PropertyAccess\Exception\ExceptionInterface
      *
      * @return DataGrid
      */
-    protected function getDataGrid()
+    protected function getDataGrid(): DataGrid
     {
         return $this->get('sidus_data_grid.registry.datagrid')
             ->getDataGrid($this->getDataGridConfigCode());
