@@ -7,6 +7,8 @@ use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\DataGridBundle\Model\DataGrid;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -95,26 +97,37 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      *
-     * @return Form
+     * @return FormInterface
      */
-    protected function getForm(Request $request, $data, array $options = [])
+    protected function getForm(Request $request, $data, array $options = []): FormInterface
     {
         $action = $this->admin->getCurrentAction();
         if (!$action->getFormType()) {
             throw new \UnexpectedValueException("Missing parameter 'form_type' for action '{$action->getCode()}'");
         }
-
         $dataId = $data && method_exists($data, 'getId') ? $data->getId() : null;
         $defaultOptions = $this->getDefaultFormOptions($request, $dataId, $action);
 
-        $builder = $this->get('form.factory')->createNamedBuilder(
+        return $this->getFormBuilder($action, $data, array_merge($defaultOptions, $options))->getForm();
+    }
+
+    /**
+     * @param Action $action
+     * @param        $data
+     * @param array  $options
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     *
+     * @return FormBuilderInterface
+     */
+    protected function getFormBuilder(Action $action, $data, array $options = []): FormBuilderInterface
+    {
+        return $this->get('form.factory')->createNamedBuilder(
             "form_{$this->admin->getCode()}_{$action->getCode()}",
             $action->getFormType(),
             $data,
-            array_merge($defaultOptions, $options)
+            $options
         );
-
-        return $builder->getForm();
     }
 
     /**
