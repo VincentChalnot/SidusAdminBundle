@@ -102,9 +102,6 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     protected function getForm(Request $request, $data, array $options = []): FormInterface
     {
         $action = $this->admin->getCurrentAction();
-        if (!$action->getFormType()) {
-            throw new \UnexpectedValueException("Missing parameter 'form_type' for action '{$action->getCode()}'");
-        }
         $dataId = $data && method_exists($data, 'getId') ? $data->getId() : null;
         $defaultOptions = $this->getDefaultFormOptions($request, $dataId, $action);
 
@@ -116,12 +113,17 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      * @param        $data
      * @param array  $options
      *
+     * @throws \UnexpectedValueException
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      *
      * @return FormBuilderInterface
      */
     protected function getFormBuilder(Action $action, $data, array $options = []): FormBuilderInterface
     {
+        if (!$action->getFormType()) {
+            throw new \UnexpectedValueException("Missing parameter 'form_type' for action '{$action->getCode()}'");
+        }
+
         return $this->get('form.factory')->createNamedBuilder(
             "form_{$this->admin->getCode()}_{$action->getCode()}",
             $action->getFormType(),
