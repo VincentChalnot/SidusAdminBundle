@@ -13,7 +13,7 @@ use UnexpectedValueException;
 class AdminConfigurationHandler
 {
     /** @var Admin[] */
-    protected $admins;
+    protected $admins = [];
 
     /** @var Admin */
     protected $currentAdmin;
@@ -29,7 +29,7 @@ class AdminConfigurationHandler
     /**
      * @return Admin[]
      */
-    public function getAdmins()
+    public function getAdmins(): array
     {
         return $this->admins;
     }
@@ -37,10 +37,11 @@ class AdminConfigurationHandler
     /**
      * @param string $code
      *
-     * @return Admin
      * @throws UnexpectedValueException
+     *
+     * @return Admin
      */
-    public function getAdmin($code)
+    public function getAdmin(string $code): Admin
     {
         if (empty($this->admins[$code])) {
             throw new UnexpectedValueException("No admin with code: {$code}");
@@ -53,16 +54,15 @@ class AdminConfigurationHandler
      * @param string $code
      *
      * @return bool
-     * @throws UnexpectedValueException
      */
-    public function hasAdmin($code)
+    public function hasAdmin(string $code): bool
     {
         return isset($this->admins[$code]);
     }
 
 
     /**
-     * @return Admin
+     * @return Admin|null
      */
     public function getCurrentAdmin()
     {
