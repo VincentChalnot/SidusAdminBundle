@@ -33,7 +33,7 @@ class AdminControllerInjecter
     public function onKernelController(FilterControllerEvent $event)
     {
         $controller = $event->getController();
-        if (!is_array($controller)) {
+        if (!\is_array($controller)) {
             return;
         }
 
@@ -41,16 +41,21 @@ class AdminControllerInjecter
         if (!$controller instanceof AdminInjectableInterface) {
             return;
         }
-        if (!$event->getRequest()->attributes->has('_admin')) {
-            $routeName = $event->getRequest()->attributes->get('_route');
+        $request = $event->getRequest();
+        if (!$request->attributes->has('_admin')) {
+            $routeName = $request->attributes->get('_route');
 
             $m = "Missing request attribute '_admin' for route {$routeName},";
             $m .= 'this means you declared this route outside the admin configuration, please include the _admin';
             $m .= 'attribute in your route definition or use the admin configuration';
             throw new \LogicException($m);
         }
-        $admin = $this->adminConfigurationHandler->getAdmin($event->getRequest()->attributes->get('_admin'));
-        $admin->setCurrentAction(substr($action, 0, -strlen('Action')));
+        $admin = $this->adminConfigurationHandler->getAdmin($request->attributes->get('_admin'));
+        if ($request->attributes->has('_action')) {
+            $admin->setCurrentAction($request->attributes->get('_action'));
+        } else {
+            $admin->setCurrentAction(substr($action, 0, -\strlen('Action'))); // Kept for back-compat
+        }
         $controller->setAdmin($admin);
         $this->adminConfigurationHandler->setCurrentAdmin($admin);
     }

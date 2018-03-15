@@ -46,6 +46,7 @@ class Action
             [
                 '_controller' => $admin->getController().':'.$code,
                 '_admin' => $admin->getCode(),
+                '_action' => $code,
             ],
             $c['defaults']
         );
