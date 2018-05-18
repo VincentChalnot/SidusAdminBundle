@@ -1,21 +1,28 @@
 <?php
+/*
+ * This file is part of the Sidus/AdminBundle package.
+ *
+ * Copyright (c) 2015-2018 Vincent Chalnot
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Sidus\AdminBundle\DependencyInjection;
 
-use Symfony\Component\Config\FileLocator;
+use Sidus\BaseBundle\DependencyInjection\SidusBaseExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
-use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * This is the class that loads and manages your bundle configuration.
  *
  * @link   http://symfony.com/doc/current/cookbook/bundles/extension.html
+ *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class SidusAdminExtension extends Extension
+class SidusAdminExtension extends SidusBaseExtension
 {
     /** @var array */
     protected $globalConfig;
@@ -38,11 +45,7 @@ class SidusAdminExtension extends Extension
             $this->createAdminServiceDefinition($code, $adminConfiguration, $container);
         }
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
-        $loader->load('events.yml');
-        $loader->load('routing.yml');
-        $loader->load('services.yml');
-        $loader->load('twig.yml');
+        parent::load($configs, $container);
     }
 
     /**
@@ -54,7 +57,7 @@ class SidusAdminExtension extends Extension
     }
 
     /**
-     * @param                  $code
+     * @param string           $code
      * @param array            $adminConfiguration
      * @param ContainerBuilder $container
      *
@@ -77,7 +80,7 @@ class SidusAdminExtension extends Extension
     }
 
     /**
-     * @param                  $code
+     * @param string           $code
      * @param array            $adminConfiguration
      * @param ContainerBuilder $container
      *

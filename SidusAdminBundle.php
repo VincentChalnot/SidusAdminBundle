@@ -5,6 +5,7 @@ namespace Sidus\AdminBundle;
 use Sidus\BaseBundle\DependencyInjection\Compiler\GenericCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 
 /**
  * @package Sidus\AdminBundle
@@ -20,7 +21,7 @@ class SidusAdminBundle extends Bundle
     {
         $container->addCompilerPass(
             new GenericCompilerPass(
-                'sidus_admin.configuration.admin.handler',
+                AdminConfigurationHandler::class,
                 'sidus.admin',
                 'addAdmin'
             )

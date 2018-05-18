@@ -1,14 +1,15 @@
 services:
-    sidus_admin.routing.route_loader:
+    Sidus\AdminBundle\Routing\AdminRouteLoader:
         class: Sidus\AdminBundle\Routing\AdminRouteLoader
-        arguments: ['@sidus_admin.configuration.admin.handler']
+        public: false
+        arguments: ['@Sidus\AdminBundle\Configuration\AdminConfigurationHandler']
         tags:
             - { name: routing.loader }
 
-    sidus_admin.routing.admin_router:
+    Sidus\AdminBundle\Routing\AdminRouter:
         class: Sidus\AdminBundle\Routing\AdminRouter
         arguments:
-            - '@sidus_admin.configuration.admin.handler'
-            - '@sidus_admin.entity.matcher'
+            - '@Sidus\AdminBundle\Configuration\AdminConfigurationHandler'
+            - '@Sidus\AdminBundle\Entity\AdminEntityMatcher'
             - '@router'
             - '@property_accessor'

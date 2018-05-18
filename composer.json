@@ -7,7 +7,7 @@
     ],
     "homepage": "https://github.com/VincentChalnot/SidusAdminBundle",
     "type": "library",
-    "license": "LGPL-3.0-or-later",
+    "license": "MIT",
     "authors": [
         {
             "name": "Vincent Chalnot",
@@ -22,7 +22,7 @@
         }
     },
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.1",
         "sidus/datagrid-bundle": "dev-v1.3-dev",
         "sidus/base-bundle": "~1.0"
     }

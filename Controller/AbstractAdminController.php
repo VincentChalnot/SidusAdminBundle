@@ -1,10 +1,19 @@
 <?php
+/*
+ * This file is part of the Sidus/AdminBundle package.
+ *
+ * Copyright (c) 2015-2018 Vincent Chalnot
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Sidus\AdminBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
+use Sidus\AdminBundle\Twig\TemplateResolver;
 use Sidus\DataGridBundle\Model\DataGrid;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,6 +25,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInte
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Sidus\AdminBundle\Routing\AdminRouter;
 
 /**
  * This class should cover all the basic needs to create admin based controllers
@@ -201,7 +211,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function getTemplate(Action $action = null, $templateType = 'html')
     {
-        return $this->container->get('sidus_admin.templating.template_resolver')->getTemplate(
+        return $this->container->get(TemplateResolver::class)->getTemplate(
             $this->admin,
             $action,
             $templateType
@@ -267,7 +277,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
         $status = 302
     ) {
-        $url = $this->container->get('sidus_admin.routing.admin_router')
+        $url = $this->container->get(AdminRouter::class)
             ->generateAdminEntityPath($this->admin, $entity, $action, $parameters, $referenceType);
 
         return new RedirectResponse($url, $status);
@@ -289,7 +299,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
         $status = 302
     ) {
-        $url = $this->container->get('sidus_admin.routing.admin_router')
+        $url = $this->container->get(AdminRouter::class)
             ->generateAdminPath($this->admin, $action, $parameters, $referenceType);
 
         return new RedirectResponse($url, $status);

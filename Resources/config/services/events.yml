@@ -1,6 +1,7 @@
 services:
-    sidus_admin.kernel.event.controller_injecter:
+    Sidus\AdminBundle\Event\AdminControllerInjecter:
         class: Sidus\AdminBundle\Event\AdminControllerInjecter
-        arguments: ['@sidus_admin.configuration.admin.handler']
+        public: false
+        arguments: ['@Sidus\AdminBundle\Configuration\AdminConfigurationHandler']
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
