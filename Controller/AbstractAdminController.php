@@ -15,6 +15,7 @@ use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Twig\TemplateResolver;
 use Sidus\DataGridBundle\Model\DataGrid;
+use Sidus\DataGridBundle\Registry\DataGridRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -70,7 +71,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function getDataGrid(): DataGrid
     {
-        return $this->get('sidus_data_grid.registry.datagrid')
+        return $this->get(DataGridRegistry::class)
             ->getDataGrid($this->getDataGridConfigCode());
     }
 
