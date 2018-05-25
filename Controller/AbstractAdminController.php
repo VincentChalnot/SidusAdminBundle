@@ -10,7 +10,8 @@
 
 namespace Sidus\AdminBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Twig\TemplateResolver;
@@ -149,9 +150,9 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function saveEntity($data)
     {
-        $em = $this->getManager();
-        $em->persist($data);
-        $em->flush();
+        $entityManager = $this->getManagerForEntity($data);
+        $entityManager->persist($data);
+        $entityManager->flush();
 
         $action = $this->admin->getCurrentAction();
         $this->addFlash('success', $this->translate("admin.flash.{$action->getCode()}.success"));
@@ -164,9 +165,9 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function deleteEntity($data)
     {
-        $em = $this->getManager();
-        $em->remove($data);
-        $em->flush();
+        $entityManager = $this->getManagerForEntity($data);
+        $entityManager->remove($data);
+        $entityManager->flush();
 
         $action = $this->admin->getCurrentAction();
         $this->addFlash('success', $this->translate("admin.flash.{$action->getCode()}.success"));
@@ -218,17 +219,21 @@ abstract class AbstractAdminController extends Controller implements AdminInject
         );
     }
 
+    /** @noinspection PhpDocMissingThrowsInspection */
     /**
      * @param array       $parameters
      * @param Action|null $action
      *
-     * @throws \Exception
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      *
      * @return Response
      */
     protected function renderAction(array $parameters = [], Action $action = null)
     {
         $response = new Response();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         $response->setContent($this->getTemplate($action)->render($parameters));
 
         return $response;
@@ -323,16 +328,38 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     /**
      * Alias to return the entity manager
      *
+     * @deprecated, use the getManagerForEntity method instead
+     *
      * @param string|null $persistentManagerName
      *
      * @throws \InvalidArgumentException
      * @throws \LogicException
      *
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
     protected function getManager($persistentManagerName = null)
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+
         return $this->getDoctrine()->getManager($persistentManagerName);
+    }
+
+    /**
+     * @param mixed $entity
+     *
+     * @throws \LogicException
+     *
+     * @return EntityManagerInterface
+     */
+    protected function getManagerForEntity($entity)
+    {
+        $class = ClassUtils::getClass($entity);
+        $entityManager = $this->getDoctrine()->getManagerForClass($class);
+        if (!$entityManager instanceof EntityManagerInterface) {
+            throw new \InvalidArgumentException("No manager found for class {$class}");
+        }
+
+        return $entityManager;
     }
 
     /**
@@ -347,7 +374,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      *
      * @return string The translated string
      */
-    protected function translate($id, array $parameters = array(), $domain = null, $locale = null)
+    protected function translate($id, array $parameters = [], $domain = null, $locale = null)
     {
         return $this->get('translator')->trans($id, $parameters, $domain, $locale);
     }
