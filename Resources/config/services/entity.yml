@@ -1,0 +1,4 @@
+services:
+    Sidus\AdminBundle\Entity\AdminEntityMatcher:
+        class: Sidus\AdminBundle\Entity\AdminEntityMatcher
+        arguments: ['@Sidus\AdminBundle\Configuration\AdminConfigurationHandler']

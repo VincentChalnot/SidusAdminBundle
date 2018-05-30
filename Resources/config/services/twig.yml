@@ -1,17 +1,17 @@
 services:
-    sidus_admin.twig.extension.admin:
+    Sidus\AdminBundle\Twig\AdminExtension:
         class: Sidus\AdminBundle\Twig\AdminExtension
         arguments:
-            - '@sidus_admin.configuration.admin.handler'
-            - '@sidus_admin.entity.matcher'
-            - '@sidus_admin.routing.admin_router'
+            - '@Sidus\AdminBundle\Configuration\AdminConfigurationHandler'
+            - '@Sidus\AdminBundle\Entity\AdminEntityMatcher'
+            - '@Sidus\AdminBundle\Routing\AdminRouter'
         tags:
             - { name: twig.extension }
 
-    sidus_admin.templating.template_resolver:
+    Sidus\AdminBundle\Twig\TemplateResolver:
         class: Sidus\AdminBundle\Twig\TemplateResolver
         arguments:
-            - '@sidus_admin.configuration.admin.handler'
+            - '@Sidus\AdminBundle\Configuration\AdminConfigurationHandler'
             - '@twig'
             - '%sidus_admin.templating.fallback_template_directory%'
             - '@logger'

@@ -1,11 +1,22 @@
 <?php
+/*
+ * This file is part of the Sidus/AdminBundle package.
+ *
+ * Copyright (c) 2015-2018 Vincent Chalnot
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Sidus\AdminBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
+use Sidus\AdminBundle\Twig\TemplateResolver;
 use Sidus\DataGridBundle\Model\DataGrid;
+use Sidus\DataGridBundle\Registry\DataGridRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -13,9 +24,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Sidus\AdminBundle\Routing\AdminRouter;
 
 /**
  * This class should cover all the basic needs to create admin based controllers
@@ -60,7 +71,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function getDataGrid(): DataGrid
     {
-        return $this->get('sidus_data_grid.registry.datagrid')
+        return $this->get(DataGridRegistry::class)
             ->getDataGrid($this->getDataGridConfigCode());
     }
 
@@ -139,9 +150,9 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function saveEntity($data)
     {
-        $em = $this->getManager();
-        $em->persist($data);
-        $em->flush();
+        $entityManager = $this->getManagerForEntity($data);
+        $entityManager->persist($data);
+        $entityManager->flush();
 
         $action = $this->admin->getCurrentAction();
         $this->addFlash('success', $this->translate("admin.flash.{$action->getCode()}.success"));
@@ -154,9 +165,9 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function deleteEntity($data)
     {
-        $em = $this->getManager();
-        $em->remove($data);
-        $em->flush();
+        $entityManager = $this->getManagerForEntity($data);
+        $entityManager->remove($data);
+        $entityManager->flush();
 
         $action = $this->admin->getCurrentAction();
         $this->addFlash('success', $this->translate("admin.flash.{$action->getCode()}.success"));
@@ -201,24 +212,28 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function getTemplate(Action $action = null, $templateType = 'html')
     {
-        return $this->container->get('sidus_admin.templating.template_resolver')->getTemplate(
+        return $this->container->get(TemplateResolver::class)->getTemplate(
             $this->admin,
             $action,
             $templateType
         );
     }
 
+    /** @noinspection PhpDocMissingThrowsInspection */
     /**
      * @param array       $parameters
      * @param Action|null $action
      *
-     * @throws \Exception
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      *
      * @return Response
      */
     protected function renderAction(array $parameters = [], Action $action = null)
     {
         $response = new Response();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         $response->setContent($this->getTemplate($action)->render($parameters));
 
         return $response;
@@ -267,7 +282,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
         $status = 302
     ) {
-        $url = $this->container->get('sidus_admin.routing.admin_router')
+        $url = $this->container->get(AdminRouter::class)
             ->generateAdminEntityPath($this->admin, $entity, $action, $parameters, $referenceType);
 
         return new RedirectResponse($url, $status);
@@ -289,7 +304,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
         $status = 302
     ) {
-        $url = $this->container->get('sidus_admin.routing.admin_router')
+        $url = $this->container->get(AdminRouter::class)
             ->generateAdminPath($this->admin, $action, $parameters, $referenceType);
 
         return new RedirectResponse($url, $status);
@@ -313,16 +328,38 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     /**
      * Alias to return the entity manager
      *
+     * @deprecated, use the getManagerForEntity method instead
+     *
      * @param string|null $persistentManagerName
      *
      * @throws \InvalidArgumentException
      * @throws \LogicException
      *
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
     protected function getManager($persistentManagerName = null)
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+
         return $this->getDoctrine()->getManager($persistentManagerName);
+    }
+
+    /**
+     * @param mixed $entity
+     *
+     * @throws \LogicException
+     *
+     * @return EntityManagerInterface
+     */
+    protected function getManagerForEntity($entity)
+    {
+        $class = ClassUtils::getClass($entity);
+        $entityManager = $this->getDoctrine()->getManagerForClass($class);
+        if (!$entityManager instanceof EntityManagerInterface) {
+            throw new \InvalidArgumentException("No manager found for class {$class}");
+        }
+
+        return $entityManager;
     }
 
     /**
@@ -337,7 +374,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      *
      * @return string The translated string
      */
-    protected function translate($id, array $parameters = array(), $domain = null, $locale = null)
+    protected function translate($id, array $parameters = [], $domain = null, $locale = null)
     {
         return $this->get('translator')->trans($id, $parameters, $domain, $locale);
     }
