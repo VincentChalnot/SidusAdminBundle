@@ -89,6 +89,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
                 'method' => $request->getMethod(),
                 'csrf_protection' => false,
                 'action' => $this->getCurrentUri($request),
+                'validation_groups' => ['filters'],
             ],
             $formOptions
         );
@@ -121,7 +122,7 @@ abstract class AbstractAdminController extends Controller implements AdminInject
 
     /**
      * @param Action $action
-     * @param        $data
+     * @param mixed  $data
      * @param array  $options
      *
      * @throws \UnexpectedValueException
