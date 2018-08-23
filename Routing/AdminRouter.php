@@ -63,8 +63,6 @@ class AdminRouter
      * @param array        $parameters
      * @param int          $referenceType
      *
-     * @throws \Exception
-     *
      * @return string
      */
     public function generateAdminPath(
@@ -78,9 +76,8 @@ class AdminRouter
 
         $missingParams = $this->computeMissingRouteParameters($action->getRoute(), $parameters);
         foreach ($missingParams as $missingParam) {
-            $contextParam = $this->router->getContext()->getParameter($missingParam);
-            if (null !== $contextParam) {
-                $parameters[$missingParam] = $contextParam;
+            if ($this->router->getContext()->hasParameter($missingParam)) {
+                $parameters[$missingParam] = $this->router->getContext()->getParameter($missingParam);
             }
         }
 

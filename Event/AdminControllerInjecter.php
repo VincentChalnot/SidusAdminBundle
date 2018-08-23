@@ -10,6 +10,7 @@
 
 namespace Sidus\AdminBundle\Event;
 
+use Sidus\AdminBundle\Action\ActionInjectableInterface;
 use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 use Sidus\AdminBundle\Controller\AdminInjectableInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -40,14 +41,13 @@ class AdminControllerInjecter
     public function onKernelController(FilterControllerEvent $event)
     {
         $controller = $event->getController();
-        if (!\is_array($controller)) {
+        if (\is_array($controller)) {
+            [$controller] = $controller; // Ignoring action
+        }
+        if (!$controller instanceof AdminInjectableInterface && !$controller instanceof ActionInjectableInterface) {
             return;
         }
 
-        list($controller, $action) = $controller;
-        if (!$controller instanceof AdminInjectableInterface) {
-            return;
-        }
         $request = $event->getRequest();
         if (!$request->attributes->has('_admin')) {
             $routeName = $request->attributes->get('_route');
@@ -58,12 +58,22 @@ class AdminControllerInjecter
             throw new \LogicException($m);
         }
         $admin = $this->adminConfigurationHandler->getAdmin($request->attributes->get('_admin'));
-        if ($request->attributes->has('_action')) {
-            $admin->setCurrentAction($request->attributes->get('_action'));
-        } else {
-            $admin->setCurrentAction(substr($action, 0, -\strlen('Action'))); // Kept for back-compat
-        }
-        $controller->setAdmin($admin);
         $this->adminConfigurationHandler->setCurrentAdmin($admin);
+        if ($controller instanceof AdminInjectableInterface) {
+            $controller->setAdmin($admin);
+        }
+
+        if (!$request->attributes->has('_action')) {
+            $routeName = $request->attributes->get('_route');
+
+            $m = "Missing request attribute '_action' for route {$routeName},";
+            $m .= 'this means you declared this route outside the admin configuration, please include the _action';
+            $m .= 'attribute in your route definition or use the admin configuration';
+            throw new \LogicException($m);
+        }
+        $admin->setCurrentAction($request->attributes->get('_action'));
+        if ($controller instanceof ActionInjectableInterface) {
+            $controller->setAction($admin->getCurrentAction());
+        }
     }
 }

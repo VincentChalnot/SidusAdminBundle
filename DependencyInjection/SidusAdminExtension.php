@@ -11,6 +11,7 @@
 namespace Sidus\AdminBundle\DependencyInjection;
 
 use Sidus\BaseBundle\DependencyInjection\SidusBaseExtension;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
@@ -32,7 +33,7 @@ class SidusAdminExtension extends SidusBaseExtension
      * @throws \Exception
      * @throws BadMethodCallException
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $this->globalConfig = $this->processConfiguration($this->createConfiguration(), $configs);
 
@@ -49,9 +50,9 @@ class SidusAdminExtension extends SidusBaseExtension
     }
 
     /**
-     * @return Configuration
+     * @return ConfigurationInterface
      */
-    protected function createConfiguration()
+    protected function createConfiguration(): ConfigurationInterface
     {
         return new Configuration();
     }
@@ -63,9 +64,9 @@ class SidusAdminExtension extends SidusBaseExtension
      *
      * @throws BadMethodCallException
      */
-    protected function createAdminServiceDefinition($code, array $adminConfiguration, ContainerBuilder $container)
+    protected function createAdminServiceDefinition($code, array $adminConfiguration, ContainerBuilder $container): void
     {
-        $adminConfiguration = $this->finalizeConfiguration($code, $adminConfiguration, $container);
+        $adminConfiguration = array_merge(['action_class' => $this->globalConfig['action_class']], $adminConfiguration);
 
         $definition = new Definition(
             $this->globalConfig['admin_class'],
@@ -77,21 +78,5 @@ class SidusAdminExtension extends SidusBaseExtension
         $definition->addTag('sidus.admin');
         $definition->setPublic(false);
         $container->setDefinition('sidus_admin.admin.'.$code, $definition);
-    }
-
-    /**
-     * @param string           $code
-     * @param array            $adminConfiguration
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    protected function finalizeConfiguration($code, array $adminConfiguration, ContainerBuilder $container)
-    {
-        $defaultConfig = [
-            'action_class' => $this->globalConfig['action_class'],
-        ];
-
-        return array_merge($defaultConfig, $adminConfiguration);
     }
 }

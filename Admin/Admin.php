@@ -20,10 +20,10 @@ class Admin
     /** @var string */
     protected $code;
 
-    /** @var string */
+    /** @var string|null */
     protected $controller;
 
-    /** @var string */
+    /** @var string|null */
     protected $prefix;
 
     /** @var Action[] */
@@ -32,16 +32,16 @@ class Admin
     /** @var array */
     protected $options = [];
 
-    /** @var string */
+    /** @var string|null */
     protected $entity;
 
-    /** @var Action */
+    /** @var Action|null */
     protected $currentAction;
 
-    /** @var string */
+    /** @var string|null */
     protected $fallbackTemplateDirectory;
 
-    /** @var string */
+    /** @var string|null */
     protected $baseTemplate;
 
     /**
@@ -50,7 +50,7 @@ class Admin
      * @param string $code
      * @param array  $adminConfiguration
      */
-    public function __construct($code, array $adminConfiguration)
+    public function __construct(string $code, array $adminConfiguration)
     {
         $this->code = $code;
         $this->controller = $adminConfiguration['controller'];
@@ -69,23 +69,23 @@ class Admin
     /**
      * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getController()
+    public function getController(): ?string
     {
         return $this->controller;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPrefix()
+    public function getPrefix(): ?string
     {
         return $this->prefix;
     }
@@ -93,7 +93,7 @@ class Admin
     /**
      * @return Action[]
      */
-    public function getActions()
+    public function getActions(): array
     {
         return $this->actions;
     }
@@ -105,7 +105,7 @@ class Admin
      *
      * @return Action
      */
-    public function getAction($code)
+    public function getAction(string $code): Action
     {
         if (!$this->hasAction($code)) {
             throw new \UnexpectedValueException("No action with code: '{$code}' for admin '{$this->getCode()}'");
@@ -119,7 +119,7 @@ class Admin
      *
      * @return bool
      */
-    public function hasAction($code)
+    public function hasAction(string $code): bool
     {
         return !empty($this->actions[$code]);
     }
@@ -129,7 +129,7 @@ class Admin
      *
      * @return bool
      */
-    public function hasRoute($route)
+    public function hasRoute(string $route): bool
     {
         foreach ($this->getActions() as $action) {
             if ($action->getRouteName() === $route) {
@@ -141,9 +141,9 @@ class Admin
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getEntity()
+    public function getEntity(): ?string
     {
         return $this->entity;
     }
@@ -151,7 +151,7 @@ class Admin
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -162,7 +162,7 @@ class Admin
      *
      * @return mixed
      */
-    public function getOption($option, $default = null)
+    public function getOption(string $option, $default = null)
     {
         if (!$this->hasOption($option)) {
             return $default;
@@ -176,23 +176,23 @@ class Admin
      *
      * @return bool
      */
-    public function hasOption($option)
+    public function hasOption(string $option): bool
     {
         return array_key_exists($option, $this->options);
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFallbackTemplateDirectory()
+    public function getFallbackTemplateDirectory(): ?string
     {
         return $this->fallbackTemplateDirectory;
     }
 
     /**
-     * @return Action
+     * @return Action|null
      */
-    public function getCurrentAction()
+    public function getCurrentAction(): ?Action
     {
         return $this->currentAction;
     }
@@ -202,7 +202,7 @@ class Admin
      *
      * @throws \UnexpectedValueException
      */
-    public function setCurrentAction($action)
+    public function setCurrentAction($action): void
     {
         if (!$action instanceof Action) {
             $action = $this->getAction($action);
@@ -211,9 +211,9 @@ class Admin
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getBaseTemplate()
+    public function getBaseTemplate(): ?string
     {
         return $this->baseTemplate;
     }

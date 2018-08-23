@@ -63,7 +63,7 @@ class Configuration implements ConfigurationInterface
      *
      * @return NodeDefinition
      */
-    protected function getAdminConfigTreeBuilder()
+    protected function getAdminConfigTreeBuilder(): NodeDefinition
     {
         $builder = new TreeBuilder();
         $node = $builder->root('configurations');
@@ -85,7 +85,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $adminDefinition
      */
-    protected function appendAdminDefinition(NodeBuilder $adminDefinition)
+    protected function appendAdminDefinition(NodeBuilder $adminDefinition): void
     {
         $actionDefinition = $adminDefinition
             ->scalarNode('controller')->isRequired()->end()
@@ -111,7 +111,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $actionDefinition
      */
-    protected function appendActionDefinition(NodeBuilder $actionDefinition)
+    protected function appendActionDefinition(NodeBuilder $actionDefinition): void
     {
         $actionDefinition
             // Custom parameters

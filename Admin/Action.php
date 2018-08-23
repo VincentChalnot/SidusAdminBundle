@@ -28,13 +28,16 @@ class Action
     /** @var Admin */
     protected $admin;
 
-    /** @var mixed */
+    /** @var array */
+    protected $options;
+
+    /** @var string|null */
     protected $formType;
 
     /** @var array */
     protected $formOptions;
 
-    /** @var string */
+    /** @var string|null */
     protected $template;
 
     /**
@@ -42,10 +45,11 @@ class Action
      * @param Admin  $admin
      * @param array  $c
      */
-    public function __construct($code, Admin $admin, array $c)
+    public function __construct(string $code, Admin $admin, array $c)
     {
         $this->code = $code;
         $this->admin = $admin;
+        $this->options = $c['options']; // Warning, options are used both here and for the route definition
         $this->formType = $c['form_type'];
         $this->formOptions = $c['form_options'];
         $this->template = $c['template'];
@@ -63,7 +67,7 @@ class Action
             $this->getAdmin()->getPrefix().$c['path'],
             $defaults,
             $c['requirements'],
-            $c['options'],
+            $c['options'], // Consider removing this as it might conflict with our options
             $c['host'],
             $c['schemes'],
             $c['methods'],
@@ -74,7 +78,7 @@ class Action
     /**
      * @return string
      */
-    public function getRouteName()
+    public function getRouteName(): string
     {
         return "sidus_admin.{$this->getAdmin()->getCode()}.{$this->getCode()}";
     }
@@ -82,7 +86,7 @@ class Action
     /**
      * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -90,7 +94,7 @@ class Action
     /**
      * @return Route
      */
-    public function getRoute()
+    public function getRoute(): Route
     {
         return $this->route;
     }
@@ -98,15 +102,48 @@ class Action
     /**
      * @return Admin
      */
-    public function getAdmin()
+    public function getAdmin(): Admin
     {
         return $this->admin;
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getFormType()
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param string $option
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getOption(string $option, $default = null)
+    {
+        if (!$this->hasOption($option)) {
+            return $default;
+        }
+
+        return $this->options[$option];
+    }
+
+    /**
+     * @param string $option
+     *
+     * @return bool
+     */
+    public function hasOption(string $option): bool
+    {
+        return array_key_exists($option, $this->options);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFormType(): ?string
     {
         return $this->formType;
     }
@@ -114,15 +151,15 @@ class Action
     /**
      * @return array
      */
-    public function getFormOptions()
+    public function getFormOptions(): array
     {
         return $this->formOptions;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTemplate()
+    public function getTemplate(): ?string
     {
         return $this->template;
     }

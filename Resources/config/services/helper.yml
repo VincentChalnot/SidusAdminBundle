@@ -1,0 +1,20 @@
+services:
+    Sidus\AdminBundle\Doctrine\DoctrineHelper:
+        public: false
+        autowire: true
+
+    Sidus\AdminBundle\Form\FormHelper:
+        public: false
+        autowire: true
+
+    Sidus\AdminBundle\Routing\RoutingHelper:
+        public: false
+        autowire: true
+
+    Sidus\AdminBundle\Templating\TemplatingHelper:
+        public: false
+        autowire: true
+
+    Sidus\AdminBundle\DataGrid\DataGridHelper:
+        public: false
+        autowire: true

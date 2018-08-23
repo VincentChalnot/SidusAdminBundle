@@ -29,7 +29,7 @@ class AdminConfigurationHandler
     /**
      * @param Admin $admin
      */
-    public function addAdmin(Admin $admin)
+    public function addAdmin(Admin $admin): void
     {
         $this->admins[$admin->getCode()] = $admin;
     }
@@ -72,7 +72,7 @@ class AdminConfigurationHandler
     /**
      * @return Admin|null
      */
-    public function getCurrentAdmin()
+    public function getCurrentAdmin(): ?Admin
     {
         return $this->currentAdmin;
     }
@@ -80,7 +80,7 @@ class AdminConfigurationHandler
     /**
      * @param Admin $currentAdmin
      */
-    public function setCurrentAdmin(Admin $currentAdmin)
+    public function setCurrentAdmin(Admin $currentAdmin): void
     {
         $this->currentAdmin = $currentAdmin;
     }
