@@ -1,15 +1,10 @@
 services:
     Sidus\AdminBundle\Routing\AdminRouteLoader:
-        class: Sidus\AdminBundle\Routing\AdminRouteLoader
+        autowire: true
         public: false
-        arguments: ['@Sidus\AdminBundle\Configuration\AdminConfigurationHandler']
         tags:
             - { name: routing.loader }
 
     Sidus\AdminBundle\Routing\AdminRouter:
-        class: Sidus\AdminBundle\Routing\AdminRouter
-        arguments:
-            - '@Sidus\AdminBundle\Configuration\AdminConfigurationHandler'
-            - '@Sidus\AdminBundle\Entity\AdminEntityMatcher'
-            - '@router'
-            - '@property_accessor'
+        autowire: true
+        public: true # This will change in the next version

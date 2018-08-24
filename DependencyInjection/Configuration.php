@@ -88,7 +88,8 @@ class Configuration implements ConfigurationInterface
     protected function appendAdminDefinition(NodeBuilder $adminDefinition): void
     {
         $actionDefinition = $adminDefinition
-            ->scalarNode('controller')->isRequired()->end()
+            ->scalarNode('controller')->defaultNull()->end()
+            ->arrayNode('controller_pattern')->defaultValue([])->scalarPrototype()->end()->end()
             ->scalarNode('prefix')->isRequired()->end()
             ->scalarNode('entity')->isRequired()->end()
             ->scalarNode('action_class')->end()

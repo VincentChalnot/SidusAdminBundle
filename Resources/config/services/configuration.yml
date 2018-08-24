@@ -1,3 +1,4 @@
 services:
     Sidus\AdminBundle\Configuration\AdminConfigurationHandler:
-        class: Sidus\AdminBundle\Configuration\AdminConfigurationHandler
+        autowire: true
+        public: false

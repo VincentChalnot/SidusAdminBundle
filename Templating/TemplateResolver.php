@@ -54,6 +54,8 @@ class TemplateResolver
 
 
     /**
+     * @todo refactor me with a template_pattern option
+     *
      * @param Admin  $admin
      * @param Action $action
      * @param string $templateType

@@ -1,17 +1,12 @@
 services:
     Sidus\AdminBundle\Twig\AdminExtension:
-        class: Sidus\AdminBundle\Twig\AdminExtension
-        arguments:
-            - '@Sidus\AdminBundle\Configuration\AdminConfigurationHandler'
-            - '@Sidus\AdminBundle\Entity\AdminEntityMatcher'
-            - '@Sidus\AdminBundle\Routing\AdminRouter'
+        autowire: true
+        public: false
         tags:
             - { name: twig.extension }
 
     Sidus\AdminBundle\Twig\TemplateResolver:
-        class: Sidus\AdminBundle\Twig\TemplateResolver
+        autowire: true
+        public: true # This will change in the next version
         arguments:
-            - '@Sidus\AdminBundle\Configuration\AdminConfigurationHandler'
-            - '@twig'
-            - '%sidus_admin.templating.fallback_template_directory%'
-            - '@logger'
+            $globalFallbackTemplate: '%sidus_admin.templating.fallback_template_directory%'

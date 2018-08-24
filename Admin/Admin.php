@@ -23,6 +23,9 @@ class Admin
     /** @var string|null */
     protected $controller;
 
+    /** @var array */
+    protected $controllerPattern = [];
+
     /** @var string|null */
     protected $prefix;
 
@@ -54,6 +57,7 @@ class Admin
     {
         $this->code = $code;
         $this->controller = $adminConfiguration['controller'];
+        $this->controllerPattern = $adminConfiguration['controller_pattern'];
         $this->prefix = $adminConfiguration['prefix'];
         $actionClass = $adminConfiguration['action_class'];
         $this->entity = $adminConfiguration['entity'];
@@ -80,6 +84,14 @@ class Admin
     public function getController(): ?string
     {
         return $this->controller;
+    }
+
+    /**
+     * @return array
+     */
+    public function getControllerPattern(): array
+    {
+        return $this->controllerPattern;
     }
 
     /**

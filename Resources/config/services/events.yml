@@ -1,7 +1,12 @@
 services:
     Sidus\AdminBundle\Event\AdminControllerInjecter:
-        class: Sidus\AdminBundle\Event\AdminControllerInjecter
+        autowire: true
         public: false
-        arguments: ['@Sidus\AdminBundle\Configuration\AdminConfigurationHandler']
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    Sidus\AdminBundle\Event\AdminControllerResolver:
+        autowire: true
+        public: false
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }

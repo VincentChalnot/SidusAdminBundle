@@ -54,18 +54,20 @@ class Action
         $this->formOptions = $c['form_options'];
         $this->template = $c['template'];
 
-        $defaults = array_merge(
-            [
-                '_controller' => $admin->getController().':'.$code,
-                '_admin' => $admin->getCode(),
-                '_action' => $code,
-            ],
-            $c['defaults']
-        );
+        if (\count($admin->getControllerPattern()) > 0) {
+            $c['defaults']['_controller_pattern'] = $admin->getControllerPattern();
+        } elseif ($admin->getController()) {
+            $c['defaults']['_controller'] = $admin->getController().':'.$code;
+        } else {
+            throw new \LogicException("You must configure either the 'controller' option or the 'controller_pattern'");
+        }
+
+        $c['defaults']['_admin'] = $admin->getCode();
+        $c['defaults']['_action'] = $code;
 
         $this->route = new Route(
             $this->getAdmin()->getPrefix().$c['path'],
-            $defaults,
+            $c['defaults'],
             $c['requirements'],
             $c['options'], // Consider removing this as it might conflict with our options
             $c['host'],
