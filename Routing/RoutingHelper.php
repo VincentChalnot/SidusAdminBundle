@@ -52,6 +52,30 @@ class RoutingHelper
     }
 
     /**
+     * @param Action $action
+     * @param array  $parameters
+     * @param int    $referenceType
+     * @param int    $status
+     *
+     * @return RedirectResponse
+     */
+    public function redirectToAction(
+        Action $action,
+        array $parameters = [],
+        $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
+        $status = 302
+    ): RedirectResponse {
+        $url = $this->adminRouter->generateAdminPath(
+            $action->getAdmin(),
+            $action->getCode(),
+            $parameters,
+            $referenceType
+        );
+
+        return new RedirectResponse($url, $status);
+    }
+
+    /**
      * @param Admin $admin
      * @param array $parameters
      *

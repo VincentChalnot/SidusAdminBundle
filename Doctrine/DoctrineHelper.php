@@ -60,6 +60,29 @@ class DoctrineHelper
         $entityManager->persist($entity);
         $entityManager->flush();
 
+        $this->addFlash($action, $session);
+    }
+
+    /**
+     * @param Action                $action
+     * @param mixed                 $entity
+     * @param SessionInterface|null $session
+     */
+    public function deleteEntity(Action $action, $entity, SessionInterface $session = null): void
+    {
+        $entityManager = $this->getManagerForEntity($entity);
+        $entityManager->remove($entity);
+        $entityManager->flush();
+
+        $this->addFlash($action, $session);
+    }
+
+    /**
+     * @param Action                $action
+     * @param SessionInterface|null $session
+     */
+    protected function addFlash(Action $action, SessionInterface $session = null): void
+    {
         if ($action && $session instanceof Session) {
             $session->getFlashBag()->add(
                 'success',
@@ -67,7 +90,9 @@ class DoctrineHelper
                     [
                         "admin.{$action->getAdmin()->getCode()}.{$action->getCode()}.success",
                         "admin.flash.{$action->getCode()}.success",
-                    ]
+                    ],
+                    [],
+                    ucfirst($action->getCode()).' success'
                 )
             );
         }
