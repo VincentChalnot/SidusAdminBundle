@@ -54,12 +54,16 @@ class Action
         $this->formOptions = $c['form_options'];
         $this->template = $c['template'];
 
-        if (\count($admin->getControllerPattern()) > 0) {
-            $c['defaults']['_controller_pattern'] = $admin->getControllerPattern();
-        } elseif ($admin->getController()) {
-            $c['defaults']['_controller'] = $admin->getController().':'.$code;
-        } else {
-            throw new \LogicException("You must configure either the 'controller' option or the 'controller_pattern'");
+        if (empty($c['defaults']['_controller_pattern']) && empty($c['defaults']['_controller'])) {
+            if (\count($admin->getControllerPattern()) > 0) {
+                $c['defaults']['_controller_pattern'] = $admin->getControllerPattern();
+            } elseif ($admin->getController()) {
+                $c['defaults']['_controller'] = $admin->getController().':'.$code;
+            } else {
+                throw new \LogicException(
+                    "You must configure either the 'controller' option or the 'controller_pattern'"
+                );
+            }
         }
 
         $c['defaults']['_admin'] = $admin->getCode();
