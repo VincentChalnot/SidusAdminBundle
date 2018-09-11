@@ -151,6 +151,10 @@ class Action
      */
     public function getFormType(): ?string
     {
+        if (!$this->formType) {
+            return $this->getAdmin()->getFormType();
+        }
+
         return $this->formType;
     }
 

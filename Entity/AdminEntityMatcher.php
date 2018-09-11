@@ -11,7 +11,7 @@
 namespace Sidus\AdminBundle\Entity;
 
 use Sidus\AdminBundle\Admin\Admin;
-use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
+use Sidus\AdminBundle\Configuration\AdminRegistry;
 
 /**
  * Used to match an admin against a Doctrine entity, will return the first one matching
@@ -20,20 +20,18 @@ use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
  */
 class AdminEntityMatcher
 {
-    /** @var AdminConfigurationHandler */
-    protected $adminConfigurationHandler;
+    /** @var AdminRegistry */
+    protected $adminRegistry;
 
     /** @var array */
     protected $cache = [];
 
     /**
-     * AdminEntityMatcher constructor.
-     *
-     * @param AdminConfigurationHandler $adminConfigurationHandler
+     * @param AdminRegistry $adminRegistry
      */
-    public function __construct(AdminConfigurationHandler $adminConfigurationHandler)
+    public function __construct(AdminRegistry $adminRegistry)
     {
-        $this->adminConfigurationHandler = $adminConfigurationHandler;
+        $this->adminRegistry = $adminRegistry;
     }
 
     /**
@@ -45,13 +43,13 @@ class AdminEntityMatcher
      */
     public function getAdminForEntity($entity)
     {
-        $class = get_class($entity);
+        $class = \get_class($entity);
 
         if (array_key_exists($class, $this->cache)) {
             return $this->cache[$class];
         }
 
-        foreach ($this->adminConfigurationHandler->getAdmins() as $admin) {
+        foreach ($this->adminRegistry->getAdmins() as $admin) {
             if (is_a($entity, $admin->getEntity())) {
                 $this->cache[$class] = $admin;
 

@@ -2,7 +2,7 @@
 
 services:
     sidus_admin.configuration.admin.handler:
-        alias: Sidus\AdminBundle\Configuration\AdminConfigurationHandler
+        alias: Sidus\AdminBundle\Configuration\AdminRegistry
 
     sidus_admin.routing.admin_router:
         alias: Sidus\AdminBundle\Routing\AdminRouter
@@ -11,4 +11,4 @@ services:
         alias: Sidus\AdminBundle\Entity\AdminEntityMatcher
 
     sidus_admin.templating.template_resolver:
-        alias: Sidus\AdminBundle\Twig\TemplateResolver
+        alias: Sidus\AdminBundle\Templating\TemplateResolver

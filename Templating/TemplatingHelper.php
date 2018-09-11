@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the Sidus/AdminBundle package.
+ *
+ * Copyright (c) 2015-2018 Vincent Chalnot
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Sidus\AdminBundle\Templating;
 
@@ -13,17 +21,17 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TemplatingHelper
 {
-    /** @var TemplateResolver */
+    /** @var TemplateResolverInterface */
     protected $templateResolver;
 
     /** @var RoutingHelper */
     protected $routingHelper;
 
     /**
-     * @param TemplateResolver $templateResolver
-     * @param RoutingHelper    $routingHelper
+     * @param TemplateResolverInterface $templateResolver
+     * @param RoutingHelper             $routingHelper
      */
-    public function __construct(TemplateResolver $templateResolver, RoutingHelper $routingHelper)
+    public function __construct(TemplateResolverInterface $templateResolver, RoutingHelper $routingHelper)
     {
         $this->templateResolver = $templateResolver;
         $this->routingHelper = $routingHelper;
@@ -38,9 +46,7 @@ class TemplatingHelper
     public function renderAction(Action $action, array $parameters = []): Response
     {
         $response = new Response();
-        $response->setContent(
-            $this->templateResolver->getTemplate($action->getAdmin(), $action)->render($parameters)
-        );
+        $response->setContent($this->templateResolver->getTemplate($action)->render($parameters));
 
         return $response;
     }

@@ -26,6 +26,9 @@ class Admin
     /** @var array */
     protected $controllerPattern = [];
 
+    /** @var array */
+    protected $templatePattern = [];
+
     /** @var string|null */
     protected $prefix;
 
@@ -38,6 +41,9 @@ class Admin
     /** @var string|null */
     protected $entity;
 
+    /** @var string|null */
+    protected $formType;
+
     /** @var Action|null */
     protected $currentAction;
 
@@ -48,8 +54,6 @@ class Admin
     protected $baseTemplate;
 
     /**
-     * Admin constructor.
-     *
      * @param string $code
      * @param array  $adminConfiguration
      */
@@ -58,13 +62,15 @@ class Admin
         $this->code = $code;
         $this->controller = $adminConfiguration['controller'];
         $this->controllerPattern = $adminConfiguration['controller_pattern'];
+        $this->templatePattern = $adminConfiguration['template_pattern'];
         $this->prefix = $adminConfiguration['prefix'];
-        $actionClass = $adminConfiguration['action_class'];
         $this->entity = $adminConfiguration['entity'];
+        $this->formType = $adminConfiguration['form_type'];
         $this->options = $adminConfiguration['options'];
         $this->fallbackTemplateDirectory = $adminConfiguration['fallback_template_directory'];
         $this->baseTemplate = $adminConfiguration['base_template'];
 
+        $actionClass = $adminConfiguration['action_class'];
         foreach ((array) $adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
             $this->actions[$actionCode] = new $actionClass($actionCode, $this, $actionConfiguration);
         }
@@ -92,6 +98,14 @@ class Admin
     public function getControllerPattern(): array
     {
         return $this->controllerPattern;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTemplatePattern(): array
+    {
+        return $this->templatePattern;
     }
 
     /**
@@ -158,6 +172,14 @@ class Admin
     public function getEntity(): ?string
     {
         return $this->entity;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getFormType(): ?string
+    {
+        return $this->formType;
     }
 
     /**

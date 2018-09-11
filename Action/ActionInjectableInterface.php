@@ -22,5 +22,5 @@ interface ActionInjectableInterface
     /**
      * @param Action $action
      */
-    public function setAction(Action $action);
+    public function setAction(Action $action): void;
 }

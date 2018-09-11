@@ -1,4 +1,7 @@
 services:
-    Sidus\AdminBundle\Configuration\AdminConfigurationHandler:
+    Sidus\AdminBundle\Configuration\AdminRegistry:
         autowire: true
         public: false
+
+    Sidus\AdminBundle\Configuration\AdminConfigurationHandler:
+        alias: Sidus\AdminBundle\Configuration\AdminRegistry

@@ -5,8 +5,11 @@ services:
         tags:
             - { name: twig.extension }
 
-    Sidus\AdminBundle\Twig\TemplateResolver:
+    Sidus\AdminBundle\Templating\TemplateResolver:
         autowire: true
         public: true # This will change in the next version
         arguments:
             $globalFallbackTemplate: '%sidus_admin.templating.fallback_template_directory%'
+
+    Sidus\AdminBundle\Templating\TemplateResolverInterface:
+        alias: Sidus\AdminBundle\Templating\TemplateResolver

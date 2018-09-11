@@ -11,7 +11,7 @@
 namespace Sidus\AdminBundle\Event;
 
 use Sidus\AdminBundle\Action\ActionInjectableInterface;
-use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
+use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Sidus\AdminBundle\Controller\AdminInjectableInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -22,15 +22,15 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class AdminControllerInjecter
 {
-    /** @var AdminConfigurationHandler */
-    protected $adminConfigurationHandler;
+    /** @var AdminRegistry */
+    protected $adminRegistry;
 
     /**
-     * @param AdminConfigurationHandler $adminConfigurationHandler
+     * @param AdminRegistry $adminRegistry
      */
-    public function __construct(AdminConfigurationHandler $adminConfigurationHandler)
+    public function __construct(AdminRegistry $adminRegistry)
     {
-        $this->adminConfigurationHandler = $adminConfigurationHandler;
+        $this->adminRegistry = $adminRegistry;
     }
 
     /**
@@ -57,8 +57,8 @@ class AdminControllerInjecter
             $m .= 'attribute in your route definition or use the admin configuration';
             throw new \LogicException($m);
         }
-        $admin = $this->adminConfigurationHandler->getAdmin($request->attributes->get('_admin'));
-        $this->adminConfigurationHandler->setCurrentAdmin($admin);
+        $admin = $this->adminRegistry->getAdmin($request->attributes->get('_admin'));
+        $this->adminRegistry->setCurrentAdmin($admin);
         if ($controller instanceof AdminInjectableInterface) {
             $controller->setAdmin($admin);
         }

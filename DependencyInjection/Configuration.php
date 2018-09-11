@@ -28,8 +28,6 @@ class Configuration implements ConfigurationInterface
     protected $root;
 
     /**
-     * Configuration constructor.
-     *
      * @param string $root
      */
     public function __construct($root = 'sidus_admin')
@@ -90,9 +88,11 @@ class Configuration implements ConfigurationInterface
         $actionDefinition = $adminDefinition
             ->scalarNode('controller')->defaultNull()->end()
             ->arrayNode('controller_pattern')->defaultValue([])->scalarPrototype()->end()->end()
+            ->arrayNode('template_pattern')->defaultValue([])->scalarPrototype()->end()->end()
             ->scalarNode('prefix')->isRequired()->end()
             ->scalarNode('entity')->isRequired()->end()
             ->scalarNode('action_class')->end()
+            ->scalarNode('form_type')->defaultNull()->end()
             ->scalarNode('base_template')->defaultNull()->end()
             ->scalarNode('fallback_template_directory')->defaultNull()->end()
             ->variableNode('options')->defaultValue([])->end()

@@ -10,7 +10,7 @@
 
 namespace Sidus\AdminBundle\Routing;
 
-use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
+use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -24,17 +24,15 @@ class AdminRouteLoader extends Loader
     /** @var bool */
     protected $loaded;
 
-    /** @var AdminConfigurationHandler */
-    protected $adminConfigurationHandler;
+    /** @var AdminRegistry */
+    protected $adminRegistry;
 
     /**
-     * AdminRouteLoader constructor.
-     *
-     * @param AdminConfigurationHandler $adminConfigurationHandler
+     * @param AdminRegistry $adminRegistry
      */
-    public function __construct(AdminConfigurationHandler $adminConfigurationHandler)
+    public function __construct(AdminRegistry $adminRegistry)
     {
-        $this->adminConfigurationHandler = $adminConfigurationHandler;
+        $this->adminRegistry = $adminRegistry;
     }
 
     /**
@@ -53,7 +51,7 @@ class AdminRouteLoader extends Loader
 
         $routes = new RouteCollection();
 
-        foreach ($this->adminConfigurationHandler->getAdmins() as $admin) {
+        foreach ($this->adminRegistry->getAdmins() as $admin) {
             foreach ($admin->getActions() as $action) {
                 $routes->add($action->getRouteName(), $action->getRoute());
             }

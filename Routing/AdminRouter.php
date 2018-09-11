@@ -11,7 +11,7 @@
 namespace Sidus\AdminBundle\Routing;
 
 use Sidus\AdminBundle\Admin\Admin;
-use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
+use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -25,8 +25,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class AdminRouter
 {
-    /** @var AdminConfigurationHandler */
-    protected $adminConfigurationHandler;
+    /** @var AdminRegistry */
+    protected $adminRegistry;
 
     /** @var AdminEntityMatcher */
     protected $adminEntityMatcher;
@@ -38,20 +38,18 @@ class AdminRouter
     protected $accessor;
 
     /**
-     * AdminExtension constructor.
-     *
-     * @param AdminConfigurationHandler $adminConfigurationHandler
+     * @param AdminRegistry             $adminRegistry
      * @param AdminEntityMatcher        $adminEntityMatcher
      * @param RouterInterface           $router
      * @param PropertyAccessorInterface $accessor
      */
     public function __construct(
-        AdminConfigurationHandler $adminConfigurationHandler,
+        AdminRegistry $adminRegistry,
         AdminEntityMatcher $adminEntityMatcher,
         RouterInterface $router,
         PropertyAccessorInterface $accessor
     ) {
-        $this->adminConfigurationHandler = $adminConfigurationHandler;
+        $this->adminRegistry = $adminRegistry;
         $this->adminEntityMatcher = $adminEntityMatcher;
         $this->router = $router;
         $this->accessor = $accessor;
@@ -156,13 +154,13 @@ class AdminRouter
     protected function getAdmin($admin): Admin
     {
         if (null === $admin) {
-            return $this->adminConfigurationHandler->getCurrentAdmin();
+            return $this->adminRegistry->getCurrentAdmin();
         }
         if ($admin instanceof Admin) {
             return $admin;
         }
 
-        return $this->adminConfigurationHandler->getAdmin($admin);
+        return $this->adminRegistry->getAdmin($admin);
     }
 
     /**

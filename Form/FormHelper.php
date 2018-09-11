@@ -1,9 +1,18 @@
 <?php
+/*
+ * This file is part of the Sidus/AdminBundle package.
+ *
+ * Copyright (c) 2015-2018 Vincent Chalnot
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Sidus\AdminBundle\Form;
 
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Routing\RoutingHelper;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -44,6 +53,28 @@ class FormHelper
         $defaultOptions = $this->getDefaultFormOptions($action, $request, $dataId);
 
         return $this->getFormBuilder($action, $data, array_merge($defaultOptions, $options))->getForm();
+    }
+
+    /**
+     * @param Action  $action
+     * @param Request $request
+     * @param mixed   $data
+     *
+     * @return FormInterface
+     */
+    public function getEmptyForm(
+        Action $action,
+        Request $request,
+        $data
+    ): FormInterface {
+        $formOptions = $this->getDefaultFormOptions($action, $request, $data);
+
+        return $this->formFactory->createNamedBuilder(
+            "form_{$action->getAdmin()->getCode()}_{$action->getCode()}",
+            FormType::class,
+            null,
+            $formOptions
+        )->getForm();
     }
 
     /**

@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the Sidus/AdminBundle package.
+ *
+ * Copyright (c) 2015-2018 Vincent Chalnot
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Sidus\AdminBundle\Event;
 
@@ -52,15 +60,15 @@ class AdminControllerResolver
      * @param Request $request
      * @param string  $admin
      * @param string  $action
-     * @param array   $controllerPattern
+     * @param array   $controllerPatterns
      *
      * @return callable|false
      */
-    protected function getController(Request $request, string $admin, string $action, array $controllerPattern)
+    protected function getController(Request $request, string $admin, string $action, array $controllerPatterns)
     {
-        foreach ($controllerPattern as $controller) {
+        foreach ($controllerPatterns as $controllerPattern) {
             $controller = strtr(
-                $controller,
+                $controllerPattern,
                 [
                     '{{admin}}' => lcfirst($admin),
                     '{{Admin}}' => ucfirst($admin),
@@ -81,7 +89,7 @@ class AdminControllerResolver
             }
         }
 
-        $flattened = implode(', ', $controllerPattern);
+        $flattened = implode(', ', $controllerPatterns);
         throw new \RuntimeException(
             "Unable to resolve any valid controller for the controller_pattern configuration: {$flattened}"
         );

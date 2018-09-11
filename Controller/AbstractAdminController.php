@@ -14,7 +14,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
-use Sidus\AdminBundle\Twig\TemplateResolver;
+use Sidus\AdminBundle\Templating\TemplateResolverInterface;
 use Sidus\DataGridBundle\Model\DataGrid;
 use Sidus\DataGridBundle\Registry\DataGridRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -213,9 +213,8 @@ abstract class AbstractAdminController extends Controller implements AdminInject
      */
     protected function getTemplate(Action $action = null, $templateType = 'html')
     {
-        return $this->container->get(TemplateResolver::class)->getTemplate(
-            $this->admin,
-            $action,
+        return $this->container->get(TemplateResolverInterface::class)->getTemplate(
+            $action ?: $this->admin->getCurrentAction(),
             $templateType
         );
     }

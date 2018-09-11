@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the Sidus/AdminBundle package.
+ *
+ * Copyright (c) 2015-2018 Vincent Chalnot
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Sidus\AdminBundle\Routing;
 
@@ -79,12 +87,12 @@ class RoutingHelper
      * @param Admin $admin
      * @param array $parameters
      *
-     * @return string
+     * @return string|null
      */
-    public function getAdminListPath(Admin $admin, array $parameters = []): string
+    public function getAdminListPath(Admin $admin, array $parameters = []): ?string
     {
         if (!$admin->hasAction('list')) {
-            throw new \UnexpectedValueException("No list action configured for admin {$admin->getCode()}");
+            return null;
         }
 
         return $this->adminRouter->generateAdminPath($admin, 'list', $parameters);

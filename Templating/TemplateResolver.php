@@ -12,19 +12,14 @@ namespace Sidus\AdminBundle\Templating;
 
 use Psr\Log\LoggerInterface;
 use Sidus\AdminBundle\Admin\Action;
-use Sidus\AdminBundle\Admin\Admin;
-use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
 
 /**
  * Resolve templates based on admin configuration
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class TemplateResolver
+class TemplateResolver implements TemplateResolverInterface
 {
-    /** @var AdminConfigurationHandler */
-    protected $adminConfigurationHandler;
-
     /** @var \Twig_Environment */
     protected $twig;
 
@@ -35,58 +30,66 @@ class TemplateResolver
     protected $globalFallbackTemplate;
 
     /**
-     * @param AdminConfigurationHandler $adminConfigurationHandler
-     * @param \Twig_Environment         $twig
-     * @param string                    $globalFallbackTemplate
-     * @param LoggerInterface           $logger
+     * @param \Twig_Environment $twig
+     * @param string            $globalFallbackTemplate
+     * @param LoggerInterface   $logger
      */
     public function __construct(
-        AdminConfigurationHandler $adminConfigurationHandler,
         \Twig_Environment $twig,
         $globalFallbackTemplate,
         LoggerInterface $logger
     ) {
-        $this->adminConfigurationHandler = $adminConfigurationHandler;
         $this->twig = $twig;
         $this->globalFallbackTemplate = $globalFallbackTemplate;
         $this->logger = $logger;
     }
 
-
     /**
-     * @todo refactor me with a template_pattern option
-     *
-     * @param Admin  $admin
      * @param Action $action
-     * @param string $templateType
-     *
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
-     * @throws \Twig_Error_Loader
-     * @throws \UnexpectedValueException
+     * @param string $format
      *
      * @return \Twig_Template
      */
-    public function getTemplate(Admin $admin = null, Action $action = null, $templateType = 'html')
+    public function getTemplate(Action $action, $format = 'html'): \Twig_Template
     {
-        if (!$admin) {
-            $admin = $this->adminConfigurationHandler->getCurrentAdmin();
-        }
-        if (!$action) {
-            $action = $admin->getCurrentAction();
-        }
-
+        $admin = $action->getAdmin();
         if ($action->getTemplate()) {
             // If the template was specified, do not try to fallback
             return $this->twig->loadTemplate($action->getTemplate());
         }
 
-        $template = ":{$action->getCode()}.{$templateType}.twig";
+        // Priority to new template_pattern system:
+        if (\count($admin->getTemplatePattern()) > 0) {
+            foreach ($admin->getTemplatePattern() as $templatePattern) {
+                $template = strtr(
+                    $templatePattern,
+                    [
+                        '{{admin}}' => lcfirst($admin->getCode()),
+                        '{{Admin}}' => ucfirst($admin->getCode()),
+                        '{{action}}' => lcfirst($action->getCode()),
+                        '{{Action}}' => ucfirst($action->getCode()),
+                        '{{format}}' => $format,
+                    ]
+                );
+                try {
+                    return $this->twig->loadTemplate($template);
+                } catch (\Twig_Error_Loader $mainError) {
+                    continue;
+                }
+            }
 
-        $customTemplate = $admin->getController().$template;
+            $flattened = implode(', ', $admin->getTemplatePattern());
+            throw new \RuntimeException(
+                "Unable to resolve any valid template for the template_pattern configuration: {$flattened}"
+            );
+        }
+
+        $template = "{$action->getCode()}.{$format}.twig";
+
+        $customTemplate = $admin->getController().':'.$template;
         $fallbackTemplate = $admin->getFallbackTemplateDirectory() ?
-            $admin->getFallbackTemplateDirectory().$template : null;
-        $globalFallbackTemplate = $this->globalFallbackTemplate ? $this->globalFallbackTemplate.$template : null;
+            $admin->getFallbackTemplateDirectory().':'.$template : null;
+        $globalFallbackTemplate = $this->globalFallbackTemplate ? $this->globalFallbackTemplate.':'.$template : null;
 
         try {
             return $this->twig->loadTemplate($customTemplate);

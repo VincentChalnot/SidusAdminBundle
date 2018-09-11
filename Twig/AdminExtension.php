@@ -11,7 +11,7 @@
 namespace Sidus\AdminBundle\Twig;
 
 use Sidus\AdminBundle\Admin\Admin;
-use Sidus\AdminBundle\Configuration\AdminConfigurationHandler;
+use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
 use Sidus\AdminBundle\Routing\AdminRouter;
 use Twig_Extension;
@@ -25,8 +25,8 @@ use UnexpectedValueException;
  */
 class AdminExtension extends Twig_Extension
 {
-    /** @var AdminConfigurationHandler */
-    protected $adminConfigurationHandler;
+    /** @var AdminRegistry */
+    protected $adminRegistry;
 
     /** @var AdminEntityMatcher */
     protected $adminEntityMatcher;
@@ -35,16 +35,16 @@ class AdminExtension extends Twig_Extension
     protected $adminRouter;
 
     /**
-     * @param AdminConfigurationHandler $adminConfigurationHandler
-     * @param AdminEntityMatcher        $adminEntityMatcher
-     * @param AdminRouter               $adminRouter
+     * @param AdminRegistry      $adminRegistry
+     * @param AdminEntityMatcher $adminEntityMatcher
+     * @param AdminRouter        $adminRouter
      */
     public function __construct(
-        AdminConfigurationHandler $adminConfigurationHandler,
+        AdminRegistry $adminRegistry,
         AdminEntityMatcher $adminEntityMatcher,
         AdminRouter $adminRouter
     ) {
-        $this->adminConfigurationHandler = $adminConfigurationHandler;
+        $this->adminRegistry = $adminRegistry;
         $this->adminEntityMatcher = $adminEntityMatcher;
         $this->adminRouter = $adminRouter;
     }
@@ -55,7 +55,7 @@ class AdminExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            new Twig_SimpleFunction('get_admins', [$this->adminConfigurationHandler, 'getAdmins']),
+            new Twig_SimpleFunction('get_admins', [$this->adminRegistry, 'getAdmins']),
             new Twig_SimpleFunction('admin_path', [$this->adminRouter, 'generateAdminPath']),
             new Twig_SimpleFunction('admin_entity_path', [$this->adminRouter, 'generateAdminEntityPath']),
             new Twig_SimpleFunction('entity_path', [$this->adminRouter, 'generateEntityPath']),
@@ -77,7 +77,7 @@ class AdminExtension extends Twig_Extension
             return $code;
         }
 
-        return $this->adminConfigurationHandler->getAdmin($code);
+        return $this->adminRegistry->getAdmin($code);
     }
 
     /**
