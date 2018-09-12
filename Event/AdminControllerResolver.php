@@ -10,6 +10,8 @@
 
 namespace Sidus\AdminBundle\Event;
 
+use Sidus\AdminBundle\Admin\Action;
+use Sidus\AdminBundle\Admin\Admin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -33,7 +35,7 @@ class AdminControllerResolver
     /**
      * @param GetResponseEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         if ($request->attributes->has('_controller')) {
@@ -49,8 +51,11 @@ class AdminControllerResolver
         }
         $admin = $request->attributes->get('_admin');
         $action = $request->attributes->get('_action');
-        if (null === $admin || null === $action) {
-            throw new \UnexpectedValueException("Missing '_admin' or '_action' request attribute");
+        if (!$admin instanceof Admin) {
+            throw new \UnexpectedValueException('_admin request attribute is not an Admin object');
+        }
+        if (!$action instanceof Action) {
+            throw new \UnexpectedValueException('_action request attribute is not an Action object');
         }
         $controller = $this->getController($request, $admin, $action, $controllerPattern);
         $request->attributes->set('_controller', $controller);
@@ -58,22 +63,22 @@ class AdminControllerResolver
 
     /**
      * @param Request $request
-     * @param string  $admin
-     * @param string  $action
+     * @param Admin   $admin
+     * @param Action  $action
      * @param array   $controllerPatterns
      *
      * @return callable|false
      */
-    protected function getController(Request $request, string $admin, string $action, array $controllerPatterns)
+    protected function getController(Request $request, Admin $admin, Action $action, array $controllerPatterns)
     {
         foreach ($controllerPatterns as $controllerPattern) {
             $controller = strtr(
                 $controllerPattern,
                 [
-                    '{{admin}}' => lcfirst($admin),
-                    '{{Admin}}' => ucfirst($admin),
-                    '{{action}}' => lcfirst($action),
-                    '{{Action}}' => ucfirst($action),
+                    '{{admin}}' => lcfirst($admin->getCode()),
+                    '{{Admin}}' => ucfirst($admin->getCode()),
+                    '{{action}}' => lcfirst($action->getCode()),
+                    '{{Action}}' => ucfirst($action->getCode()),
                 ]
             );
             $testRequest = clone $request;

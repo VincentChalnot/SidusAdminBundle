@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection NullPointerExceptionInspection */
+
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -40,7 +41,7 @@ class Configuration implements ConfigurationInterface
      * {@inheritdoc}
      * @throws \RuntimeException
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root($this->root);

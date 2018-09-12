@@ -43,7 +43,7 @@ class AdminRouteLoader extends Loader
      *
      * @return RouteCollection
      */
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): RouteCollection
     {
         if (true === $this->loaded) {
             throw new \RuntimeException('Do not add the "sidus_admin" loader twice');
@@ -68,7 +68,7 @@ class AdminRouteLoader extends Loader
      *
      * @return bool
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return 'sidus_admin' === $type;
     }

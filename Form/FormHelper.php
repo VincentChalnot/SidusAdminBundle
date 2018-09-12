@@ -67,7 +67,8 @@ class FormHelper
         Request $request,
         $data
     ): FormInterface {
-        $formOptions = $this->getDefaultFormOptions($action, $request, $data);
+        $dataId = $data && method_exists($data, 'getId') ? $data->getId() : null;
+        $formOptions = $this->getDefaultFormOptions($action, $request, $dataId);
 
         return $this->formFactory->createNamedBuilder(
             "form_{$action->getAdmin()->getCode()}_{$action->getCode()}",

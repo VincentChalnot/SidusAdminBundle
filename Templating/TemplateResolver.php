@@ -120,21 +120,23 @@ class TemplateResolver implements TemplateResolverInterface
                     ]
                 );
             }
-        } else {
-            try {
-                return $this->twig->loadTemplate($globalFallbackTemplate);
-            } catch (\Twig_Error_Loader $fallbackError) {
-                $this->logger->critical(
-                    "Missing template '{$customTemplate}' and global fallback template '{$globalFallbackTemplate}'",
-                    [
-                        'template' => $customTemplate,
-                        'globalFallbackTemplate' => $globalFallbackTemplate,
-                        'admin' => $admin->getCode(),
-                        'action' => $action->getCode(),
-                        'fallbackError' => $fallbackError,
-                    ]
-                );
-            }
+
+            throw $mainError;
+        }
+
+        try {
+            return $this->twig->loadTemplate($globalFallbackTemplate);
+        } catch (\Twig_Error_Loader $fallbackError) {
+            $this->logger->critical(
+                "Missing template '{$customTemplate}' and global fallback template '{$globalFallbackTemplate}'",
+                [
+                    'template' => $customTemplate,
+                    'globalFallbackTemplate' => $globalFallbackTemplate,
+                    'admin' => $admin->getCode(),
+                    'action' => $action->getCode(),
+                    'fallbackError' => $fallbackError,
+                ]
+            );
         }
 
         throw $mainError;

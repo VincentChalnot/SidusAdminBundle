@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ReturnTypeCanBeDeclaredInspection */
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -232,8 +232,6 @@ abstract class AbstractAdminController extends Controller implements AdminInject
     protected function renderAction(array $parameters = [], Action $action = null)
     {
         $response = new Response();
-        /** @noinspection PhpUnhandledExceptionInspection */
-        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         $response->setContent($this->getTemplate($action)->render($parameters));
 
         return $response;

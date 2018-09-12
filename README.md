@@ -135,7 +135,7 @@ class PostController extends AbstractAdminController
      *
      * @return Response
      */
-    public function editAction(Request $request, Post $post)
+    public function editAction(Request $request, Post $post): Response
     {
         $form = $this->getForm($request, $post);
         $form->handleRequest($request);
@@ -176,7 +176,7 @@ class PostController extends Controller implements AdminInjectableInterface
     /**
      * @param Admin $admin
      */
-    public function setAdmin(Admin $admin)
+    public function setAdmin(Admin $admin): void
     {
         $this->admin = $admin;
     }

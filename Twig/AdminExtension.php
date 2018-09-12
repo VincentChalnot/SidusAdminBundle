@@ -52,7 +52,7 @@ class AdminExtension extends Twig_Extension
     /**
      * @return array
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new Twig_SimpleFunction('get_admins', [$this->adminRegistry, 'getAdmins']),
@@ -71,7 +71,7 @@ class AdminExtension extends Twig_Extension
      *
      * @return Admin
      */
-    public function getAdmin($code)
+    public function getAdmin($code): Admin
     {
         if ($code instanceof Admin) {
             return $code;
@@ -85,7 +85,7 @@ class AdminExtension extends Twig_Extension
      *
      * @return string The extension name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'sidus_admin';
     }

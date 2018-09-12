@@ -11,7 +11,7 @@
 namespace Sidus\AdminBundle\Event;
 
 use Sidus\AdminBundle\Action\ActionInjectableInterface;
-use Sidus\AdminBundle\Configuration\AdminRegistry;
+use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Controller\AdminInjectableInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -22,23 +22,12 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class AdminControllerInjecter
 {
-    /** @var AdminRegistry */
-    protected $adminRegistry;
-
-    /**
-     * @param AdminRegistry $adminRegistry
-     */
-    public function __construct(AdminRegistry $adminRegistry)
-    {
-        $this->adminRegistry = $adminRegistry;
-    }
-
     /**
      * @param FilterControllerEvent $event
      *
      * @throws \LogicException|\UnexpectedValueException|\InvalidArgumentException
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event): void
     {
         $controller = $event->getController();
         if (\is_array($controller)) {
@@ -52,13 +41,14 @@ class AdminControllerInjecter
         if (!$request->attributes->has('_admin')) {
             $routeName = $request->attributes->get('_route');
 
-            $m = "Missing request attribute '_admin' for route {$routeName},";
-            $m .= 'this means you declared this route outside the admin configuration, please include the _admin';
-            $m .= 'attribute in your route definition or use the admin configuration';
+            $m = "Missing request attribute '_admin' for route {$routeName}, this means you declared";
+            $m .= ' this route outside the admin configuration, please use the admin configuration';
             throw new \LogicException($m);
         }
-        $admin = $this->adminRegistry->getAdmin($request->attributes->get('_admin'));
-        $this->adminRegistry->setCurrentAdmin($admin);
+        $admin = $request->attributes->get('_admin');
+        if (!$admin instanceof Admin) {
+            throw new \UnexpectedValueException('_admin request attribute is not an Admin object');
+        }
         if ($controller instanceof AdminInjectableInterface) {
             $controller->setAdmin($admin);
         }

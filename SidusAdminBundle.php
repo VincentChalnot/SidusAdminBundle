@@ -25,7 +25,7 @@ class SidusAdminBundle extends Bundle
      *
      * @param ContainerBuilder $container
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(
             new GenericCompilerPass(

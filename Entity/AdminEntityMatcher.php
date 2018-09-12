@@ -41,7 +41,7 @@ class AdminEntityMatcher
      *
      * @return Admin
      */
-    public function getAdminForEntity($entity)
+    public function getAdminForEntity($entity): Admin
     {
         $class = \get_class($entity);
 

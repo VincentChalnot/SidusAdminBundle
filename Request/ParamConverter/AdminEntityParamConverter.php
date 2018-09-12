@@ -14,7 +14,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
-use Sidus\AdminBundle\Configuration\AdminRegistry;
+use Sidus\AdminBundle\Admin\Admin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -26,28 +26,26 @@ class AdminEntityParamConverter implements ParamConverterInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var AdminRegistry */
-    protected $adminRegistry;
-
     /**
      * @param ManagerRegistry $doctrine
-     * @param AdminRegistry   $adminRegistry
      */
-    public function __construct(ManagerRegistry $doctrine, AdminRegistry $adminRegistry)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
-        $this->adminRegistry = $adminRegistry;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(Request $request, ParamConverter $configuration)
+    public function apply(Request $request, ParamConverter $configuration): bool
     {
         if (!$request->attributes->has('_admin')) {
             throw new \UnexpectedValueException('Missing _admin request attribute');
         }
-        $admin = $this->adminRegistry->getAdmin($request->attributes->get('_admin'));
+        $admin = $request->attributes->get('_admin');
+        if (!$admin instanceof Admin) {
+            throw new \UnexpectedValueException('_admin request attribute is not an Admin object');
+        }
         $entityManager = $this->doctrine->getManagerForClass($admin->getEntity());
         if (!$entityManager instanceof EntityManagerInterface) {
             throw new \UnexpectedValueException("Unable to find an EntityManager for class {$admin->getEntity()}");
@@ -71,7 +69,7 @@ class AdminEntityParamConverter implements ParamConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(ParamConverter $configuration)
+    public function supports(ParamConverter $configuration): bool
     {
         return 'sidus_admin.entity' === $configuration->getConverter();
     }
