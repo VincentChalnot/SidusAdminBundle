@@ -95,8 +95,8 @@ class AdminControllerResolver
         }
 
         $flattened = implode(', ', $controllerPatterns);
-        throw new \RuntimeException(
-            "Unable to resolve any valid controller for the controller_pattern configuration: {$flattened}"
-        );
+        $m = "Unable to resolve any valid controller for the admin '{$admin->getCode()}' and action ";
+        $m .= "'{$action->getCode()}' and for the controller_pattern configuration: {$flattened}";
+        throw new \RuntimeException($m);
     }
 }
