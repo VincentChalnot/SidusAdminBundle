@@ -2,95 +2,54 @@
 
 namespace Sidus\AdminBundle\Action;
 
-use Sidus\AdminBundle\Templating\TemplatingHelper;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Form\FormHelper;
 use Sidus\AdminBundle\Routing\RoutingHelper;
+use Sidus\AdminBundle\Templating\TemplatingHelper;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Security("is_granted('delete', data)")
  */
-class DeleteAction implements ActionInjectableInterface
+class DeleteAction extends AbstractEmptyFormAction
 {
-    /** @var FormHelper */
-    protected $formHelper;
+    /** @var RoutingHelper */
+    protected $routingHelper;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var RoutingHelper */
-    protected $routingHelper;
-
-    /** @var TemplatingHelper */
-    protected $templatingHelper;
-
-    /** @var Action */
-    protected $action;
-
     /**
      * @param FormHelper       $formHelper
-     * @param DoctrineHelper   $doctrineHelper
-     * @param RoutingHelper    $routingHelper
      * @param TemplatingHelper $templatingHelper
+     * @param RoutingHelper    $routingHelper
+     * @param DoctrineHelper   $doctrineHelper
      */
     public function __construct(
         FormHelper $formHelper,
-        DoctrineHelper $doctrineHelper,
+        TemplatingHelper $templatingHelper,
         RoutingHelper $routingHelper,
-        TemplatingHelper $templatingHelper
+        DoctrineHelper $doctrineHelper
     ) {
-        $this->formHelper = $formHelper;
-        $this->doctrineHelper = $doctrineHelper;
+        parent::__construct($formHelper, $templatingHelper);
         $this->routingHelper = $routingHelper;
-        $this->templatingHelper = $templatingHelper;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
-     * @ParamConverter(name="data", converter="sidus_admin.entity")
-     *
-     * @param Request $request
-     * @param mixed   $data
-     *
-     * @throws \Exception
-     *
-     * @return Response
+     * {@inheritdoc}
      */
-    public function __invoke(Request $request, $data): Response
+    protected function applyAction(Request $request, FormInterface $form, $data): Response
     {
-        $dataId = $data->getId();
-        $form = $this->formHelper->getEmptyForm($this->action, $request, $data);
+        $this->doctrineHelper->deleteEntity($this->action, $data, $request->getSession());
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->doctrineHelper->deleteEntity($this->action, $data, $request->getSession());
-
-            return $this->routingHelper->redirectToAction(
-                $this->action->getAdmin()->getAction(
-                    $this->action->getOption('redirect_action', 'list')
-                )
-            );
-        }
-
-        return $this->templatingHelper->renderFormAction(
-            $this->action,
-            $form,
-            $data,
-            [
-                'dataId' => $dataId,
-            ]
+        return $this->routingHelper->redirectToAction(
+            $this->action->getAdmin()->getAction(
+                $this->action->getOption('redirect_action', 'list')
+            )
         );
-    }
-
-    /**
-     * @param Action $action
-     */
-    public function setAction(Action $action): void
-    {
-        $this->action = $action;
     }
 }
