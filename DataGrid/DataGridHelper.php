@@ -94,6 +94,26 @@ class DataGridHelper
         DataGrid $dataGrid = null,
         array $formOptions = []
     ): DataGrid {
+        $dataGrid = $this->buildDataGridForm($action, $request, $dataGrid, $formOptions);
+        $dataGrid->handleRequest($request);
+
+        return $dataGrid;
+    }
+
+    /**
+     * @param Action        $action
+     * @param Request       $request
+     * @param DataGrid|null $dataGrid
+     * @param array         $formOptions
+     *
+     * @return DataGrid
+     */
+    public function buildDataGridForm(
+        Action $action,
+        Request $request,
+        DataGrid $dataGrid = null,
+        array $formOptions = []
+    ): DataGrid {
         if (null === $dataGrid) {
             $dataGrid = $this->getDataGrid($action);
         }
@@ -110,7 +130,6 @@ class DataGridHelper
         // Create form with filters
         $builder = $this->formFactory->createBuilder(FormType::class, null, $formOptions);
         $dataGrid->buildForm($builder);
-        $dataGrid->handleRequest($request);
 
         return $dataGrid;
     }
