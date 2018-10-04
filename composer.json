@@ -23,7 +23,7 @@
     },
     "require": {
         "php": ">=7.1",
-        "sidus/datagrid-bundle": "dev-v2.0-dev",
+        "sidus/datagrid-bundle": "2.0.*",
         "sidus/base-bundle": "~1.0"
     }
 }
