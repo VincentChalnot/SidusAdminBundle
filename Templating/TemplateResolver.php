@@ -74,6 +74,7 @@ class TemplateResolver implements TemplateResolverInterface
                 try {
                     return $this->twig->loadTemplate($template);
                 } catch (\Twig_Error_Loader $mainError) {
+                    $this->logger->debug("Unable to load template '{$template}': {$mainError->getMessage()}");
                     continue;
                 }
             }
