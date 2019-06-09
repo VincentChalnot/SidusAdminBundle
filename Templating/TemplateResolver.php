@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2018 Vincent Chalnot
+ * Copyright (c) 2015-2019 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,6 +12,10 @@ namespace Sidus\AdminBundle\Templating;
 
 use Psr\Log\LoggerInterface;
 use Sidus\AdminBundle\Admin\Action;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Template;
 
 /**
  * Resolve templates based on admin configuration
@@ -48,9 +52,13 @@ class TemplateResolver implements TemplateResolverInterface
      * @param Action $action
      * @param string $format
      *
-     * @return \Twig_Template
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     *
+     * @return Template
      */
-    public function getTemplate(Action $action, $format = 'html'): \Twig_Template
+    public function getTemplate(Action $action, $format = 'html'): Template
     {
         $admin = $action->getAdmin();
         if ($action->getTemplate()) {
@@ -73,7 +81,7 @@ class TemplateResolver implements TemplateResolverInterface
                 );
                 try {
                     return $this->twig->loadTemplate($template);
-                } catch (\Twig_Error_Loader $mainError) {
+                } catch (LoaderError $mainError) {
                     $this->logger->debug("Unable to load template '{$template}': {$mainError->getMessage()}");
                     continue;
                 }
@@ -94,7 +102,7 @@ class TemplateResolver implements TemplateResolverInterface
 
         try {
             return $this->twig->loadTemplate($customTemplate);
-        } catch (\Twig_Error_Loader $mainError) {
+        } catch (LoaderError $mainError) {
             $nextTemplate = $fallbackTemplate ?: $globalFallbackTemplate;
             $this->logger->notice(
                 "Missing template {$customTemplate}, falling back to template {$nextTemplate}",
@@ -109,7 +117,7 @@ class TemplateResolver implements TemplateResolverInterface
         if ($fallbackTemplate) {
             try {
                 return $this->twig->loadTemplate($fallbackTemplate);
-            } catch (\Twig_Error_Loader $fallbackError) {
+            } catch (LoaderError $fallbackError) {
                 $this->logger->critical(
                     "Missing template '{$customTemplate}' and fallback template '{$fallbackTemplate}'",
                     [
@@ -127,7 +135,7 @@ class TemplateResolver implements TemplateResolverInterface
 
         try {
             return $this->twig->loadTemplate($globalFallbackTemplate);
-        } catch (\Twig_Error_Loader $fallbackError) {
+        } catch (LoaderError $fallbackError) {
             $this->logger->critical(
                 "Missing template '{$customTemplate}' and global fallback template '{$globalFallbackTemplate}'",
                 [
