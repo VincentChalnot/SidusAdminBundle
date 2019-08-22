@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -14,8 +14,8 @@ use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
 use Sidus\AdminBundle\Routing\AdminRouter;
-use Twig_Extension;
-use Twig_SimpleFunction;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 use UnexpectedValueException;
 
 /**
@@ -23,7 +23,7 @@ use UnexpectedValueException;
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class AdminExtension extends Twig_Extension
+class AdminExtension extends AbstractExtension
 {
     /** @var AdminRegistry */
     protected $adminRegistry;
@@ -55,12 +55,12 @@ class AdminExtension extends Twig_Extension
     public function getFunctions(): array
     {
         return [
-            new Twig_SimpleFunction('get_admins', [$this->adminRegistry, 'getAdmins']),
-            new Twig_SimpleFunction('admin_path', [$this->adminRouter, 'generateAdminPath']),
-            new Twig_SimpleFunction('admin_entity_path', [$this->adminRouter, 'generateAdminEntityPath']),
-            new Twig_SimpleFunction('entity_path', [$this->adminRouter, 'generateEntityPath']),
-            new Twig_SimpleFunction('entity_admin', [$this->adminEntityMatcher, 'getAdminForEntity']),
-            new Twig_SimpleFunction('admin', [$this, 'getAdmin']),
+            new TwigFunction('get_admins', [$this->adminRegistry, 'getAdmins']),
+            new TwigFunction('admin_path', [$this->adminRouter, 'generateAdminPath']),
+            new TwigFunction('admin_entity_path', [$this->adminRouter, 'generateAdminEntityPath']),
+            new TwigFunction('entity_path', [$this->adminRouter, 'generateEntityPath']),
+            new TwigFunction('entity_admin', [$this->adminEntityMatcher, 'getAdminForEntity']),
+            new TwigFunction('admin', [$this, 'getAdmin']),
         ];
     }
 

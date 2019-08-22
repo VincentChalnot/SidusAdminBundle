@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -8,19 +8,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Sidus\AdminBundle\Controller;
+namespace Sidus\AdminBundle\Action;
 
-use Sidus\AdminBundle\Admin\Admin;
+use Sidus\AdminBundle\Admin\Action;
 
 /**
- * If a controller implements this interface, it will be injected with it's current matching admin
+ * Allow the action to redirect to a custom action
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-interface AdminInjectableInterface
+interface RedirectableInterface extends ActionInjectableInterface
 {
     /**
-     * @param Admin $admin
+     * @param Action $action
      */
-    public function setAdmin(Admin $admin);
+    public function setRedirectAction(Action $action): void;
 }

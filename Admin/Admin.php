@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -10,6 +10,8 @@
 
 namespace Sidus\AdminBundle\Admin;
 
+use UnexpectedValueException;
+
 /**
  * The admin serves as an action holder and is attached to a Doctrine entity
  *
@@ -19,9 +21,6 @@ class Admin
 {
     /** @var string */
     protected $code;
-
-    /** @var string|null */
-    protected $controller;
 
     /** @var array */
     protected $controllerPattern = [];
@@ -48,9 +47,6 @@ class Admin
     protected $currentAction;
 
     /** @var string|null */
-    protected $fallbackTemplateDirectory;
-
-    /** @var string|null */
     protected $baseTemplate;
 
     /**
@@ -60,15 +56,12 @@ class Admin
     public function __construct(string $code, array $adminConfiguration)
     {
         $this->code = $code;
-        $this->controller = $adminConfiguration['controller'];
         $this->controllerPattern = $adminConfiguration['controller_pattern'];
         $this->templatePattern = $adminConfiguration['template_pattern'];
         $this->prefix = $adminConfiguration['prefix'];
         $this->entity = $adminConfiguration['entity'];
         $this->formType = $adminConfiguration['form_type'];
         $this->options = $adminConfiguration['options'];
-        $this->fallbackTemplateDirectory = $adminConfiguration['fallback_template_directory'];
-        $this->baseTemplate = $adminConfiguration['base_template'];
 
         $actionClass = $adminConfiguration['action_class'];
         foreach ((array) $adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
@@ -82,14 +75,6 @@ class Admin
     public function getCode(): string
     {
         return $this->code;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getController(): ?string
-    {
-        return $this->controller;
     }
 
     /**
@@ -127,14 +112,14 @@ class Admin
     /**
      * @param string $code
      *
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      *
      * @return Action
      */
     public function getAction(string $code): Action
     {
         if (!$this->hasAction($code)) {
-            throw new \UnexpectedValueException("No action with code: '{$code}' for admin '{$this->getCode()}'");
+            throw new UnexpectedValueException("No action with code: '{$code}' for admin '{$this->getCode()}'");
         }
 
         return $this->actions[$code];
@@ -216,14 +201,6 @@ class Admin
     }
 
     /**
-     * @return string|null
-     */
-    public function getFallbackTemplateDirectory(): ?string
-    {
-        return $this->fallbackTemplateDirectory;
-    }
-
-    /**
      * @return Action|null
      */
     public function getCurrentAction(): ?Action
@@ -234,7 +211,7 @@ class Admin
     /**
      * @param string|Action $action
      *
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function setCurrentAction($action): void
     {

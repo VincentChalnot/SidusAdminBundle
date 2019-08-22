@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -10,7 +10,9 @@
 
 namespace Sidus\AdminBundle\Admin;
 
+use LogicException;
 use Symfony\Component\Routing\Route;
+use function count;
 
 /**
  * Holds information about an action and it's related route and template
@@ -55,14 +57,12 @@ class Action
         $this->template = $c['template'];
 
         if (empty($c['defaults']['_controller_pattern']) && empty($c['defaults']['_controller'])) {
-            if (\count($admin->getControllerPattern()) > 0) {
+            if (count($admin->getControllerPattern()) > 0) {
                 $c['defaults']['_controller_pattern'] = $admin->getControllerPattern();
-            } elseif ($admin->getController()) {
-                $c['defaults']['_controller'] = $admin->getController().':'.$code;
             } else {
-                throw new \LogicException(
-                    "You must configure either the 'controller' option or the 'controller_pattern'"
-                );
+                $m = "You must configure either the 'defaults._controller' option in the action ";
+                $m .= "or the 'controller_pattern' option in the admin";
+                throw new LogicException($m);
             }
         }
 

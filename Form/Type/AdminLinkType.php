@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -10,6 +10,7 @@
 
 namespace Sidus\AdminBundle\Form\Type;
 
+use LogicException;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
@@ -49,7 +50,7 @@ class AdminLinkType extends AbstractType
      * @param FormInterface $form
      * @param array         $options
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['admin'] = $options['admin'];
         $view->vars['admin_action'] = $options['admin_action'];
@@ -57,10 +58,8 @@ class AdminLinkType extends AbstractType
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \Exception
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(
             [
@@ -89,13 +88,13 @@ class AdminLinkType extends AbstractType
         );
         $resolver->setNormalizer(
             'admin_action',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 /** @var Admin $admin */
                 $admin = $options['admin'];
 
                 if ($value instanceof Action) {
                     if ($value->getAdmin() !== $admin) {
-                        throw new \LogicException(
+                        throw new LogicException(
                             "Wrong Admin for Action {$value->getCode()}: {$value->getAdmin()->getCode()}"
                         );
                     }
@@ -125,7 +124,7 @@ class AdminLinkType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'admin_link';
     }
@@ -133,7 +132,7 @@ class AdminLinkType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): string
     {
         return LinkType::class;
     }

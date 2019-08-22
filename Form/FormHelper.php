@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use UnexpectedValueException;
 
 /**
  * Provides a simple way to access form utilities from a controller or an action
@@ -83,15 +84,14 @@ class FormHelper
      * @param mixed  $data
      * @param array  $options
      *
-     * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws UnexpectedValueException
      *
      * @return FormBuilderInterface
      */
     public function getFormBuilder(Action $action, $data, array $options = []): FormBuilderInterface
     {
         if (!$action->getFormType()) {
-            throw new \UnexpectedValueException("Missing parameter 'form_type' for action '{$action->getCode()}'");
+            throw new UnexpectedValueException("Missing parameter 'form_type' for action '{$action->getCode()}'");
         }
 
         return $this->formFactory->createNamedBuilder(

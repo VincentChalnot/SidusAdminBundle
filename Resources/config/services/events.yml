@@ -8,6 +8,8 @@ services:
     Sidus\AdminBundle\Event\AdminControllerResolver:
         autowire: true
         public: false
+        arguments:
+            $controllerResolver: '@controller_resolver'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: -1 }
 

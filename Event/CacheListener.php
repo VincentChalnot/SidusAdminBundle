@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -12,13 +12,8 @@ namespace Sidus\AdminBundle\Event;
 
 use Sidus\AdminBundle\Admin\Admin;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
-use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
-use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use UnexpectedValueException;
 
 /**
  * Add no-cache header to all Http Responses from the admin.
@@ -29,15 +24,6 @@ class CacheListener
 {
     /**
      * @param FilterResponseEvent $event
-     *
-     * @throws \InvalidArgumentException
-     * @throws AccessException
-     * @throws \UnexpectedValueException
-     * @throws InvalidOptionsException
-     * @throws MissingOptionsException
-     * @throws NoSuchOptionException
-     * @throws OptionDefinitionException
-     * @throws UndefinedOptionsException
      */
     public function onKernelResponse(FilterResponseEvent $event): void
     {
@@ -47,7 +33,7 @@ class CacheListener
 
         $admin = $event->getRequest()->attributes->get('_admin');
         if (!$admin instanceof Admin) {
-            throw new \UnexpectedValueException('_admin request attribute is not an Admin object');
+            throw new UnexpectedValueException('_admin request attribute is not an Admin object');
         }
 
         $resolver = new OptionsResolver();

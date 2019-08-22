@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -10,6 +10,7 @@
 
 namespace Sidus\AdminBundle\Routing;
 
+use RuntimeException;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
@@ -21,9 +22,6 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class AdminRouteLoader extends Loader
 {
-    /** @var bool */
-    protected $loaded;
-
     /** @var AdminRegistry */
     protected $adminRegistry;
 
@@ -39,16 +37,12 @@ class AdminRouteLoader extends Loader
      * @param mixed $resource
      * @param null  $type
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      *
      * @return RouteCollection
      */
     public function load($resource, $type = null): RouteCollection
     {
-        if (true === $this->loaded) {
-            throw new \RuntimeException('Do not add the "sidus_admin" loader twice');
-        }
-
         $routes = new RouteCollection();
 
         foreach ($this->adminRegistry->getAdmins() as $admin) {
@@ -56,8 +50,6 @@ class AdminRouteLoader extends Loader
                 $routes->add($action->getRouteName(), $action->getRoute());
             }
         }
-
-        $this->loaded = true;
 
         return $routes;
     }

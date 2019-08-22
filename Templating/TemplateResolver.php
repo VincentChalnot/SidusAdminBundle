@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -10,12 +10,16 @@
 
 namespace Sidus\AdminBundle\Templating;
 
+use LogicException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Sidus\AdminBundle\Admin\Action;
+use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Template;
+use function count;
 
 /**
  * Resolve templates based on admin configuration
@@ -24,27 +28,21 @@ use Twig\Template;
  */
 class TemplateResolver implements TemplateResolverInterface
 {
-    /** @var \Twig_Environment */
+    /** @var Environment */
     protected $twig;
 
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var string */
-    protected $globalFallbackTemplate;
-
     /**
-     * @param \Twig_Environment $twig
-     * @param string            $globalFallbackTemplate
-     * @param LoggerInterface   $logger
+     * @param Environment     $twig
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        \Twig_Environment $twig,
-        $globalFallbackTemplate,
+        Environment $twig,
         LoggerInterface $logger
     ) {
         $this->twig = $twig;
-        $this->globalFallbackTemplate = $globalFallbackTemplate;
         $this->logger = $logger;
     }
 
@@ -62,92 +60,37 @@ class TemplateResolver implements TemplateResolverInterface
     {
         $admin = $action->getAdmin();
         if ($action->getTemplate()) {
-            // If the template was specified, do not try to fallback
+            // If the template was specified, use this one
             return $this->twig->loadTemplate($action->getTemplate());
         }
 
         // Priority to new template_pattern system:
-        if (\count($admin->getTemplatePattern()) > 0) {
-            foreach ($admin->getTemplatePattern() as $templatePattern) {
-                $template = strtr(
-                    $templatePattern,
-                    [
-                        '{{admin}}' => lcfirst($admin->getCode()),
-                        '{{Admin}}' => ucfirst($admin->getCode()),
-                        '{{action}}' => lcfirst($action->getCode()),
-                        '{{Action}}' => ucfirst($action->getCode()),
-                        '{{format}}' => $format,
-                    ]
-                );
-                try {
-                    return $this->twig->loadTemplate($template);
-                } catch (LoaderError $mainError) {
-                    $this->logger->debug("Unable to load template '{$template}': {$mainError->getMessage()}");
-                    continue;
-                }
-            }
-
-            $flattened = implode(', ', $admin->getTemplatePattern());
-            throw new \RuntimeException(
-                "Unable to resolve any valid template for the template_pattern configuration: {$flattened}"
-            );
+        if (count($admin->getTemplatePattern()) === 0) {
+            throw new LogicException("No template configured for action {$admin->getCode()}.{$action->getCode()}");
         }
 
-        $template = "{$action->getCode()}.{$format}.twig";
-
-        $customTemplate = $admin->getController().':'.$template;
-        $fallbackTemplate = $admin->getFallbackTemplateDirectory() ?
-            $admin->getFallbackTemplateDirectory().':'.$template : null;
-        $globalFallbackTemplate = $this->globalFallbackTemplate ? $this->globalFallbackTemplate.':'.$template : null;
-
-        try {
-            return $this->twig->loadTemplate($customTemplate);
-        } catch (LoaderError $mainError) {
-            $nextTemplate = $fallbackTemplate ?: $globalFallbackTemplate;
-            $this->logger->notice(
-                "Missing template {$customTemplate}, falling back to template {$nextTemplate}",
+        foreach ($admin->getTemplatePattern() as $templatePattern) {
+            $template = strtr(
+                $templatePattern,
                 [
-                    'template' => $customTemplate,
-                    'admin' => $admin->getCode(),
-                    'action' => $action->getCode(),
+                    '{{admin}}' => lcfirst($admin->getCode()),
+                    '{{Admin}}' => ucfirst($admin->getCode()),
+                    '{{action}}' => lcfirst($action->getCode()),
+                    '{{Action}}' => ucfirst($action->getCode()),
+                    '{{format}}' => $format,
                 ]
             );
-        }
-
-        if ($fallbackTemplate) {
             try {
-                return $this->twig->loadTemplate($fallbackTemplate);
-            } catch (LoaderError $fallbackError) {
-                $this->logger->critical(
-                    "Missing template '{$customTemplate}' and fallback template '{$fallbackTemplate}'",
-                    [
-                        'template' => $customTemplate,
-                        'fallbackTemplate' => $fallbackTemplate,
-                        'admin' => $admin->getCode(),
-                        'action' => $action->getCode(),
-                        'error' => $fallbackError,
-                    ]
-                );
+                return $this->twig->loadTemplate($template);
+            } catch (LoaderError $mainError) {
+                $this->logger->debug("Unable to load template '{$template}': {$mainError->getMessage()}");
+                continue;
             }
-
-            throw $mainError;
         }
 
-        try {
-            return $this->twig->loadTemplate($globalFallbackTemplate);
-        } catch (LoaderError $fallbackError) {
-            $this->logger->critical(
-                "Missing template '{$customTemplate}' and global fallback template '{$globalFallbackTemplate}'",
-                [
-                    'template' => $customTemplate,
-                    'globalFallbackTemplate' => $globalFallbackTemplate,
-                    'admin' => $admin->getCode(),
-                    'action' => $action->getCode(),
-                    'fallbackError' => $fallbackError,
-                ]
-            );
-        }
-
-        throw $mainError;
+        $flattened = implode(', ', $admin->getTemplatePattern());
+        throw new RuntimeException(
+            "Unable to resolve any valid template for the template_pattern configuration: {$flattened}"
+        );
     }
 }

@@ -1,0 +1,37 @@
+{% extends '@SidusAdmin/base.html.twig' %}
+{# @var admin \Sidus\AdminBundle\Admin\Admin #}
+
+{% block container %}
+    <div class="row">
+        <div class="col-lg-4">
+            <h2>{{ admin.currentAction.code|capitalize }}: {{ data }}</h2>
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ block('form_actions') }}
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block form_actions %}
+    <div class="btn-group pull-right">
+        {{ block('back_button') }}
+        {{ block('submit_button') }}
+    </div>
+{% endblock %}
+
+{% block back_button %}
+    {% if listPath|default(false) %}
+        <a href="{{ listPath }}" class="btn btn-default">
+            <i class="fa fa-arrow-left"></i> Back
+        </a>
+    {% endif %}
+{% endblock %}
+
+{% block submit_button %}
+    <button type="submit" class="btn btn-primary">
+        {% spaceless %}
+            <i class="fa fa-save"></i> Submit
+        {% endspaceless %}
+    </button>
+{% endblock %}

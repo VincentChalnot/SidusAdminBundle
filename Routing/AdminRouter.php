@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -10,6 +10,8 @@
 
 namespace Sidus\AdminBundle\Routing;
 
+use Exception;
+use LogicException;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
@@ -17,6 +19,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
+use UnexpectedValueException;
 
 /**
  * Generated path for admins and actions
@@ -88,8 +91,6 @@ class AdminRouter
      * @param array  $parameters
      * @param int    $referenceType
      *
-     * @throws \Exception
-     *
      * @return string
      */
     public function generateEntityPath(
@@ -110,8 +111,6 @@ class AdminRouter
      * @param array        $parameters
      * @param int          $referenceType
      *
-     * @throws \Exception
-     *
      * @return string
      */
     public function generateAdminEntityPath(
@@ -128,11 +127,11 @@ class AdminRouter
         foreach ($missingParams as $missingParam) {
             try {
                 $parameters[$missingParam] = $this->accessor->getValue($entity, $missingParam);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 try {
                     // Fallback to array syntax
                     $parameters[$missingParam] = $this->accessor->getValue($entity, "[{$missingParam}]");
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $contextParam = $this->router->getContext()->getParameter($missingParam);
                     if (null !== $contextParam) {
                         $parameters[$missingParam] = $contextParam;
@@ -147,7 +146,7 @@ class AdminRouter
     /**
      * @param string|Admin $admin
      *
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      *
      * @return Admin
      */
@@ -167,7 +166,7 @@ class AdminRouter
      * @param Route $route
      * @param array $parameters
      *
-     * @throws \LogicException
+     * @throws LogicException
      *
      * @return array
      */

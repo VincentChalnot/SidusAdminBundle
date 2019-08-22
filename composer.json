@@ -23,7 +23,18 @@
     },
     "require": {
         "php": ">=7.1",
-        "sidus/datagrid-bundle": "dev-v2.0-dev",
+        "doctrine/orm": "~2.3",
+        "twig/twig": "~2.0",
+        "symfony/dependency-injection": "~3.0|~4.0",
+        "symfony/routing": "~3.0|~4.0",
+        "symfony/form": "~3.0|~4.0",
+        "symfony/http-foundation": "~3.0|~4.0",
+        "symfony/security-core": "~3.0|~4.0",
+        "symfony/config": "~3.0|~4.0",
+        "symfony/translation": "~3.0|~4.0",
+        "symfony/http-kernel": "~3.0|~4.0",
+        "symfony/options-resolver": "~3.0|~4.0",
+        "sidus/datagrid-bundle": "3.0.*|dev-v3.0-dev",
         "sidus/base-bundle": "~1.0"
     }
 }

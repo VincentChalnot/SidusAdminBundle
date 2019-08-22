@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -46,6 +46,7 @@ class TemplatingHelper
     public function renderAction(Action $action, array $parameters = []): Response
     {
         $response = new Response();
+        /** @noinspection PhpUnhandledExceptionInspection */
         $response->setContent($this->templateResolver->getTemplate($action)->render($parameters));
 
         return $response;

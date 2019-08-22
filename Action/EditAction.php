@@ -1,4 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+/*
+ * This file is part of the Sidus/AdminBundle package.
+ *
+ * Copyright (c) 2015-2019 Vincent Chalnot
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Sidus\AdminBundle\Action;
 
@@ -15,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @Security("is_granted('edit', data)")
  */
-class EditAction implements ActionInjectableInterface
+class EditAction implements RedirectableInterface
 {
     /** @var FormHelper */
     protected $formHelper;
@@ -58,8 +66,6 @@ class EditAction implements ActionInjectableInterface
      *
      * @param Request $request
      * @param mixed   $data
-     *
-     * @throws \Exception
      *
      * @return Response
      */

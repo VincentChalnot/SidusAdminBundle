@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -10,24 +10,28 @@
 
 namespace Sidus\AdminBundle\Event;
 
+use LogicException;
+use RuntimeException;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use UnexpectedValueException;
+use function is_array;
 
 /**
  * Resolve the proper controller when the _controller_pattern option is used
  */
 class AdminControllerResolver
 {
-    /** @var ContainerControllerResolver */
+    /** @var ControllerResolverInterface */
     public $controllerResolver;
 
     /**
-     * @param ContainerControllerResolver $controllerResolver
+     * @param ControllerResolverInterface $controllerResolver
      */
-    public function __construct(ContainerControllerResolver $controllerResolver)
+    public function __construct(ControllerResolverInterface $controllerResolver)
     {
         $this->controllerResolver = $controllerResolver;
     }
@@ -46,16 +50,16 @@ class AdminControllerResolver
         }
 
         $controllerPattern = $request->attributes->get('_controller_pattern');
-        if (!\is_array($controllerPattern)) {
-            throw new \UnexpectedValueException("'_controller_pattern' must be an array");
+        if (!is_array($controllerPattern)) {
+            throw new UnexpectedValueException("'_controller_pattern' must be an array");
         }
         $admin = $request->attributes->get('_admin');
         $action = $request->attributes->get('_action');
         if (!$admin instanceof Admin) {
-            throw new \UnexpectedValueException('_admin request attribute is not an Admin object');
+            throw new UnexpectedValueException('_admin request attribute is not an Admin object');
         }
         if (!$action instanceof Action) {
-            throw new \UnexpectedValueException('_action request attribute is not an Action object');
+            throw new UnexpectedValueException('_action request attribute is not an Action object');
         }
         $controller = $this->getController($request, $admin, $action, $controllerPattern);
         $request->attributes->set('_controller', $controller);
@@ -85,7 +89,7 @@ class AdminControllerResolver
             $testRequest->attributes->set('_controller', $controller);
             try {
                 $resolvedController = $this->controllerResolver->getController($testRequest);
-            } catch (\LogicException $e) {
+            } catch (LogicException $e) {
                 continue;
             }
 
@@ -97,6 +101,6 @@ class AdminControllerResolver
         $flattened = implode(', ', $controllerPatterns);
         $m = "Unable to resolve any valid controller for the admin '{$admin->getCode()}' and action ";
         $m .= "'{$action->getCode()}' and for the controller_pattern configuration: {$flattened}";
-        throw new \RuntimeException($m);
+        throw new RuntimeException($m);
     }
 }

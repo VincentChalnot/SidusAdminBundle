@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -10,10 +10,12 @@
 
 namespace Sidus\AdminBundle\Event;
 
+use LogicException;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use UnexpectedValueException;
 
 /**
  * Resolve the _admin and _action request attributes to real objects
@@ -48,7 +50,7 @@ class AdminResolver
         $this->adminRegistry->setCurrentAdmin($admin);
 
         if (!$request->attributes->has('_action')) {
-            throw new \UnexpectedValueException('Missing _action request attribute');
+            throw new UnexpectedValueException('Missing _action request attribute');
         }
         $action = $request->attributes->get('_action');
         if (!$action instanceof Action) {
@@ -57,7 +59,7 @@ class AdminResolver
         }
 
         if ($action->getAdmin()->getCode() !== $admin->getCode()) {
-            throw new \LogicException('Current action does not belong to current admin');
+            throw new LogicException('Current action does not belong to current admin');
         }
     }
 }

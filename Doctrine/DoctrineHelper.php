@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -13,6 +13,8 @@ namespace Sidus\AdminBundle\Doctrine;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
+use LogicException;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\BaseBundle\Translator\TranslatableTrait;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -42,7 +44,7 @@ class DoctrineHelper
     /**
      * @param mixed $entity
      *
-     * @throws \LogicException
+     * @throws LogicException
      *
      * @return EntityManagerInterface
      */
@@ -51,7 +53,7 @@ class DoctrineHelper
         $class = ClassUtils::getClass($entity);
         $entityManager = $this->doctrine->getManagerForClass($class);
         if (!$entityManager instanceof EntityManagerInterface) {
-            throw new \InvalidArgumentException("No manager found for class {$class}");
+            throw new InvalidArgumentException("No manager found for class {$class}");
         }
 
         return $entityManager;

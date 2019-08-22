@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -30,17 +30,10 @@ class SidusAdminExtension extends SidusBaseExtension
 
     /**
      * {@inheritdoc}
-     * @throws \Exception
-     * @throws BadMethodCallException
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $this->globalConfig = $this->processConfiguration($this->createConfiguration(), $configs);
-
-        $container->setParameter(
-            'sidus_admin.templating.fallback_template_directory',
-            $this->globalConfig['fallback_template_directory']
-        );
 
         foreach ((array) $this->globalConfig['configurations'] as $code => $adminConfiguration) {
             $this->createAdminServiceDefinition($code, $adminConfiguration, $container);

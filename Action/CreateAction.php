@@ -1,4 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+/*
+ * This file is part of the Sidus/AdminBundle package.
+ *
+ * Copyright (c) 2015-2019 Vincent Chalnot
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Sidus\AdminBundle\Action;
 
@@ -13,11 +21,10 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class CreateAction implements ActionInjectableInterface
 {
+    use UpdateSubActionRedirectionTrait;
+
     /** @var EditAction */
     protected $editAction;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
 
     /** @var Action */
     protected $action;
@@ -35,22 +42,12 @@ class CreateAction implements ActionInjectableInterface
     /**
      * @param Request $request
      *
-     * @throws \Exception
-     *
      * @return Response
      */
     public function __invoke(Request $request): Response
     {
-        $this->editAction->setAction($this->action);
-        $admin = $this->action->getAdmin();
-        $class = $admin->getEntity();
-
-        foreach (['edit', 'read'] as $actionCode) {
-            if ($admin->hasAction($actionCode) && $this->authorizationChecker->isGranted($actionCode, $class)) {
-                $this->editAction->setRedirectAction($admin->getAction($actionCode));
-                break;
-            }
-        }
+        $this->updateRedirectAction($this->editAction, $this->action);
+        $class = $this->action->getAdmin()->getEntity();
 
         return ($this->editAction)($request, new $class());
     }

@@ -7,4 +7,4 @@ services:
 
     Sidus\AdminBundle\Routing\AdminRouter:
         autowire: true
-        public: true # This will change in the next version
+        public: false

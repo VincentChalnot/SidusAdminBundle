@@ -16,9 +16,12 @@ Simple example:
 sidus_admin:
     configurations:
         post:
-            controller: 'MyBundle:Post' # Controller reference, like in Symfony routing but without the action name
-            entity: MyBundle\Entity\Post # Class name of your enity
+            entity: MyBundle\Entity\Post # Class name of your entity
             prefix: /post # Routing prefix
+            controller_pattern:
+                - 'Sidus\AdminBundle\Action\{{Action}}Action' # Full controller reference
+            template_pattern:
+                - '@SidusAdmin/Action/{{action}}.{{format}}.twig'
             actions:
                 list:
                     path:     /list # Routing path
@@ -35,21 +38,26 @@ All values are the default one except when specified otherwise.
 sidus_admin:
     admin_class: Sidus\AdminBundle\Admin\Admin
     action_class: Sidus\AdminBundle\Admin\Action
-    fallback_template_directory: ~
     configurations:
         <admin_code>:
-            controller: ~ # REQUIRED: The controller reference that will be used to generate routing
-            prefix: ~ # REQUIRED: Routing prefix for all actions
             entity: ~ # REQUIRED: The fully qualified class name of the entity (or the Doctrine's shorter reference)
+            prefix: ~ # REQUIRED: Routing prefix for all actions
+            controller_pattern: [] # The controller reference that will be used to generate routing
+            # Available interpolation variables are:
+            # {{admin}} lowercase first letter admin code
+            # {{Admin}} uppercase first letter admin code
+            # {{action}} lowercase first letter action code
+            # {{Action}} uppercase first letter action code
+            # If you don't set any controller_pattern you will need to set the _controller attribute in the defaults of
+            # each action.
+            template_pattern: [] # The template pattern
             action_class: # Defaults to main action_class
-            base_template: ~ # Can be used in your template (in extends for eg.), not used by this bundle otherwise
-            fallback_template_directory: ~ # When template is not found in the controller's directory, uses this folder
             options: {} # You can put anything here
             actions:
                 <action_code>: # The action code needs to match the controller's method name without the "Action" suffix
                     form_type: ~ # Useful in combination with AbstractAdminController::getForm($request, $data)
                     form_options: ~ # Static form options
-                    template: <controller>:<action_code>.<format>.twig # Computed by the TemplateResolver
+                    template: ~ # Computed by the TemplateResolver using template_pattern if null
                     # All the following options are used to generate the route for the routing component
                     # See Symfony doc here: http://symfony.com/doc/current/routing.html
                     path: ~ # REQUIRED
@@ -73,16 +81,16 @@ won't need to pass any parameter manually.
 #### PHP
 ```php
 <?php
-/** @var $adminRouter \Sidus\AdminBundle\Routing\AdminRouter */
-$adminRouter->generateAdminPath('post', 'list');
+/** @var $adminRouter AdminRouter */
+use Sidus\AdminBundle\Routing\AdminRouter;$adminRouter->generateAdminPath('post', 'list');
 $adminRouter->generateEntityPath($entity, 'edit');
 ```
 
 When dealing with multiple admins for a single class, you can use this function instead:
 ```php
 <?php
-/** @var $adminRouter \Sidus\AdminBundle\Routing\AdminRouter */
-$adminRouter->generateAdminEntityPath('post', $entity, 'edit');
+/** @var $adminRouter AdminRouter */
+use Sidus\AdminBundle\Routing\AdminRouter;$adminRouter->generateAdminEntityPath('post', $entity, 'edit');
 ```
 
 #### Twig
@@ -103,84 +111,13 @@ For each method, you can pass additional route parameters in the argument just a
 the UrlGeneratorInterface reference type (absolute, relative...).
 ```php
 <?php
-/** @var $adminRouter \Sidus\AdminBundle\Routing\AdminRouter */
-$adminRouter->generateAdminEntityPath(
+/** @var $adminRouter AdminRouter */
+use Sidus\AdminBundle\Routing\AdminRouter;use Symfony\Component\Routing\Generator\UrlGeneratorInterface;$adminRouter->generateAdminEntityPath(
     'post',
     $entity,
     'edit',
     ['parametrer' => 'value'],
-    \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_PATH
+    UrlGeneratorInterface::ABSOLUTE_PATH
 );
 ```
 
-## Controllers
-
-This bundle provides an (optional) abstract controller to make final controller's action methods less verbose:
-
-```php
-<?php
-
-namespace MyBundle\Controller;
-
-use Sidus\AdminBundle\Controller\AbstractAdminController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use MyBundle\Entity\Post;
-
-class PostController extends AbstractAdminController
-{
-    /**
-     * @param Request $request
-     * @param Post    $post
-     *
-     * @return Response
-     */
-    public function editAction(Request $request, Post $post): Response
-    {
-        $form = $this->getForm($request, $post);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->saveEntity($post);
-
-            return $this->redirectToEntity($post, 'edit');
-        }
-
-        return $this->renderAction(
-            [
-                'form' => $form->createView(),
-                'post' => $post,
-                'admin' => $this->admin,
-            ]
-        );
-    }
-}
-```
-
-If you don't want the whole AbstractAdminController thing, you can just implements the AdminInjectableInterface to have
-the admin object associated to your request injected at runtime:
-
-```php
-<?php
-
-namespace MyBundle\Controller;
-
-use Sidus\AdminBundle\Controller\AdminInjectableInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sidus\AdminBundle\Admin\Admin;
-
-class PostController extends Controller implements AdminInjectableInterface
-{
-    /** @var Admin */
-    protected $admin;
-
-    /**
-     * @param Admin $admin
-     */
-    public function setAdmin(Admin $admin): void
-    {
-        $this->admin = $admin;
-    }
-       
-    // Your code
-}
-```

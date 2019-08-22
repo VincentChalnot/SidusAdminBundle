@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
@@ -17,6 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInte
 use Sidus\AdminBundle\Admin\Admin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use UnexpectedValueException;
 
 /**
  * Uses the admin configuration to convert an entity id to a real doctrine entity
@@ -40,21 +41,21 @@ class AdminEntityParamConverter implements ParamConverterInterface
     public function apply(Request $request, ParamConverter $configuration): bool
     {
         if (!$request->attributes->has('_admin')) {
-            throw new \UnexpectedValueException('Missing _admin request attribute');
+            throw new UnexpectedValueException('Missing _admin request attribute');
         }
         $admin = $request->attributes->get('_admin');
         if (!$admin instanceof Admin) {
-            throw new \UnexpectedValueException('_admin request attribute is not an Admin object');
+            throw new UnexpectedValueException('_admin request attribute is not an Admin object');
         }
         $entityManager = $this->doctrine->getManagerForClass($admin->getEntity());
         if (!$entityManager instanceof EntityManagerInterface) {
-            throw new \UnexpectedValueException("Unable to find an EntityManager for class {$admin->getEntity()}");
+            throw new UnexpectedValueException("Unable to find an EntityManager for class {$admin->getEntity()}");
         }
         $id = $request->attributes->get($configuration->getOptions()['attribute'] ?? 'id');
         if (null === $id) {
             $m = "Unable to resolve request attribute for identifier, either use 'id' as a request parameter or set it";
             $m .= " manually in the 'attribute' option of your param converter configuration";
-            throw new \UnexpectedValueException($m);
+            throw new UnexpectedValueException($m);
         }
         $repository = $entityManager->getRepository($admin->getEntity());
         $entity = $repository->find($id);
