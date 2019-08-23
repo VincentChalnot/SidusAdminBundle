@@ -48,6 +48,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+            ->scalarNode('base_template')->defaultValue('@SidusAdmin/base.html.twig')->end()
             ->scalarNode('admin_class')->defaultValue(Admin::class)->end()
             ->scalarNode('action_class')->defaultValue(Action::class)->end()
             ->append($this->getAdminConfigTreeBuilder())
@@ -88,6 +89,7 @@ class Configuration implements ConfigurationInterface
         $actionDefinition = $adminDefinition
             ->scalarNode('controller')->defaultNull()->end()
             ->arrayNode('controller_pattern')->defaultValue([])->scalarPrototype()->end()->end()
+            ->scalarNode('base_template')->defaultNull()->end()
             ->arrayNode('template_pattern')->defaultValue([])->scalarPrototype()->end()->end()
             ->scalarNode('prefix')->isRequired()->end()
             ->scalarNode('entity')->isRequired()->end()
@@ -116,6 +118,7 @@ class Configuration implements ConfigurationInterface
             // Custom parameters
             ->scalarNode('form_type')->defaultNull()->end()
             ->variableNode('form_options')->defaultValue([])->end()
+            ->scalarNode('base_template')->defaultNull()->end()
             ->scalarNode('template')->defaultNull()->end()
             // Default route parameters
             ->scalarNode('path')->isRequired()->end()

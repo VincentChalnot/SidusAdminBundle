@@ -108,6 +108,7 @@ class TemplatingHelper
     ): array {
         $parameters = [
             'listPath' => $this->routingHelper->getAdminListPath($action->getAdmin(), $listRouteParameters),
+            'action' => $action,
             'admin' => $action->getAdmin(),
         ];
 

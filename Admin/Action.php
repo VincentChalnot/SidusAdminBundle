@@ -42,6 +42,9 @@ class Action
     /** @var string|null */
     protected $template;
 
+    /** @var string */
+    protected $baseTemplate;
+
     /**
      * @param string $code
      * @param Admin  $admin
@@ -55,6 +58,7 @@ class Action
         $this->formType = $c['form_type'];
         $this->formOptions = $c['form_options'];
         $this->template = $c['template'];
+        $this->baseTemplate = $c['base_template'];
 
         if (empty($c['defaults']['_controller_pattern']) && empty($c['defaults']['_controller'])) {
             if (count($admin->getControllerPattern()) > 0) {
@@ -172,5 +176,13 @@ class Action
     public function getTemplate(): ?string
     {
         return $this->template;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseTemplate(): string
+    {
+        return $this->baseTemplate;
     }
 }

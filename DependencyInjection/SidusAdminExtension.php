@@ -60,6 +60,9 @@ class SidusAdminExtension extends SidusBaseExtension
     protected function createAdminServiceDefinition($code, array $adminConfiguration, ContainerBuilder $container): void
     {
         $adminConfiguration = array_merge(['action_class' => $this->globalConfig['action_class']], $adminConfiguration);
+        if (!isset($adminConfiguration['base_template'])) {
+            $adminConfiguration['base_template'] = $this->globalConfig['base_template'];
+        }
 
         $definition = new Definition(
             $this->globalConfig['admin_class'],

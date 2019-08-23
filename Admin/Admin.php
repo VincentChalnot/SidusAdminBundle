@@ -25,6 +25,9 @@ class Admin
     /** @var array */
     protected $controllerPattern = [];
 
+    /** @var string */
+    protected $baseTemplate;
+
     /** @var array */
     protected $templatePattern = [];
 
@@ -46,9 +49,6 @@ class Admin
     /** @var Action|null */
     protected $currentAction;
 
-    /** @var string|null */
-    protected $baseTemplate;
-
     /**
      * @param string $code
      * @param array  $adminConfiguration
@@ -57,6 +57,7 @@ class Admin
     {
         $this->code = $code;
         $this->controllerPattern = $adminConfiguration['controller_pattern'];
+        $this->baseTemplate = $adminConfiguration['base_template'];
         $this->templatePattern = $adminConfiguration['template_pattern'];
         $this->prefix = $adminConfiguration['prefix'];
         $this->entity = $adminConfiguration['entity'];
@@ -65,6 +66,9 @@ class Admin
 
         $actionClass = $adminConfiguration['action_class'];
         foreach ((array) $adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
+            if (!isset($actionConfiguration['base_template'])) {
+                $actionConfiguration['base_template'] = $adminConfiguration['base_template'];
+            }
             $this->actions[$actionCode] = new $actionClass($actionCode, $this, $actionConfiguration);
         }
     }
