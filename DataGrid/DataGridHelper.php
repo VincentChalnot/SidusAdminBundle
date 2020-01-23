@@ -124,6 +124,7 @@ class DataGridHelper
                 'action' => $this->routingHelper->getCurrentUri($action, $request),
                 'validation_groups' => ['filters'],
             ],
+            $dataGrid->getFormOptions(),
             $formOptions
         );
 
