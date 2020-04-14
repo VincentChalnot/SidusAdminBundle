@@ -9,6 +9,13 @@ Example in twig:
 <a href="{{ entity_path(entity, 'edit') }}">Edit</a>
 ```
 
+## Warning
+
+This bundle requires the security component of Symfony, it will enforce access to any entity using the voter.
+To ease the configuration of this, we recommend the ````cleverage/permission-bundle````.
+Also, by a design mistake, this bundle is tightly linked to the use of Doctrine, it can still be used for non-doctrine
+entities but unplugging Doctrine from dependencies will require some extra work.
+
 ## Configuration
 
 Simple example:
