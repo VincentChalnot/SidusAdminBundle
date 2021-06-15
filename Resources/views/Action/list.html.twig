@@ -2,5 +2,5 @@
 {% extends action.baseTemplate %}
 
 {% block container %}
-    {{ render_datagrid(datagrid) }}
+    {{ render_datagrid(datagrid, {action: action, admin: action.admin}) }}
 {% endblock %}

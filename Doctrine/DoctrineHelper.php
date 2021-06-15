@@ -1,25 +1,26 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Sidus\AdminBundle\Doctrine;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use InvalidArgumentException;
-use LogicException;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\BaseBundle\Translator\TranslatableTrait;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides a simple way to access Doctrine utilities from a controller or an action
@@ -28,27 +29,14 @@ class DoctrineHelper
 {
     use TranslatableTrait;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /**
-     * @param ManagerRegistry     $doctrine
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(ManagerRegistry $doctrine, TranslatorInterface $translator)
-    {
-        $this->doctrine = $doctrine;
+    public function __construct(
+        protected ManagerRegistry $doctrine,
+        TranslatorInterface $translator,
+    ) {
         $this->translator = $translator;
     }
 
-    /**
-     * @param mixed $entity
-     *
-     * @throws LogicException
-     *
-     * @return EntityManagerInterface
-     */
-    public function getManagerForEntity($entity): EntityManagerInterface
+    public function getManagerForEntity(object $entity): EntityManagerInterface
     {
         $class = ClassUtils::getClass($entity);
         $entityManager = $this->doctrine->getManagerForClass($class);
@@ -59,12 +47,7 @@ class DoctrineHelper
         return $entityManager;
     }
 
-    /**
-     * @param Action|null           $action
-     * @param mixed                 $entity
-     * @param SessionInterface|null $session
-     */
-    public function saveEntity(Action $action, $entity, SessionInterface $session = null): void
+    public function saveEntity(Action $action, object $entity, SessionInterface $session = null): void
     {
         $entityManager = $this->getManagerForEntity($entity);
         $entityManager->persist($entity);
@@ -73,12 +56,7 @@ class DoctrineHelper
         $this->addFlash($action, $session);
     }
 
-    /**
-     * @param Action                $action
-     * @param mixed                 $entity
-     * @param SessionInterface|null $session
-     */
-    public function deleteEntity(Action $action, $entity, SessionInterface $session = null): void
+    public function deleteEntity(Action $action, object $entity, SessionInterface $session = null): void
     {
         $entityManager = $this->getManagerForEntity($entity);
         $entityManager->remove($entity);
@@ -87,19 +65,15 @@ class DoctrineHelper
         $this->addFlash($action, $session);
     }
 
-    /**
-     * @param Action                $action
-     * @param SessionInterface|null $session
-     */
-    protected function addFlash(Action $action, SessionInterface $session = null): void
+    public function addFlash(Action $action, SessionInterface $session = null): void
     {
         if ($action && $session instanceof Session) {
             $session->getFlashBag()->add(
                 'success',
                 $this->tryTranslate(
                     [
-                        "admin.{$action->getAdmin()->getCode()}.{$action->getCode()}.success",
-                        "admin.flash.{$action->getCode()}.success",
+                        "sidus.admin.{$action->getAdmin()->getCode()}.{$action->getCode()}.success",
+                        "sidus.admin.flash.{$action->getCode()}.success",
                     ],
                     [],
                     ucfirst($action->getCode()).' success'

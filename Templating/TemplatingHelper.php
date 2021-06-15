@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Templating;
 
@@ -21,44 +23,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TemplatingHelper
 {
-    /** @var TemplateResolverInterface */
-    protected $templateResolver;
-
-    /** @var RoutingHelper */
-    protected $routingHelper;
-
-    /**
-     * @param TemplateResolverInterface $templateResolver
-     * @param RoutingHelper             $routingHelper
-     */
-    public function __construct(TemplateResolverInterface $templateResolver, RoutingHelper $routingHelper)
-    {
-        $this->templateResolver = $templateResolver;
-        $this->routingHelper = $routingHelper;
+    public function __construct(
+        protected TemplateResolverInterface $templateResolver,
+        protected RoutingHelper $routingHelper,
+    ) {
     }
 
-    /**
-     * @param Action $action
-     * @param array  $parameters
-     *
-     * @return Response
-     */
     public function renderAction(Action $action, array $parameters = []): Response
     {
-        $response = new Response();
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $response->setContent($this->templateResolver->getTemplate($action)->render($parameters));
-
-        return $response;
+        return new Response(
+            $this->templateResolver->getTemplate($action)->render(
+                array_merge($action->getTemplateParameters(), $parameters)
+            )
+        );
     }
 
-    /**
-     * @param Action   $action
-     * @param DataGrid $dataGrid
-     * @param array    $viewParameters
-     *
-     * @return Response
-     */
     public function renderListAction(
         Action $action,
         DataGrid $dataGrid,
@@ -73,18 +52,10 @@ class TemplatingHelper
         return $this->renderAction($action, $viewParameters);
     }
 
-    /**
-     * @param Action        $action
-     * @param FormInterface $form
-     * @param null          $data
-     * @param array         $viewParameters
-     *
-     * @return Response
-     */
     public function renderFormAction(
         Action $action,
         FormInterface $form,
-        $data = null,
+        object|array|null $data = null,
         array $viewParameters = []
     ): Response {
         $viewParameters = array_merge($this->getViewParameters($action, $form, $data), $viewParameters);
@@ -92,18 +63,10 @@ class TemplatingHelper
         return $this->renderAction($action, $viewParameters);
     }
 
-    /**
-     * @param Action        $action
-     * @param FormInterface $form
-     * @param mixed         $data
-     * @param array         $listRouteParameters
-     *
-     * @return array
-     */
     public function getViewParameters(
         Action $action,
         FormInterface $form = null,
-        $data = null,
+        object|array|null $data = null,
         array $listRouteParameters = []
     ): array {
         $parameters = [
@@ -115,7 +78,7 @@ class TemplatingHelper
         if ($form) {
             $parameters['form'] = $form->createView();
         }
-        if ($data) {
+        if (null !== $data) {
             $parameters['data'] = $data;
         }
 

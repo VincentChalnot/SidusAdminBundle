@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
@@ -15,16 +17,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Common logic found in clone and create, does not deserves a dedicated service
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
  */
 trait UpdateSubActionRedirectionTrait
 {
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    protected AuthorizationCheckerInterface $authorizationChecker;
 
-    /**
-     * @param RedirectableInterface $redirectable
-     * @param Action                $action
-     */
     protected function updateRedirectAction(RedirectableInterface $redirectable, Action $action): void
     {
         $redirectable->setAction($action);

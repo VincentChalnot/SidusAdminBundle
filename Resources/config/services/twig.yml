@@ -3,7 +3,7 @@ services:
         autowire: true
         public: false
         tags:
-            - { name: twig.extension }
+            - twig.extension
 
     Sidus\AdminBundle\Templating\TemplateResolver:
         autowire: true

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Event;
 
@@ -14,7 +16,7 @@ use LogicException;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use UnexpectedValueException;
 
 /**
@@ -22,21 +24,11 @@ use UnexpectedValueException;
  */
 class AdminResolver
 {
-    /** @var AdminRegistry */
-    public $adminRegistry;
-
-    /**
-     * @param AdminRegistry $adminRegistry
-     */
-    public function __construct(AdminRegistry $adminRegistry)
+    public function __construct(protected AdminRegistry $adminRegistry)
     {
-        $this->adminRegistry = $adminRegistry;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
         if (!$request->attributes->has('_admin')) {

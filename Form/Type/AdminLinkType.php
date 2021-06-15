@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Form\Type;
 
@@ -29,36 +31,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AdminLinkType extends AbstractType
 {
-    /** @var AdminRouter */
-    protected $adminRouter;
-
-    /** @var AdminRegistry */
-    protected $adminRegistry;
-
-    /**
-     * @param AdminRouter   $adminRouter
-     * @param AdminRegistry $adminRegistry
-     */
-    public function __construct(AdminRouter $adminRouter, AdminRegistry $adminRegistry)
-    {
-        $this->adminRouter = $adminRouter;
-        $this->adminRegistry = $adminRegistry;
+    public function __construct(
+        protected AdminRouter $adminRouter,
+        protected AdminRegistry $adminRegistry
+    ) {
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['admin'] = $options['admin'];
         $view->vars['admin_action'] = $options['admin_action'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(
@@ -72,7 +56,7 @@ class AdminLinkType extends AbstractType
                 'admin' => null,
             ]
         );
-        $resolver->setAllowedTypes('admin', ['NULL', 'string', Admin::class]);
+        $resolver->setAllowedTypes('admin', ['null', 'string', Admin::class]);
         $resolver->setNormalizer(
             'admin',
             function (Options $options, $value) {
@@ -121,17 +105,11 @@ class AdminLinkType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix(): string
     {
         return 'admin_link';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent(): string
     {
         return LinkType::class;

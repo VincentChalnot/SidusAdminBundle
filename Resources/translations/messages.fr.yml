@@ -1,0 +1,11 @@
+sidus:
+    datagrid:
+        reset:
+            label: Réinitialiser
+        submit:
+            label: Filtrer
+        results:
+            label: 'Affichage de %length% sur %count% résultats'
+        boolean:
+            yes: Oui
+            no: Non

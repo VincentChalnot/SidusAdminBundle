@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Sidus\AdminBundle\Request\ParamConverter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Sidus\AdminBundle\Admin\Admin;
@@ -24,20 +26,10 @@ use UnexpectedValueException;
  */
 class AdminEntityParamConverter implements ParamConverterInterface
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /**
-     * @param ManagerRegistry $doctrine
-     */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(protected ManagerRegistry $doctrine)
     {
-        $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(Request $request, ParamConverter $configuration): bool
     {
         if (!$request->attributes->has('_admin')) {
@@ -51,25 +43,28 @@ class AdminEntityParamConverter implements ParamConverterInterface
         if (!$entityManager instanceof EntityManagerInterface) {
             throw new UnexpectedValueException("Unable to find an EntityManager for class {$admin->getEntity()}");
         }
-        $id = $request->attributes->get($configuration->getOptions()['attribute'] ?? 'id');
-        if (null === $id) {
-            $m = "Unable to resolve request attribute for identifier, either use 'id' as a request parameter or set it";
-            $m .= " manually in the 'attribute' option of your param converter configuration";
-            throw new UnexpectedValueException($m);
+        $classMetadata = $entityManager->getClassMetadata($admin->getEntity());
+
+        $identifiers = [];
+        foreach ($classMetadata->getIdentifier() as $identifier) {
+            if (!$request->attributes->has($identifier)) {
+                $m = "Missing identifier request attribute for entity {$admin->getEntity()}: '{$identifier}'";
+                throw new UnexpectedValueException($m);
+            }
+            $identifiers[$identifier] = $request->attributes->get($identifier);
         }
+
         $repository = $entityManager->getRepository($admin->getEntity());
-        $entity = $repository->find($id);
+        $entity = $repository->findOneBy($identifiers);
         if (!$entity) {
-            throw new NotFoundHttpException("No entity found for class {$admin->getEntity()} and id {$id}");
+            $flat = implode($identifiers);
+            throw new NotFoundHttpException("No entity found for class {$admin->getEntity()} and identifiers {$flat}");
         }
         $request->attributes->set($configuration->getName(), $entity);
 
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(ParamConverter $configuration): bool
     {
         return 'sidus_admin.entity' === $configuration->getConverter();

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
@@ -24,32 +26,15 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DeleteAction extends AbstractEmptyFormAction
 {
-    /** @var RoutingHelper */
-    protected $routingHelper;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /**
-     * @param FormHelper       $formHelper
-     * @param TemplatingHelper $templatingHelper
-     * @param RoutingHelper    $routingHelper
-     * @param DoctrineHelper   $doctrineHelper
-     */
     public function __construct(
         FormHelper $formHelper,
         TemplatingHelper $templatingHelper,
-        RoutingHelper $routingHelper,
-        DoctrineHelper $doctrineHelper
+        protected RoutingHelper $routingHelper,
+        protected DoctrineHelper $doctrineHelper
     ) {
         parent::__construct($formHelper, $templatingHelper);
-        $this->routingHelper = $routingHelper;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyAction(Request $request, FormInterface $form, $data): Response
     {
         $this->doctrineHelper->deleteEntity($this->action, $data, $request->getSession());

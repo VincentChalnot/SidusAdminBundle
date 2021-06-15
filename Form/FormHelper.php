@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Form;
 
@@ -24,52 +26,24 @@ use UnexpectedValueException;
  */
 class FormHelper
 {
-    /** @var RoutingHelper */
-    protected $routingHelper;
-
-    /** @var FormFactoryInterface */
-    protected $formFactory;
-
-    /**
-     * @param RoutingHelper        $routingHelper
-     * @param FormFactoryInterface $formFactory
-     */
-    public function __construct(RoutingHelper $routingHelper, FormFactoryInterface $formFactory)
-    {
-        $this->routingHelper = $routingHelper;
-        $this->formFactory = $formFactory;
+    public function __construct(
+        protected RoutingHelper $routingHelper,
+        protected FormFactoryInterface $formFactory,
+    ) {
     }
 
-    /**
-     * @param Action  $action
-     * @param Request $request
-     * @param mixed   $data
-     * @param array   $options
-     *
-     * @return FormInterface
-     */
-    public function getForm(Action $action, Request $request, $data, array $options = []): FormInterface
+    public function getForm(Action $action, Request $request, mixed $data, array $options = []): FormInterface
     {
-        $dataId = $data && method_exists($data, 'getId') ? $data->getId() : null;
-        $defaultOptions = $this->getDefaultFormOptions($action, $request, $dataId);
+        $defaultOptions = $this->getDefaultFormOptions($action, $request);
 
         return $this->getFormBuilder($action, $data, array_merge($defaultOptions, $options))->getForm();
     }
 
-    /**
-     * @param Action  $action
-     * @param Request $request
-     * @param mixed   $data
-     *
-     * @return FormInterface
-     */
     public function getEmptyForm(
         Action $action,
         Request $request,
-        $data
     ): FormInterface {
-        $dataId = $data && method_exists($data, 'getId') ? $data->getId() : null;
-        $formOptions = $this->getDefaultFormOptions($action, $request, $dataId);
+        $formOptions = $this->getDefaultFormOptions($action, $request);
 
         return $this->formFactory->createNamedBuilder(
             "form_{$action->getAdmin()->getCode()}_{$action->getCode()}",
@@ -79,16 +53,7 @@ class FormHelper
         )->getForm();
     }
 
-    /**
-     * @param Action $action
-     * @param mixed  $data
-     * @param array  $options
-     *
-     * @throws UnexpectedValueException
-     *
-     * @return FormBuilderInterface
-     */
-    public function getFormBuilder(Action $action, $data, array $options = []): FormBuilderInterface
+    public function getFormBuilder(Action $action, mixed $data, array $options = []): FormBuilderInterface
     {
         if (!$action->getFormType()) {
             throw new UnexpectedValueException("Missing parameter 'form_type' for action '{$action->getCode()}'");
@@ -102,24 +67,15 @@ class FormHelper
         );
     }
 
-    /**
-     * @param Action  $action
-     * @param Request $request
-     * @param null    $dataId
-     *
-     * @return array
-     */
-    public function getDefaultFormOptions(Action $action, Request $request, $dataId = null): array
+    public function getDefaultFormOptions(Action $action, Request $request): array
     {
-        $dataId = $dataId ?: 'new';
-
         return array_merge(
             $action->getFormOptions(),
             [
                 'action' => $this->routingHelper->getCurrentUri($action, $request),
                 'attr' => [
                     'novalidate' => 'novalidate',
-                    'id' => "form_{$action->getAdmin()->getCode()}_{$action->getCode()}_{$dataId}",
+                    'id' => "form_{$action->getAdmin()->getCode()}_{$action->getCode()}",
                 ],
                 'method' => 'post',
             ]

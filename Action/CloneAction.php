@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Sidus\AdminBundle\Action;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sidus\AdminBundle\Admin\Action;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -22,44 +23,23 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class CloneAction implements ActionInjectableInterface
 {
+    use ActionInjectableTrait;
     use UpdateSubActionRedirectionTrait;
 
-    /** @var EditAction */
-    protected $editAction;
-
-    /** @var Action */
-    protected $action;
-
-    /**
-     * @param EditAction                    $editAction
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
-    public function __construct(EditAction $editAction, AuthorizationCheckerInterface $authorizationChecker)
-    {
-        $this->editAction = $editAction;
+    public function __construct(
+        protected EditAction $editAction,
+        AuthorizationCheckerInterface $authorizationChecker,
+    ) {
         $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
      * @ParamConverter(name="data", converter="sidus_admin.entity")
-     *
-     * @param Request $request
-     * @param mixed   $data
-     *
-     * @return Response
      */
-    public function __invoke(Request $request, $data): Response
+    public function __invoke(Request $request, mixed $data): Response
     {
         $this->updateRedirectAction($this->editAction, $this->action);
 
         return ($this->editAction)($request, clone $data);
-    }
-
-    /**
-     * @param Action $action
-     */
-    public function setAction(Action $action): void
-    {
-        $this->action = $action;
     }
 }

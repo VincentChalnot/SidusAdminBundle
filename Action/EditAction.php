@@ -1,19 +1,20 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
 use Sidus\AdminBundle\Templating\TemplatingHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Form\FormHelper;
 use Sidus\AdminBundle\Routing\RoutingHelper;
@@ -25,51 +26,20 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class EditAction implements RedirectableInterface
 {
-    /** @var FormHelper */
-    protected $formHelper;
+    use RedirectableTrait;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var RoutingHelper */
-    protected $routingHelper;
-
-    /** @var TemplatingHelper */
-    protected $templatingHelper;
-
-    /** @var Action */
-    protected $action;
-
-    /** @var Action */
-    protected $redirectAction;
-
-    /**
-     * @param FormHelper       $formHelper
-     * @param DoctrineHelper   $doctrineHelper
-     * @param RoutingHelper    $routingHelper
-     * @param TemplatingHelper $templatingHelper
-     */
     public function __construct(
-        FormHelper $formHelper,
-        DoctrineHelper $doctrineHelper,
-        RoutingHelper $routingHelper,
-        TemplatingHelper $templatingHelper
+        protected FormHelper $formHelper,
+        protected DoctrineHelper $doctrineHelper,
+        protected RoutingHelper $routingHelper,
+        protected TemplatingHelper $templatingHelper
     ) {
-        $this->formHelper = $formHelper;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->routingHelper = $routingHelper;
-        $this->templatingHelper = $templatingHelper;
     }
 
     /**
      * @ParamConverter(name="data", converter="sidus_admin.entity")
-     *
-     * @param Request $request
-     * @param mixed   $data
-     *
-     * @return Response
      */
-    public function __invoke(Request $request, $data): Response
+    public function __invoke(Request $request, mixed $data): Response
     {
         $form = $this->formHelper->getForm($this->action, $request, $data);
 
@@ -81,22 +51,5 @@ class EditAction implements RedirectableInterface
         }
 
         return $this->templatingHelper->renderFormAction($this->action, $form, $data);
-    }
-
-    /**
-     * @param Action $action
-     */
-    public function setRedirectAction(Action $action): void
-    {
-        $this->redirectAction = $action;
-    }
-
-    /**
-     * @param Action $action
-     */
-    public function setAction(Action $action): void
-    {
-        $this->action = $action;
-        $this->redirectAction = $action;
     }
 }

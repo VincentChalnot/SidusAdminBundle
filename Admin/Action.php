@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Admin;
 
@@ -21,35 +23,24 @@ use function count;
  */
 class Action
 {
-    /** @var string */
-    protected $code;
+    protected string $code;
 
-    /** @var Route */
-    protected $route;
+    protected Route $route;
 
-    /** @var Admin */
-    protected $admin;
+    protected Admin $admin;
 
-    /** @var array */
-    protected $options;
+    protected array $options;
 
-    /** @var string|null */
-    protected $formType;
+    protected ?string $formType;
 
-    /** @var array */
-    protected $formOptions;
+    protected array $formOptions;
 
-    /** @var string|null */
-    protected $template;
+    protected ?string $template;
 
-    /** @var string */
-    protected $baseTemplate;
+    protected array $templateParameters;
 
-    /**
-     * @param string $code
-     * @param Admin  $admin
-     * @param array  $c
-     */
+    protected ?string $baseTemplate;
+
     public function __construct(string $code, Admin $admin, array $c)
     {
         $this->code = $code;
@@ -58,6 +49,7 @@ class Action
         $this->formType = $c['form_type'];
         $this->formOptions = $c['form_options'];
         $this->template = $c['template'];
+        $this->templateParameters = $c['template_parameters'];
         $this->baseTemplate = $c['base_template'];
 
         if (empty($c['defaults']['_controller_pattern']) && empty($c['defaults']['_controller'])) {
@@ -85,53 +77,32 @@ class Action
         );
     }
 
-    /**
-     * @return string
-     */
     public function getRouteName(): string
     {
         return "sidus_admin.{$this->getAdmin()->getCode()}.{$this->getCode()}";
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return Route
-     */
     public function getRoute(): Route
     {
         return $this->route;
     }
 
-    /**
-     * @return Admin
-     */
     public function getAdmin(): Admin
     {
         return $this->admin;
     }
 
-    /**
-     * @return array
-     */
     public function getOptions(): array
     {
         return $this->options;
     }
 
-    /**
-     * @param string $option
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    public function getOption(string $option, $default = null)
+    public function getOption(string $option, mixed $default = null)
     {
         if (!$this->hasOption($option)) {
             return $default;
@@ -140,19 +111,11 @@ class Action
         return $this->options[$option];
     }
 
-    /**
-     * @param string $option
-     *
-     * @return bool
-     */
     public function hasOption(string $option): bool
     {
         return array_key_exists($option, $this->options);
     }
 
-    /**
-     * @return string|null
-     */
     public function getFormType(): ?string
     {
         if (!$this->formType) {
@@ -162,25 +125,21 @@ class Action
         return $this->formType;
     }
 
-    /**
-     * @return array
-     */
     public function getFormOptions(): array
     {
         return $this->formOptions;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTemplate(): ?string
     {
         return $this->template;
     }
 
-    /**
-     * @return string
-     */
+    public function getTemplateParameters(): array
+    {
+        return $this->templateParameters;
+    }
+
     public function getBaseTemplate(): string
     {
         return $this->baseTemplate;

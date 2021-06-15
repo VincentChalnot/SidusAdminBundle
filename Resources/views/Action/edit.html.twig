@@ -3,14 +3,41 @@
 
 {% block container %}
     <div class="row">
-        <div class="col-lg-4">
-            <h2>{{ admin.currentAction.code|capitalize }}: {{ data }}</h2>
+        <div class="{{ form_container_class|default('col-lg-4') }}">
+            <h2>
+                {{ tryTrans(
+                    [
+                        'sidus.admin.'~admin.code~'.action.'~action.code~'.title',
+                        'sidus.admin.action.'~action.code~'.title'
+                    ], {
+                        '%entity%': data|tostring
+                    },
+                    admin.code|humanize~' - '~action.code|humanize
+                ) }}
+            </h2>
             {{ form_start(form) }}
+            {{ block('message') }}
             {{ form_widget(form) }}
             {{ block('form_actions') }}
             {{ form_end(form) }}
         </div>
     </div>
+{% endblock %}
+
+{% block message %}
+    {% set message = tryTrans(
+        [
+            'sidus.admin.'~admin.code~'.action.'~action.code~'.message',
+            'sidus.admin.action.'~action.code~'.message',
+        ], {
+            '%entity%': data|tostring
+        }
+    ) %}
+    {% if message %}
+        <div class="{{ message_class|default('alert alert-info') }}">
+            {{ message }}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block form_actions %}
@@ -22,16 +49,30 @@
 
 {% block back_button %}
     {% if listPath|default(false) %}
-        <a href="{{ listPath }}" class="btn btn-default">
-            <i class="fa fa-arrow-left"></i> Back
+        <a href="{{ listPath }}" class="{{ back_class|default('btn btn-default') }}">
+            {{ tryTrans(
+                [
+                    'sidus.admin.'~admin.code~'.action.'~action.code~'.button.back',
+                    'sidus.admin.action.'~action.code~'.button.back',
+                    'sidus.admin.button.back',
+                ],
+                {},
+                'Back'
+            ) }}
         </a>
     {% endif %}
 {% endblock %}
 
 {% block submit_button %}
-    <button type="submit" class="btn btn-primary">
-        {% spaceless %}
-            <i class="fa fa-save"></i> Submit
-        {% endspaceless %}
+    <button type="submit" class="{{ submit_class|default('btn btn-primary') }}">
+        {{ tryTrans(
+            [
+                'sidus.admin.'~admin.code~'.action.'~action.code~'.button.submit',
+                'sidus.admin.action.'~action.code~'.button.submit',
+                'sidus.admin.button.submit',
+            ],
+            {},
+            'Submit'
+        ) }}
     </button>
 {% endblock %}

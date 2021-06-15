@@ -15,14 +15,24 @@ namespace Sidus\AdminBundle\Action;
 use Sidus\AdminBundle\Admin\Action;
 
 /**
- * If an action implements this interface, it will be injected with it's current matching action
+ * Companion trait for RedirectableInterface
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-interface ActionInjectableInterface
+trait RedirectableTrait
 {
-    /**
-     * @param Action $action
-     */
-    public function setAction(Action $action): void;
+    use ActionInjectableTrait;
+
+    protected Action $redirectAction;
+
+    public function setRedirectAction(Action $action): void
+    {
+        $this->redirectAction = $action;
+    }
+
+    public function setAction(Action $action): void
+    {
+        $this->action = $action;
+        $this->redirectAction = $action;
+    }
 }

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Templating;
 
@@ -16,9 +18,7 @@ use RuntimeException;
 use Sidus\AdminBundle\Admin\Action;
 use Twig\Environment;
 use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
-use Twig\Template;
+use Twig\TemplateWrapper;
 use function count;
 
 /**
@@ -28,40 +28,18 @@ use function count;
  */
 class TemplateResolver implements TemplateResolverInterface
 {
-    /** @var Environment */
-    protected $twig;
-
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /**
-     * @param Environment     $twig
-     * @param LoggerInterface $logger
-     */
     public function __construct(
-        Environment $twig,
-        LoggerInterface $logger
+        protected Environment $twig,
+        protected LoggerInterface $logger
     ) {
-        $this->twig = $twig;
-        $this->logger = $logger;
     }
 
-    /**
-     * @param Action $action
-     * @param string $format
-     *
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     *
-     * @return Template
-     */
-    public function getTemplate(Action $action, $format = 'html'): Template
+    public function getTemplate(Action $action, string $templateType = 'html'): TemplateWrapper
     {
         $admin = $action->getAdmin();
         if ($action->getTemplate()) {
             // If the template was specified, use this one
-            return $this->twig->loadTemplate($action->getTemplate());
+            return $this->twig->load($action->getTemplate());
         }
 
         // Priority to new template_pattern system:
@@ -77,11 +55,11 @@ class TemplateResolver implements TemplateResolverInterface
                     '{{Admin}}' => ucfirst($admin->getCode()),
                     '{{action}}' => lcfirst($action->getCode()),
                     '{{Action}}' => ucfirst($action->getCode()),
-                    '{{format}}' => $format,
+                    '{{format}}' => $templateType,
                 ]
             );
             try {
-                return $this->twig->loadTemplate($template);
+                return $this->twig->load($template);
             } catch (LoaderError $mainError) {
                 $this->logger->debug("Unable to load template '{$template}': {$mainError->getMessage()}");
                 continue;

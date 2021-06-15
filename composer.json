@@ -12,7 +12,7 @@
         {
             "name": "Vincent Chalnot",
             "email": "vincent@sidus.fr",
-            "homepage": "http://chalnot.fr",
+            "homepage": "https://sidus.fr",
             "role": "Developer"
         }
     ],
@@ -22,17 +22,16 @@
         }
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=8.0",
         "doctrine/orm": "~2.3",
-        "symfony/framework-bundle": "~3.0|~4.0",
-        "sensio/framework-extra-bundle": "^3.0|^5.5",
-        "symfony/security-bundle": "~3.0|~4.0",
-        "symfony/expression-language": "~3.0|~4.0",
-        "symfony/yaml": "~3.0|~4.0",
-        "symfony/form": "~3.0|~4.0",
-        "symfony/translation": "~3.0|~4.0",
-        "symfony/twig-bundle": "~3.0|~4.0",
-
+        "symfony/framework-bundle": ">=4.0",
+        "sensio/framework-extra-bundle": ">=4.0",
+        "symfony/security-bundle": ">=4.0",
+        "symfony/expression-language": ">=4.0",
+        "symfony/yaml": ">=4.0",
+        "symfony/form": ">=4.0",
+        "symfony/translation": ">=4.0",
+        "symfony/twig-bundle": ">=4.0",
         "sidus/datagrid-bundle": "3.0.*|dev-v3.0-dev",
         "sidus/base-bundle": "~1.0"
     },

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Event;
 
@@ -16,7 +18,7 @@ use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use UnexpectedValueException;
 use function is_array;
 
@@ -25,21 +27,11 @@ use function is_array;
  */
 class AdminControllerResolver
 {
-    /** @var ControllerResolverInterface */
-    public $controllerResolver;
-
-    /**
-     * @param ControllerResolverInterface $controllerResolver
-     */
-    public function __construct(ControllerResolverInterface $controllerResolver)
+    public function __construct(protected ControllerResolverInterface $controllerResolver)
     {
-        $this->controllerResolver = $controllerResolver;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
         if ($request->attributes->has('_controller')) {
@@ -65,15 +57,7 @@ class AdminControllerResolver
         $request->attributes->set('_controller', $controller);
     }
 
-    /**
-     * @param Request $request
-     * @param Admin   $admin
-     * @param Action  $action
-     * @param array   $controllerPatterns
-     *
-     * @return callable|false
-     */
-    protected function getController(Request $request, Admin $admin, Action $action, array $controllerPatterns)
+    protected function getController(Request $request, Admin $admin, Action $action, array $controllerPatterns): callable
     {
         foreach ($controllerPatterns as $controllerPattern) {
             $controller = strtr(
@@ -89,7 +73,7 @@ class AdminControllerResolver
             $testRequest->attributes->set('_controller', $controller);
             try {
                 $resolvedController = $this->controllerResolver->getController($testRequest);
-            } catch (LogicException $e) {
+            } catch (LogicException) {
                 continue;
             }
 

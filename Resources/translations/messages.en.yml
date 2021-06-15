@@ -1,0 +1,15 @@
+sidus:
+    admin:
+        action:
+            create:
+                label: Create
+            edit:
+                label: Edit
+            delete:
+                label: Delete
+                message: Are you sure you want to delete the entity '%entity%'?
+
+        button:
+            submit: Submit
+            close: Close
+            back: Back

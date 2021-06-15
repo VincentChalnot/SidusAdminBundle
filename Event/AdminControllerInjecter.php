@@ -1,19 +1,21 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Event;
 
 use LogicException;
 use Sidus\AdminBundle\Action\ActionInjectableInterface;
 use Sidus\AdminBundle\Admin\Admin;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use UnexpectedValueException;
 use function is_array;
 
@@ -24,10 +26,7 @@ use function is_array;
  */
 class AdminControllerInjecter
 {
-    /**
-     * @param FilterControllerEvent $event
-     */
-    public function onKernelController(FilterControllerEvent $event): void
+    public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
         if (is_array($controller)) {
@@ -59,8 +58,6 @@ class AdminControllerInjecter
             throw new LogicException($m);
         }
         $admin->setCurrentAction($request->attributes->get('_action'));
-        if ($controller instanceof ActionInjectableInterface) {
-            $controller->setAction($admin->getCurrentAction());
-        }
+        $controller->setAction($admin->getCurrentAction());
     }
 }

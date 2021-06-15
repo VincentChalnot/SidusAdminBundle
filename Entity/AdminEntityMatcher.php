@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Entity;
 
@@ -22,28 +24,13 @@ use function get_class;
  */
 class AdminEntityMatcher
 {
-    /** @var AdminRegistry */
-    protected $adminRegistry;
+    protected array $cache = [];
 
-    /** @var array */
-    protected $cache = [];
-
-    /**
-     * @param AdminRegistry $adminRegistry
-     */
-    public function __construct(AdminRegistry $adminRegistry)
+    public function __construct(protected AdminRegistry $adminRegistry)
     {
-        $this->adminRegistry = $adminRegistry;
     }
 
-    /**
-     * @param mixed $entity
-     *
-     * @throws UnexpectedValueException
-     *
-     * @return Admin
-     */
-    public function getAdminForEntity($entity): Admin
+    public function getAdminForEntity(object $entity): Admin
     {
         $class = get_class($entity);
 

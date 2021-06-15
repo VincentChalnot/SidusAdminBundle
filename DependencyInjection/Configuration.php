@@ -1,12 +1,14 @@
-<?php declare(strict_types=1); /** @noinspection NullPointerExceptionInspection */
+<?php /** @noinspection NullPointerExceptionInspection */
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2019 Vincent Chalnot
+ * Copyright (c) 2015-2021 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Sidus\AdminBundle\DependencyInjection;
 
@@ -43,8 +45,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root($this->root);
+        $treeBuilder = new TreeBuilder($this->root);
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
@@ -64,8 +66,8 @@ class Configuration implements ConfigurationInterface
      */
     protected function getAdminConfigTreeBuilder(): NodeDefinition
     {
-        $builder = new TreeBuilder();
-        $node = $builder->root('configurations');
+        $builder = new TreeBuilder('configurations');
+        $node = $builder->getRootNode();
         $adminDefinition = $node
             ->useAttributeAsKey('code')
             ->prototype('array')
@@ -91,8 +93,8 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('controller_pattern')->defaultValue([])->scalarPrototype()->end()->end()
             ->scalarNode('base_template')->defaultNull()->end()
             ->arrayNode('template_pattern')->defaultValue([])->scalarPrototype()->end()->end()
-            ->scalarNode('prefix')->isRequired()->end()
-            ->scalarNode('entity')->isRequired()->end()
+            ->scalarNode('prefix')->isRequired()->cannotBeEmpty()->end()
+            ->scalarNode('entity')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('action_class')->end()
             ->scalarNode('form_type')->defaultNull()->end()
             ->variableNode('options')->defaultValue([])->end()
@@ -120,8 +122,9 @@ class Configuration implements ConfigurationInterface
             ->variableNode('form_options')->defaultValue([])->end()
             ->scalarNode('base_template')->defaultNull()->end()
             ->scalarNode('template')->defaultNull()->end()
+            ->variableNode('template_parameters')->defaultValue([])->end()
             // Default route parameters
-            ->scalarNode('path')->isRequired()->end()
+            ->scalarNode('path')->isRequired()->cannotBeEmpty()->end()
             ->variableNode('defaults')->defaultValue([])->end()
             ->variableNode('requirements')->defaultValue([])->end()
             ->variableNode('options')->defaultValue([])->end()
