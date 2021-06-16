@@ -1,26 +1,8 @@
 services:
-    Sidus\AdminBundle\Event\AdminResolver:
+    Sidus\AdminBundle\Event\:
+        resource: '../../../Event'
         autowire: true
         public: false
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 10 }
-
-    Sidus\AdminBundle\Event\AdminControllerResolver:
-        autowire: true
-        public: false
-        arguments:
+        autoconfigure: true
+        bind:
             $controllerResolver: '@controller_resolver'
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: -1 }
-
-    Sidus\AdminBundle\Event\AdminControllerInjecter:
-        autowire: true
-        public: false
-        tags:
-            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
-
-    Sidus\AdminBundle\Event\CacheListener:
-        autowire: true
-        public: false
-        tags:
-            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }

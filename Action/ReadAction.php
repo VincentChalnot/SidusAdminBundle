@@ -15,9 +15,9 @@ namespace Sidus\AdminBundle\Action;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sidus\AdminBundle\Form\FormHelper;
+use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Security("is_granted('read', data)")
@@ -35,7 +35,7 @@ class ReadAction implements ActionInjectableInterface
     /**
      * @ParamConverter(name="data", converter="sidus_admin.entity")
      */
-    public function __invoke(Request $request, mixed $data): Response
+    public function __invoke(Request $request, mixed $data): ActionResponseInterface
     {
         $form = $this->formHelper->getForm($this->action, $request, $data, ['disabled' => true]);
 

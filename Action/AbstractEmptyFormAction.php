@@ -12,12 +12,12 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
+use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sidus\AdminBundle\Form\FormHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Base class to implement empty form actions
@@ -35,7 +35,7 @@ abstract class AbstractEmptyFormAction implements ActionInjectableInterface
     /**
      * @ParamConverter(name="data", converter="sidus_admin.entity")
      */
-    public function __invoke(Request $request, object $data): Response
+    public function __invoke(Request $request, object $data): ActionResponseInterface
     {
         $form = $this->formHelper->getEmptyForm($this->action, $request);
 
@@ -51,5 +51,5 @@ abstract class AbstractEmptyFormAction implements ActionInjectableInterface
         );
     }
 
-    abstract protected function applyAction(Request $request, FormInterface $form, object $data): Response;
+    abstract protected function applyAction(Request $request, FormInterface $form, object $data): ActionResponseInterface;
 }

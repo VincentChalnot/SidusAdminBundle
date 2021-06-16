@@ -14,9 +14,7 @@ namespace Sidus\AdminBundle\Routing;
 
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Provides a simple way to access routing utilities from a controller or an action
@@ -25,40 +23,6 @@ class RoutingHelper
 {
     public function __construct(protected AdminRouter $adminRouter)
     {
-    }
-
-    public function redirectToEntity(
-        Action $action,
-        object $entity,
-        array $parameters = [],
-        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
-        int $status = 302
-    ): RedirectResponse {
-        $url = $this->adminRouter->generateAdminEntityPath(
-            $action->getAdmin(),
-            $entity,
-            $action->getCode(),
-            $parameters,
-            $referenceType
-        );
-
-        return new RedirectResponse($url, $status);
-    }
-
-    public function redirectToAction(
-        Action $action,
-        array $parameters = [],
-        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
-        int $status = 302
-    ): RedirectResponse {
-        $url = $this->adminRouter->generateAdminPath(
-            $action->getAdmin(),
-            $action->getCode(),
-            $parameters,
-            $referenceType
-        );
-
-        return new RedirectResponse($url, $status);
     }
 
     public function getAdminListPath(Admin $admin, array $parameters = []): ?string

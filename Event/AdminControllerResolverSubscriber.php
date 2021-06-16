@@ -16,6 +16,7 @@ use LogicException;
 use RuntimeException;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -23,10 +24,17 @@ use UnexpectedValueException;
 use function is_array;
 
 /**
- * Resolve the proper controller when the _controller_pattern option is used
+ * Resolve the proper controller when the _controller_pattern option is used and sets the _controller request attribute
  */
-class AdminControllerResolver
+class AdminControllerResolverSubscriber implements EventSubscriberInterface
 {
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            RequestEvent::class => ['onKernelRequest', -1],
+        ];
+    }
+
     public function __construct(protected ControllerResolverInterface $controllerResolver)
     {
     }
@@ -57,8 +65,12 @@ class AdminControllerResolver
         $request->attributes->set('_controller', $controller);
     }
 
-    protected function getController(Request $request, Admin $admin, Action $action, array $controllerPatterns): callable
-    {
+    protected function getController(
+        Request $request,
+        Admin $admin,
+        Action $action,
+        array $controllerPatterns
+    ): callable {
         foreach ($controllerPatterns as $controllerPattern) {
             $controller = strtr(
                 $controllerPattern,

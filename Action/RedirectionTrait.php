@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
-use Sidus\AdminBundle\Admin\Action;
+use Sidus\AdminBundle\Request\RedirectActionResponse;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -20,21 +20,21 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-trait UpdateSubActionRedirectionTrait
+trait RedirectionTrait
 {
     protected AuthorizationCheckerInterface $authorizationChecker;
 
-    protected function updateRedirectAction(RedirectableInterface $redirectable, Action $action): void
+    protected function updateRedirectAction(RedirectActionResponse $response): RedirectActionResponse
     {
-        $redirectable->setAction($action);
-        $admin = $action->getAdmin();
+        $admin = $response->getAction()->getAdmin();
         $class = $admin->getEntity();
 
-        foreach (['edit', 'read'] as $actionCode) {
+        foreach (['edit', 'read', 'list'] as $actionCode) {
             if ($admin->hasAction($actionCode) && $this->authorizationChecker->isGranted($actionCode, $class)) {
-                $redirectable->setRedirectAction($admin->getAction($actionCode));
-                break;
+                return $response->withAction($admin->getAction($actionCode));
             }
         }
+
+        return $response;
     }
 }

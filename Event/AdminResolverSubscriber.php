@@ -16,16 +16,24 @@ use LogicException;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use UnexpectedValueException;
 
 /**
  * Resolve the _admin and _action request attributes to real objects
  */
-class AdminResolver
+class AdminResolverSubscriber implements EventSubscriberInterface
 {
     public function __construct(protected AdminRegistry $adminRegistry)
     {
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            RequestEvent::class => ['onKernelRequest', 10],
+        ];
     }
 
     public function onKernelRequest(RequestEvent $event): void

@@ -13,8 +13,9 @@ declare(strict_types=1);
 namespace Sidus\AdminBundle\Action;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sidus\AdminBundle\Request\ActionResponseInterface;
+use Sidus\AdminBundle\Request\RedirectActionResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -23,7 +24,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class CreateAction implements ActionInjectableInterface
 {
     use ActionInjectableTrait;
-    use UpdateSubActionRedirectionTrait;
+    use RedirectionTrait;
 
     public function __construct(
         protected EditAction $editAction,
@@ -32,11 +33,16 @@ class CreateAction implements ActionInjectableInterface
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request): ActionResponseInterface
     {
-        $this->updateRedirectAction($this->editAction, $this->action);
         $class = $this->action->getAdmin()->getEntity();
 
-        return ($this->editAction)($request, new $class());
+        $response = ($this->editAction)($request, new $class());
+
+        if ($response instanceof RedirectActionResponse) {
+            return $this->updateRedirectAction($response);
+        }
+
+        return $response;
     }
 }

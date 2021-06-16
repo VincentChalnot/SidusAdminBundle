@@ -14,8 +14,9 @@ namespace Sidus\AdminBundle\Action;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sidus\AdminBundle\Request\ActionResponseInterface;
+use Sidus\AdminBundle\Request\RedirectActionResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -24,7 +25,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class CloneAction implements ActionInjectableInterface
 {
     use ActionInjectableTrait;
-    use UpdateSubActionRedirectionTrait;
+    use RedirectionTrait;
 
     public function __construct(
         protected EditAction $editAction,
@@ -36,10 +37,14 @@ class CloneAction implements ActionInjectableInterface
     /**
      * @ParamConverter(name="data", converter="sidus_admin.entity")
      */
-    public function __invoke(Request $request, mixed $data): Response
+    public function __invoke(Request $request, mixed $data): ActionResponseInterface
     {
-        $this->updateRedirectAction($this->editAction, $this->action);
+        $response = ($this->editAction)($request, clone $data);
 
-        return ($this->editAction)($request, clone $data);
+        if ($response instanceof RedirectActionResponse) {
+            return $this->updateRedirectAction($response);
+        }
+
+        return $response;
     }
 }

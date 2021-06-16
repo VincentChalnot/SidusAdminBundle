@@ -13,10 +13,10 @@ declare(strict_types=1);
 namespace Sidus\AdminBundle\Action;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
 use Sidus\AdminBundle\DataGrid\DataGridHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -33,7 +33,7 @@ class ListAction implements ActionInjectableInterface
     ) {
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request): ActionResponseInterface
     {
         $dataGrid = $this->dataGridHelper->bindDataGridRequest($this->action, $request);
 

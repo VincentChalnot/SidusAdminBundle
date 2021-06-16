@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Sidus\AdminBundle\Event;
 
 use Sidus\AdminBundle\Admin\Admin;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use UnexpectedValueException;
@@ -22,8 +23,15 @@ use UnexpectedValueException;
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class CacheListener
+class CacheSubscriber implements EventSubscriberInterface
 {
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ResponseEvent::class => 'onKernelResponse',
+        ];
+    }
+
     public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->getRequest()->attributes->has('_admin')) {

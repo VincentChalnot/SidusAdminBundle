@@ -13,10 +13,11 @@ declare(strict_types=1);
 namespace Sidus\AdminBundle\Templating;
 
 use Sidus\AdminBundle\Admin\Action;
+use Sidus\AdminBundle\Request\ActionResponse;
+use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Routing\RoutingHelper;
 use Sidus\DataGridBundle\Model\DataGrid;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides a simple way to access rendering utilities from a controller or an action
@@ -24,25 +25,20 @@ use Symfony\Component\HttpFoundation\Response;
 class TemplatingHelper
 {
     public function __construct(
-        protected TemplateResolverInterface $templateResolver,
         protected RoutingHelper $routingHelper,
     ) {
     }
 
-    public function renderAction(Action $action, array $parameters = []): Response
+    public function renderAction(Action $action, array $parameters = []): ActionResponseInterface
     {
-        return new Response(
-            $this->templateResolver->getTemplate($action)->render(
-                array_merge($action->getTemplateParameters(), $parameters)
-            )
-        );
+        return new ActionResponse($action, $parameters);
     }
 
     public function renderListAction(
         Action $action,
         DataGrid $dataGrid,
         array $viewParameters = []
-    ): Response {
+    ): ActionResponseInterface {
         $viewParameters = array_merge(
             $this->getViewParameters($action),
             ['datagrid' => $dataGrid],
@@ -57,7 +53,7 @@ class TemplatingHelper
         FormInterface $form,
         object|array|null $data = null,
         array $viewParameters = []
-    ): Response {
+    ): ActionResponseInterface {
         $viewParameters = array_merge($this->getViewParameters($action, $form, $data), $viewParameters);
 
         return $this->renderAction($action, $viewParameters);

@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
+use Sidus\AdminBundle\Request\ActionResponseInterface;
+use Sidus\AdminBundle\Request\RedirectActionResponse;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -19,14 +21,13 @@ use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Form\FormHelper;
 use Sidus\AdminBundle\Routing\RoutingHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Security("is_granted('edit', data)")
  */
-class EditAction implements RedirectableInterface
+class EditAction implements ActionInjectableInterface
 {
-    use RedirectableTrait;
+    use ActionInjectableTrait;
 
     public function __construct(
         protected FormHelper $formHelper,
@@ -39,7 +40,7 @@ class EditAction implements RedirectableInterface
     /**
      * @ParamConverter(name="data", converter="sidus_admin.entity")
      */
-    public function __invoke(Request $request, mixed $data): Response
+    public function __invoke(Request $request, mixed $data): ActionResponseInterface
     {
         $form = $this->formHelper->getForm($this->action, $request, $data);
 
@@ -47,7 +48,11 @@ class EditAction implements RedirectableInterface
         if ($form->isSubmitted() && $form->isValid()) {
             $this->doctrineHelper->saveEntity($this->action, $data, $request->getSession());
 
-            return $this->routingHelper->redirectToEntity($this->redirectAction, $data, $request->query->all());
+            return new RedirectActionResponse(
+                action: $this->action,
+                entity: $data,
+                parameters: $request->query->all(),
+            );
         }
 
         return $this->templatingHelper->renderFormAction($this->action, $form, $data);
