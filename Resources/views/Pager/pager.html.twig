@@ -1,0 +1,66 @@
+{% apply spaceless %}
+    {# @var pager \Pagerfanta\Pagerfanta #}
+    <nav aria-label="Pager">
+        <ul class="pagination justify-content-center mb-0">
+            {% if pager.hasPreviousPage() %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ page_path(pager.previousPage) }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        <span aria-hidden="true">&laquo;</span>
+                    </span>
+                </li>
+            {% endif %}
+
+            {% include '@SidusAdmin/Pager/pager.page.html.twig' with {page: 1} %}
+
+            {% if pager.currentPage > 5 %}
+                <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+            {% endif %}
+            {% if pager.nbPages > 2 %}
+                {% for page in range(max(2, pager.currentPage - 3), min(pager.currentPage + 3, pager.nbPages - 1)) %}
+                    {% include '@SidusAdmin/Pager/pager.page.html.twig' %}
+                {% endfor %}
+            {% endif %}
+            {% if pager.currentPage <= (pager.nbPages - 5) %}
+                <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+            {% endif %}
+            {% if pager.nbPages > 1 %}
+                {% include '@SidusAdmin/Pager/pager.page.html.twig' with {page: pager.nbPages} %}
+            {% endif %}
+
+            {% if pager.hasNextPage() %}
+                <li class="page-item">
+                    <a class="page-link rounded-right" href="{{ page_path(pager.nextPage) }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link rounded-right">
+                        <span aria-hidden="true">&raquo;</span>
+                    </span>
+                </li>
+            {% endif %}
+
+            {% block datagrid_count %}
+                <li class="page-item disabled d-none d-xl-block ml-1">
+                    <span class="page-link rounded">
+                        {{ 'sidus.datagrid.results.label'|trans({
+                            '%length%': pager.currentPageResults|length,
+                            '%first%': pager.currentPageOffsetStart,
+                            '%last%': pager.currentPageOffsetEnd,
+                            '%count%': pager.count,
+                        }) }}
+                    </span>
+                </li>
+            {% endblock %}
+        </ul>
+    </nav>
+{% endapply %}

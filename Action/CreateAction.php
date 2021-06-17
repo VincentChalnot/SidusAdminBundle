@@ -37,6 +37,7 @@ class CreateAction implements ActionInjectableInterface
     {
         $class = $this->action->getAdmin()->getEntity();
 
+        $this->editAction->setAction($this->action);
         $response = ($this->editAction)($request, new $class());
 
         if ($response instanceof RedirectActionResponse) {

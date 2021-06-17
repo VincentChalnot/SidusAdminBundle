@@ -39,6 +39,7 @@ class CloneAction implements ActionInjectableInterface
      */
     public function __invoke(Request $request, mixed $data): ActionResponseInterface
     {
+        $this->editAction->setAction($this->action);
         $response = ($this->editAction)($request, clone $data);
 
         if ($response instanceof RedirectActionResponse) {

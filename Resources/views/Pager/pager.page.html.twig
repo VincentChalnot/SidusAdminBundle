@@ -1,0 +1,6 @@
+{# @var pager \Pagerfanta\Pagerfanta #}
+{% apply spaceless %}
+    <li class="page-item{{ pager.currentPage == page ? ' active' }}">
+        <a class="page-link" href="{{ page_path(page) }}">{{ page }}</a>
+    </li>
+{% endapply %}

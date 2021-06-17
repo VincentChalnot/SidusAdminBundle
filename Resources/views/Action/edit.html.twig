@@ -10,7 +10,7 @@
                         'sidus.admin.'~admin.code~'.action.'~action.code~'.title',
                         'sidus.admin.action.'~action.code~'.title'
                     ], {
-                        '%entity%': data|tostring
+                        '%entity%': data is defined ? data|tostring
                     },
                     admin.code|humanize~' - '~action.code|humanize
                 ) }}
@@ -30,7 +30,7 @@
             'sidus.admin.'~admin.code~'.action.'~action.code~'.message',
             'sidus.admin.action.'~action.code~'.message',
         ], {
-            '%entity%': data|tostring
+            '%entity%': data is defined ? data|tostring
         }
     ) %}
     {% if message %}
