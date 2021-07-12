@@ -4,17 +4,7 @@
 {% block container %}
     <div class="row">
         <div class="{{ form_container_class|default('col-lg-4') }}">
-            <h2>
-                {{ tryTrans(
-                    [
-                        'sidus.admin.'~admin.code~'.action.'~action.code~'.title',
-                        'sidus.admin.action.'~action.code~'.title'
-                    ], {
-                        '%entity%': data is defined ? data|tostring
-                    },
-                    admin.code|humanize~' - '~action.code|humanize
-                ) }}
-            </h2>
+            {{ block('title') }}
             {{ form_start(form) }}
             {{ block('message') }}
             {{ form_widget(form) }}
@@ -22,6 +12,20 @@
             {{ form_end(form) }}
         </div>
     </div>
+{% endblock %}
+
+{% block title %}
+    <h2>
+        {{ tryTrans(
+            [
+                'sidus.admin.'~admin.code~'.action.'~action.code~'.title',
+                'sidus.admin.action.'~action.code~'.title'
+            ], {
+                '%entity%': data is defined ? data|tostring
+            },
+            admin.code|humanize~' - '~action.code|humanize
+        ) }}
+    </h2>
 {% endblock %}
 
 {% block message %}
