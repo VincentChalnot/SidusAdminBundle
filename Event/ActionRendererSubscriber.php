@@ -46,6 +46,10 @@ class ActionRendererSubscriber implements EventSubscriberInterface
         $template = $this->templateResolver->getTemplate($action);
 
         $parameters = array_merge(
+            [
+                'action' => $action,
+                'admin' => $action->getAdmin(),
+            ],
             $action->getTemplateParameters(),
             $response->getParameters()
         );

@@ -43,6 +43,40 @@ class AdminEntityParamConverter implements ParamConverterInterface
         if (!$entityManager instanceof EntityManagerInterface) {
             throw new UnexpectedValueException("Unable to find an EntityManager for class {$admin->getEntity()}");
         }
+
+        try {
+            $entity = $this->findByIdentifiers($admin, $entityManager, $request);
+        } catch (UnexpectedValueException $e1) {
+            try {
+                $entity = $this->findByUniqueAttribute($admin, $entityManager, $request, $e1);
+            } catch (UnexpectedValueException $e2) {
+                try {
+                    $entity = $this->findByUniqueConstraint($admin, $entityManager, $request, $e2);
+                } catch (UnexpectedValueException $e3) {
+                    throw new UnexpectedValueException(
+                        'Unable to resolve any entity given request parameters',
+                        0,
+                        $e3
+                    );
+                }
+            }
+        }
+
+        $request->attributes->set($configuration->getName(), $entity);
+
+        return true;
+    }
+
+    public function supports(ParamConverter $configuration): bool
+    {
+        return 'sidus_admin.entity' === $configuration->getConverter();
+    }
+
+    protected function findByIdentifiers(
+        Admin $admin,
+        EntityManagerInterface $entityManager,
+        Request $request,
+    ): object {
         $classMetadata = $entityManager->getClassMetadata($admin->getEntity());
 
         $identifiers = [];
@@ -60,13 +94,77 @@ class AdminEntityParamConverter implements ParamConverterInterface
             $flat = implode($identifiers);
             throw new NotFoundHttpException("No entity found for class {$admin->getEntity()} and identifiers {$flat}");
         }
-        $request->attributes->set($configuration->getName(), $entity);
 
-        return true;
+        return $entity;
     }
 
-    public function supports(ParamConverter $configuration): bool
-    {
-        return 'sidus_admin.entity' === $configuration->getConverter();
+    private function findByUniqueAttribute(
+        Admin $admin,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        \Throwable $previousException,
+    ): object {
+        $classMetadata = $entityManager->getClassMetadata($admin->getEntity());
+        $repository = $entityManager->getRepository($admin->getEntity());
+
+        foreach ($classMetadata->fieldMappings as $fieldMapping) {
+            $fieldName = $fieldMapping['fieldName'];
+            if ($classMetadata->isIdentifier($fieldName)
+                || !$classMetadata->isUniqueField($fieldName)
+                || !$request->attributes->has($fieldName)
+            ) {
+                continue;
+            }
+
+            $entity = $repository->findOneBy([$fieldName => $request->attributes->get($fieldName)]);
+            if (!$entity) {
+                throw new NotFoundHttpException(
+                    "No entity found for class {$admin->getEntity()} and unique attribute {$fieldName}"
+                );
+            }
+
+            return $entity;
+        }
+
+        throw new UnexpectedValueException('No unique attribute in request', 0, $previousException);
+    }
+
+    private function findByUniqueConstraint(
+        Admin $admin,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        \Throwable $previousException,
+    ): object {
+        $classMetadata = $entityManager->getClassMetadata($admin->getEntity());
+        $repository = $entityManager->getRepository($admin->getEntity());
+
+        if (!array_key_exists('uniqueConstraints', $classMetadata->table)) {
+            throw new UnexpectedValueException(
+                'No attribute matching a unique constraint in request',
+                0,
+                $previousException,
+            );
+        }
+
+        foreach ($classMetadata->table['uniqueConstraints'] as $uniqueConstraint) {
+            $criteria = [];
+            foreach ($uniqueConstraint['columns'] as $fieldName) {
+                if (!$request->attributes->has($fieldName)) {
+                    continue 2;
+                }
+                $criteria[$fieldName] = $request->attributes->get($fieldName);
+            }
+            $entity = $repository->findOneBy($criteria);
+            if (!$entity) {
+                $fieldNames = implode(', ', array_keys($criteria));
+                throw new NotFoundHttpException(
+                    "No entity found for class {$admin->getEntity()} and unique attributes {$fieldNames}"
+                );
+            }
+
+            return $entity;
+        }
+
+        throw new UnexpectedValueException('No unique constraint in request', 0, $previousException);
     }
 }
