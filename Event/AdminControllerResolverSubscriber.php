@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Event;
 
-use LogicException;
 use RuntimeException;
 use Sidus\AdminBundle\Admin\Action;
 use Sidus\AdminBundle\Admin\Admin;
@@ -85,7 +84,11 @@ class AdminControllerResolverSubscriber implements EventSubscriberInterface
             $testRequest->attributes->set('_controller', $controller);
             try {
                 $resolvedController = $this->controllerResolver->getController($testRequest);
-            } catch (LogicException) {
+            } catch (\InvalidArgumentException $exception) {
+                // Throw the exception if it's not about a missing service for easier debugging
+                if (!str_contains($exception->getMessage(), 'does neither exist as service nor as class')) {
+                    throw $exception;
+                }
                 continue;
             }
 
