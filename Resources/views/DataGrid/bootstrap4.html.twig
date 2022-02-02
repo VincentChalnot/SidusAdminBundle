@@ -50,19 +50,7 @@
             {% set sort = datagrid.formView.sortable %}
             <table class="table">
                 {% block datagrid_table_headers %}
-                    <thead>
-                    <tr>
-                        {% for column in datagrid.columns %}
-                            <th>
-                                {% if sort[column.sortColumn] is defined %}
-                                    {{ form_widget(sort[column.sortColumn], {label: column.renderLabel}) }}
-                                {% else %}
-                                    {{ column.renderLabel }}
-                                {% endif %}
-                            </th>
-                        {% endfor %}
-                    </tr>
-                    </thead>
+                    {% include '@SidusDataGrid/partials/table_headers.html.twig' %}
                 {% endblock %}
                 {% block datagrid_table_body %}
                     <tbody>
