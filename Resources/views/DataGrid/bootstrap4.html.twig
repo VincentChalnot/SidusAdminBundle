@@ -31,14 +31,7 @@
                 {% endfor %}
                 {% block filters_actions %}
                     <div class="text-right mb-3">
-                        <div class="btn-group">
-                            {% if datagrid.formView.filterResetButton is defined %}
-                                {{ form_widget(datagrid.formView.filterResetButton) }}
-                            {% endif %}
-                            {% if datagrid.formView.filterSubmitButton is defined %}
-                                {{ form_widget(datagrid.formView.filterSubmitButton) }}
-                            {% endif %}
-                        </div>
+                        {{ block('filters_actions', '@SidusDataGrid/DataGrid/bootstrap4.html.twig') }}
                     </div>
                 {% endblock %}
             </div>
@@ -46,42 +39,8 @@
     {% endblock %}
 
     <div class="{{ datagrid_wrapper_class|default('col-xl-10 col-lg-9 col-md-8') }}">
-        {% block datagrid_table %}
-            {% set sort = datagrid.formView.sortable %}
-            <table class="table">
-                {% block datagrid_table_headers %}
-                    {% include '@SidusDataGrid/partials/table_headers.html.twig' %}
-                {% endblock %}
-                {% block datagrid_table_body %}
-                    <tbody>
-                    {% for result in pager %}
-                        <tr class="datagrid-row"{% if result.id is defined %} data-entity-id="{{ result.id }}"{% endif %}>
-                            {% for column in datagrid.columns %}
-                                <td>
-                                    {% if column.template %}
-                                        {% include column.template with column.templateVars %}
-                                    {% else %}
-                                        {{ column.renderValue(result) }}
-                                    {% endif %}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="{{ datagrid.columns|length }}">
-                                <div class="alert alert-secondary text-center m-4" role="alert">
-                                    <span class="text-secondary">No result</span>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                {% endblock %}
-            </table>
-        {% endblock %}
-        {% block pagination %}
-            {% include '@SidusAdmin/Pager/pager.html.twig' %}
-        {% endblock %}
+        {{ block('datagrid_table', '@SidusDataGrid/DataGrid/bootstrap4.html.twig') }}
+        {{ block('pagination', '@SidusDataGrid/DataGrid/bootstrap4.html.twig') }}
     </div>
 </div>
 {{ form_end(form) }}
