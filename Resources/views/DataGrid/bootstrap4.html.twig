@@ -5,6 +5,7 @@
     {# @var pager \Pagerfanta\Pagerfanta #}
     {% set pager = datagrid.queryHandler.pager %}
     {% set form = datagrid.formView %}
+    {{ block('form_start') }}
 
     <div class="row">
         {% block filters %}
@@ -41,4 +42,6 @@
             {{ block('pagination') }}
         </div>
     </div>
+
+    {{ block('form_end') }}
 {% endblock %}
