@@ -1,46 +1,44 @@
 {# @var datagrid \Sidus\DataGridBundle\Model\DataGrid #}
-{# @var pager \Pagerfanta\Pagerfanta #}
-{% set pager = datagrid.queryHandler.pager %}
+{% extends '@SidusDataGrid/DataGrid/bootstrap4.html.twig' %}
 
-{% set form = datagrid.formView %}
-{% if datagrid.formTheme %}
-    {% form_theme form datagrid.formTheme %}
-{% endif %}
-{{ form_start(form) }}
+{% block datagrid %}
+    {# @var pager \Pagerfanta\Pagerfanta #}
+    {% set pager = datagrid.queryHandler.pager %}
+    {% set form = datagrid.formView %}
 
-<div class="row">
-    {% block filters %}
-        {% if form.filters|length > 0 %}
-            <div class="{{ filters_wrapper_class|default('col-xl-2 col-lg-3 col-md-4') }}">
-                {% block datagrid_actions %}
-                    {% if datagrid.formView.actions|length %}
-                        <div class="btn-group">
-                            <div class="btn-toolbar" role="toolbar">
-                                <div class="btn-group" role="group">
-                                    {% for action in datagrid.formView.actions %}
-                                        {{ form_widget(action) }}
-                                    {% endfor %}
+    <div class="row">
+        {% block filters %}
+            {% if form.filters|length > 0 %}
+                <div class="{{ filters_wrapper_class|default('col-xl-2 col-lg-3 col-md-4') }}">
+                    {% block datagrid_actions %}
+                        {% if datagrid.formView.actions|length %}
+                            <div class="btn-group">
+                                <div class="btn-toolbar" role="toolbar">
+                                    <div class="btn-group" role="group">
+                                        {% for action in datagrid.formView.actions %}
+                                            {{ form_widget(action) }}
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
+                            <hr>
+                        {% endif %}
+                    {% endblock %}
+                    {% for filter in form.filters %}
+                        {{ form_row(filter) }}
+                    {% endfor %}
+                    {% block filters_actions %}
+                        <div class="text-right mb-3">
+                            {{ parent() }}
                         </div>
-                        <hr>
-                    {% endif %}
-                {% endblock %}
-                {% for filter in form.filters %}
-                    {{ form_row(filter) }}
-                {% endfor %}
-                {% block filters_actions %}
-                    <div class="text-right mb-3">
-                        {{ block('filters_actions', '@SidusDataGrid/DataGrid/bootstrap4.html.twig') }}
-                    </div>
-                {% endblock %}
-            </div>
-        {% endif %}
-    {% endblock %}
+                    {% endblock %}
+                </div>
+            {% endif %}
+        {% endblock %}
 
-    <div class="{{ datagrid_wrapper_class|default('col-xl-10 col-lg-9 col-md-8') }}">
-        {{ block('datagrid_table', '@SidusDataGrid/DataGrid/bootstrap4.html.twig') }}
-        {{ block('pagination', '@SidusDataGrid/DataGrid/bootstrap4.html.twig') }}
+        <div class="{{ datagrid_wrapper_class|default('col-xl-10 col-lg-9 col-md-8') }}">
+            {{ block('datagrid_table') }}
+            {{ block('pagination') }}
+        </div>
     </div>
-</div>
-{{ form_end(form) }}
+{% endblock %}
