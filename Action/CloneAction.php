@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Request\RedirectActionResponse;
@@ -34,9 +33,6 @@ class CloneAction implements ActionInjectableInterface
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * @ParamConverter(name="data", converter="sidus_admin.entity")
-     */
     public function __invoke(Request $request, mixed $data): ActionResponseInterface
     {
         $this->editAction->setAction($this->action);

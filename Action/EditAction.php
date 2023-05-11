@@ -15,7 +15,6 @@ namespace Sidus\AdminBundle\Action;
 use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Request\RedirectActionResponse;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Form\FormHelper;
@@ -37,9 +36,6 @@ class EditAction implements ActionInjectableInterface
     ) {
     }
 
-    /**
-     * @ParamConverter(name="data", converter="sidus_admin.entity")
-     */
     public function __invoke(Request $request, mixed $data): ActionResponseInterface
     {
         $form = $this->formHelper->getForm($this->action, $request, $data);

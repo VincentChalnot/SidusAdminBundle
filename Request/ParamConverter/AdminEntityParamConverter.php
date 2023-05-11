@@ -33,15 +33,15 @@ class AdminEntityParamConverter implements ParamConverterInterface
     public function apply(Request $request, ParamConverter $configuration): bool
     {
         if (!$request->attributes->has('_admin')) {
-            throw new UnexpectedValueException('Missing _admin request attribute');
+            return false;
         }
         $admin = $request->attributes->get('_admin');
         if (!$admin instanceof Admin) {
-            throw new UnexpectedValueException('_admin request attribute is not an Admin object');
+            return false;
         }
         $entityManager = $this->doctrine->getManagerForClass($admin->getEntity());
         if (!$entityManager instanceof EntityManagerInterface) {
-            throw new UnexpectedValueException("Unable to find an EntityManager for class {$admin->getEntity()}");
+            return false;
         }
 
         try {
@@ -69,7 +69,7 @@ class AdminEntityParamConverter implements ParamConverterInterface
 
     public function supports(ParamConverter $configuration): bool
     {
-        return 'sidus_admin.entity' === $configuration->getConverter();
+        return true;
     }
 
     protected function findByIdentifiers(
