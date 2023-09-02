@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,13 +12,13 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Entity;
 
-use Sidus\AdminBundle\Admin\Admin;
+use Sidus\AdminBundle\Model\Admin;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
 use UnexpectedValueException;
 use function get_class;
 
 /**
- * Used to match an admin against a Doctrine entity, will return the first one matching
+ * Used to match an admin against an entity, will return the first one matching
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
@@ -32,14 +32,17 @@ class AdminEntityMatcher
 
     public function getAdminForEntity(object $entity): Admin
     {
-        $class = get_class($entity);
+        return $this->getAdminForClass(get_class($entity));
+    }
 
+    public function getAdminForClass(string $class): Admin
+    {
         if (array_key_exists($class, $this->cache)) {
             return $this->cache[$class];
         }
 
         foreach ($this->adminRegistry->getAdmins() as $admin) {
-            if (is_a($entity, $admin->getEntity())) {
+            if (is_a($class, $admin->getEntity(), true)) {
                 $this->cache[$class] = $admin;
 
                 return $admin;

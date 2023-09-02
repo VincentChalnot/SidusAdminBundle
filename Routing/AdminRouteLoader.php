@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,16 +23,21 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class AdminRouteLoader extends Loader
 {
-    /**
-     * @noinspection MagicMethodsValidityInspection
-     * @noinspection PhpMissingParentConstructorInspection
-     */
-    public function __construct(protected AdminRegistry $adminRegistry)
-    {
+    protected bool $isLoaded = false;
+
+    public function __construct(
+        protected AdminRegistry $adminRegistry,
+        string $env = null,
+    ) {
+        parent::__construct($env);
     }
 
     public function load(mixed $resource, string $type = null): RouteCollection
     {
+        if (true === $this->isLoaded) {
+            throw new \RuntimeException('Do not add the "sidus_admin" loader twice');
+        }
+
         $routes = new RouteCollection();
 
         foreach ($this->adminRegistry->getAdmins() as $admin) {
@@ -40,6 +45,7 @@ class AdminRouteLoader extends Loader
                 $routes->add($action->getRouteName(), $action->getRoute());
             }
         }
+        $this->isLoaded = true;
 
         return $routes;
     }

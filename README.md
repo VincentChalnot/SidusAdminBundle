@@ -12,9 +12,7 @@ Example in twig:
 ## Warning
 
 This bundle requires the security component of Symfony, it will enforce access to any entity using the voter.
-To ease the configuration of this, we recommend the ````cleverage/permission-bundle````.
-Also, by a design mistake, this bundle is tightly linked to the use of Doctrine, it can still be used for non-doctrine
-entities but unplugging Doctrine from dependencies will require some extra work.
+This bundle is easier to use with Doctrine, it can still be used for non-doctrine entities.
 
 ## Configuration
 
@@ -43,8 +41,8 @@ All values are the default one except when specified otherwise.
 
 ```yaml
 sidus_admin:
-    admin_class: Sidus\AdminBundle\Admin\Admin
-    action_class: Sidus\AdminBundle\Admin\Action
+    admin_class: Sidus\AdminBundle\Model\Admin
+    action_class: Sidus\AdminBundle\Model\Action
     configurations:
         <admin_code>:
             entity: ~ # REQUIRED: The fully qualified class name of the entity (or the Doctrine's shorter reference)
@@ -60,11 +58,13 @@ sidus_admin:
             template_pattern: [] # The template pattern
             action_class: # Defaults to main action_class
             options: {} # You can put anything here
+            permissions: [ ROLE_USER ] # List of permissions required to access the whole admin
             actions:
                 <action_code>: # The action code needs to match the controller's method name without the "Action" suffix
                     form_type: ~ # Useful in combination with AbstractAdminController::getForm($request, $data)
                     form_options: ~ # Static form options
                     template: ~ # Computed by the TemplateResolver using template_pattern if null
+                    permissions: [ ROLE_USER ] # List of permissions required to access the action
                     # All the following options are used to generate the route for the routing component
                     # See Symfony doc here: http://symfony.com/doc/current/routing.html
                     path: ~ # REQUIRED

@@ -1,6 +1,0 @@
-services:
-    Sidus\AdminBundle\Form\Type\AdminLinkType:
-        public: false
-        autowire: true
-        tags:
-            - { name: form.type }

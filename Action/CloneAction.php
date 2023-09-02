@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,15 +12,14 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sidus\AdminBundle\Attribute\AdminEntity;
 use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Request\RedirectActionResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-/**
- * @Security("(is_granted('read', data) and is_granted('create', _admin.getEntity()))")
- */
+#[AsController]
 class CloneAction implements ActionInjectableInterface
 {
     use ActionInjectableTrait;
@@ -33,8 +32,11 @@ class CloneAction implements ActionInjectableInterface
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    public function __invoke(Request $request, mixed $data): ActionResponseInterface
-    {
+    public function __invoke(
+        Request $request,
+        #[AdminEntity]
+        object $data,
+    ): ActionResponseInterface {
         $this->editAction->setAction($this->action);
         $response = ($this->editAction)($request, clone $data);
 

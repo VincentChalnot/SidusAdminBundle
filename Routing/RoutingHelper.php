@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Routing;
 
-use Sidus\AdminBundle\Admin\Action;
-use Sidus\AdminBundle\Admin\Admin;
+use Sidus\AdminBundle\Model\Action;
+use Sidus\AdminBundle\Model\Admin;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

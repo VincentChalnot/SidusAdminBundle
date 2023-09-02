@@ -1,4 +1,0 @@
-services:
-    Sidus\AdminBundle\Configuration\AdminRegistry:
-        autowire: true
-        public: false

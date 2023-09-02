@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sidus\AdminBundle\Attribute\AdminEntity;
 use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Form\FormHelper;
 use Sidus\AdminBundle\Request\ActionResponseInterface;
@@ -21,10 +21,9 @@ use Sidus\AdminBundle\Routing\RoutingHelper;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 
-/**
- * @Security("is_granted('delete', data)")
- */
+#[AsController]
 class DeleteAction extends AbstractEmptyFormAction
 {
     public function __construct(
@@ -36,8 +35,12 @@ class DeleteAction extends AbstractEmptyFormAction
         parent::__construct($formHelper, $templatingHelper);
     }
 
-    protected function applyAction(Request $request, FormInterface $form, $data): ActionResponseInterface
-    {
+    protected function applyAction(
+        Request $request,
+        FormInterface $form,
+        #[AdminEntity]
+        object $data,
+    ): ActionResponseInterface {
         $this->doctrineHelper->deleteEntity($this->action, $data, $request->getSession());
 
         return new RedirectActionResponse(

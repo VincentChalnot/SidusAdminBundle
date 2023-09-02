@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Configuration;
 
-use Sidus\AdminBundle\Admin\Admin;
+use Sidus\AdminBundle\Model\Admin;
 use UnexpectedValueException;
 
 /**
@@ -27,9 +27,13 @@ class AdminRegistry
 
     protected Admin $currentAdmin;
 
-    /**
-     * @param Admin $admin
-     */
+    public function __construct(iterable $admins)
+    {
+        foreach ($admins as $admin) {
+            $this->addAdmin($admin);
+        }
+    }
+
     public function addAdmin(Admin $admin): void
     {
         $this->admins[$admin->getCode()] = $admin;
@@ -43,13 +47,6 @@ class AdminRegistry
         return $this->admins;
     }
 
-    /**
-     * @param string $code
-     *
-     * @throws UnexpectedValueException
-     *
-     * @return Admin
-     */
     public function getAdmin(string $code): Admin
     {
         if (empty($this->admins[$code])) {
@@ -59,28 +56,16 @@ class AdminRegistry
         return $this->admins[$code];
     }
 
-    /**
-     * @param string $code
-     *
-     * @return bool
-     */
     public function hasAdmin(string $code): bool
     {
         return isset($this->admins[$code]);
     }
 
-
-    /**
-     * @return Admin|null
-     */
     public function getCurrentAdmin(): ?Admin
     {
         return $this->currentAdmin;
     }
 
-    /**
-     * @param Admin $currentAdmin
-     */
     public function setCurrentAdmin(Admin $currentAdmin): void
     {
         $this->currentAdmin = $currentAdmin;

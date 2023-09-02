@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            $controllerResolver: '@controller_resolver'
+            $admins: !tagged_iterator sidus.admin
+
+    Sidus\AdminBundle\:
+        resource: '../../'
+        exclude: '../../{DependencyInjection,Model}'
+
+    Sidus\AdminBundle\Routing\AdminRouteLoader:
+        tags:
+            - routing.loader
+
+    Sidus\AdminBundle\Templating\TemplateResolverInterface:
+        alias: Sidus\AdminBundle\Templating\TemplateResolver

@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ use Sidus\AdminBundle\Request\RedirectActionResponse;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * Common logic found in clone and create, does not deserves a dedicated service
+ * Common logic found in clone and create, does not deserve a dedicated service
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */

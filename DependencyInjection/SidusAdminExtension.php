@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,11 +12,13 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\DependencyInjection;
 
-use Sidus\BaseBundle\DependencyInjection\SidusBaseExtension;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -25,7 +27,7 @@ use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class SidusAdminExtension extends SidusBaseExtension
+class SidusAdminExtension extends Extension
 {
     /** @var array */
     protected array $globalConfig;
@@ -41,7 +43,8 @@ class SidusAdminExtension extends SidusBaseExtension
             $this->createAdminServiceDefinition($code, $adminConfiguration, $container);
         }
 
-        parent::load($configs, $container);
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.yaml');
     }
 
     /**
@@ -52,15 +55,11 @@ class SidusAdminExtension extends SidusBaseExtension
         return new Configuration();
     }
 
-    /**
-     * @param string           $code
-     * @param array            $adminConfiguration
-     * @param ContainerBuilder $container
-     *
-     * @throws BadMethodCallException
-     */
-    protected function createAdminServiceDefinition($code, array $adminConfiguration, ContainerBuilder $container): void
-    {
+    protected function createAdminServiceDefinition(
+        string $code,
+        array $adminConfiguration,
+        ContainerBuilder $container,
+    ): void {
         $adminConfiguration = array_merge(['action_class' => $this->globalConfig['action_class']], $adminConfiguration);
         if (!isset($adminConfiguration['base_template'])) {
             $adminConfiguration['base_template'] = $this->globalConfig['base_template'];

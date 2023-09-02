@@ -1,6 +1,0 @@
-services:
-    Sidus\AdminBundle\Request\ParamConverter\AdminEntityParamConverter:
-        autowire: true
-        public: false
-        tags:
-            - { name: request.param_converter, converter: sidus_admin.entity }

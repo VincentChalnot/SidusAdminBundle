@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
+use Sidus\AdminBundle\Attribute\AdminEntity;
 use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
 use Sidus\AdminBundle\Form\FormHelper;
@@ -31,8 +32,11 @@ abstract class AbstractEmptyFormAction implements ActionInjectableInterface
     ) {
     }
 
-    public function __invoke(Request $request, object $data): ActionResponseInterface
-    {
+    public function __invoke(
+        Request $request,
+        #[AdminEntity]
+        object $data,
+    ): ActionResponseInterface {
         $form = $this->formHelper->getEmptyForm($this->action, $request);
 
         $form->handleRequest($request);
@@ -47,5 +51,9 @@ abstract class AbstractEmptyFormAction implements ActionInjectableInterface
         );
     }
 
-    abstract protected function applyAction(Request $request, FormInterface $form, object $data): ActionResponseInterface;
+    abstract protected function applyAction(
+        Request $request,
+        FormInterface $form,
+        object $data,
+    ): ActionResponseInterface;
 }

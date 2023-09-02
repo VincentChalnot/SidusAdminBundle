@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,7 @@ namespace Sidus\AdminBundle\Templating;
 use LogicException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Sidus\AdminBundle\Admin\Action;
+use Sidus\AdminBundle\Model\Action;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\TemplateWrapper;

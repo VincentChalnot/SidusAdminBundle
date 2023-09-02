@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,48 +10,65 @@
 
 declare(strict_types=1);
 
-namespace Sidus\AdminBundle\Request\ParamConverter;
+namespace Sidus\AdminBundle\Request;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
-use Sidus\AdminBundle\Admin\Admin;
+use Sidus\AdminBundle\Attribute\AdminEntity;
+use Sidus\AdminBundle\Model\Action;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use UnexpectedValueException;
 
 /**
  * Uses the admin configuration to convert an entity id to a real doctrine entity
  */
-class AdminEntityParamConverter implements ParamConverterInterface
+class AdminEntityValueResolver implements ValueResolverInterface
 {
-    public function __construct(protected ManagerRegistry $doctrine)
-    {
+    public function __construct(
+        protected AuthorizationCheckerInterface $authorizationChecker,
+        protected ?ManagerRegistry $managerRegistry = null,
+    ) {
     }
 
-    public function apply(Request $request, ParamConverter $configuration): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (!$request->attributes->has('_admin')) {
-            return false;
+        if (!$this->managerRegistry) {
+            return;
         }
-        $admin = $request->attributes->get('_admin');
-        if (!$admin instanceof Admin) {
-            return false;
-        }
-        $entityManager = $this->doctrine->getManagerForClass($admin->getEntity());
-        if (!$entityManager instanceof EntityManagerInterface) {
-            return false;
+        if (empty($argument->getAttributes(AdminEntity::class))) {
+            return;
         }
 
+        $action = $request->attributes->get('_action');
+        if (!$action instanceof Action) {
+            throw new UnexpectedValueException("Unable to resolve entity without action");
+        }
+        $entityClass = $action->getAdmin()->getEntity();
+        $entityManager = $this->managerRegistry->getManagerForClass($entityClass);
+        if (!$entityManager instanceof EntityManagerInterface) {
+            return;
+        }
+
+        yield $this->getArgumentValue($entityClass, $entityManager, $request);;
+    }
+
+    protected function getArgumentValue(
+        string $entityClass,
+        EntityManagerInterface $entityManager,
+        Request $request,
+    ): object {
         try {
-            $entity = $this->findByIdentifiers($admin, $entityManager, $request);
+            return $this->findByIdentifiers($entityClass, $entityManager, $request);
         } catch (UnexpectedValueException $e1) {
             try {
-                $entity = $this->findByUniqueAttribute($admin, $entityManager, $request, $e1);
+                return $this->findByUniqueAttribute($entityClass, $entityManager, $request, $e1);
             } catch (UnexpectedValueException $e2) {
                 try {
-                    $entity = $this->findByUniqueConstraint($admin, $entityManager, $request, $e2);
+                    return $this->findByUniqueConstraint($entityClass, $entityManager, $request, $e2);
                 } catch (UnexpectedValueException $e3) {
                     throw new UnexpectedValueException(
                         'Unable to resolve any entity given request parameters',
@@ -61,51 +78,42 @@ class AdminEntityParamConverter implements ParamConverterInterface
                 }
             }
         }
-
-        $request->attributes->set($configuration->getName(), $entity);
-
-        return true;
-    }
-
-    public function supports(ParamConverter $configuration): bool
-    {
-        return true;
     }
 
     protected function findByIdentifiers(
-        Admin $admin,
+        string $entityClass,
         EntityManagerInterface $entityManager,
         Request $request,
     ): object {
-        $classMetadata = $entityManager->getClassMetadata($admin->getEntity());
+        $classMetadata = $entityManager->getClassMetadata($entityClass);
 
         $identifiers = [];
         foreach ($classMetadata->getIdentifier() as $identifier) {
             if (!$request->attributes->has($identifier)) {
-                $m = "Missing identifier request attribute for entity {$admin->getEntity()}: '{$identifier}'";
+                $m = "Missing identifier request attribute for entity {$entityClass}: '{$identifier}'";
                 throw new UnexpectedValueException($m);
             }
             $identifiers[$identifier] = $request->attributes->get($identifier);
         }
 
-        $repository = $entityManager->getRepository($admin->getEntity());
+        $repository = $entityManager->getRepository($entityClass);
         $entity = $repository->findOneBy($identifiers);
         if (!$entity) {
             $flat = implode($identifiers);
-            throw new NotFoundHttpException("No entity found for class {$admin->getEntity()} and identifiers {$flat}");
+            throw new NotFoundHttpException("No entity found for class {$entityClass} and identifiers {$flat}");
         }
 
         return $entity;
     }
 
-    private function findByUniqueAttribute(
-        Admin $admin,
+    protected function findByUniqueAttribute(
+        string $entityClass,
         EntityManagerInterface $entityManager,
         Request $request,
         \Throwable $previousException,
     ): object {
-        $classMetadata = $entityManager->getClassMetadata($admin->getEntity());
-        $repository = $entityManager->getRepository($admin->getEntity());
+        $classMetadata = $entityManager->getClassMetadata($entityClass);
+        $repository = $entityManager->getRepository($entityClass);
 
         foreach ($classMetadata->fieldMappings as $fieldMapping) {
             $fieldName = $fieldMapping['fieldName'];
@@ -119,7 +127,7 @@ class AdminEntityParamConverter implements ParamConverterInterface
             $entity = $repository->findOneBy([$fieldName => $request->attributes->get($fieldName)]);
             if (!$entity) {
                 throw new NotFoundHttpException(
-                    "No entity found for class {$admin->getEntity()} and unique attribute {$fieldName}"
+                    "No entity found for class {$entityClass} and unique attribute {$fieldName}"
                 );
             }
 
@@ -129,14 +137,14 @@ class AdminEntityParamConverter implements ParamConverterInterface
         throw new UnexpectedValueException('No unique attribute in request', 0, $previousException);
     }
 
-    private function findByUniqueConstraint(
-        Admin $admin,
+    protected function findByUniqueConstraint(
+        string $entityClass,
         EntityManagerInterface $entityManager,
         Request $request,
         \Throwable $previousException,
     ): object {
-        $classMetadata = $entityManager->getClassMetadata($admin->getEntity());
-        $repository = $entityManager->getRepository($admin->getEntity());
+        $classMetadata = $entityManager->getClassMetadata($entityClass);
+        $repository = $entityManager->getRepository($entityClass);
 
         if (!array_key_exists('uniqueConstraints', $classMetadata->table)) {
             throw new UnexpectedValueException(
@@ -158,7 +166,7 @@ class AdminEntityParamConverter implements ParamConverterInterface
             if (!$entity) {
                 $fieldNames = implode(', ', array_keys($criteria));
                 throw new NotFoundHttpException(
-                    "No entity found for class {$admin->getEntity()} and unique attributes {$fieldNames}"
+                    "No entity found for class {$entityClass} and unique attributes {$fieldNames}"
                 );
             }
 

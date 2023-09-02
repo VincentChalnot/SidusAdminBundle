@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\DataGrid;
 
-use Sidus\AdminBundle\Admin\Action;
+use Sidus\AdminBundle\Model\Action;
 use Sidus\AdminBundle\Routing\RoutingHelper;
 use Sidus\DataGridBundle\Model\DataGrid;
 use Sidus\DataGridBundle\Registry\DataGridRegistry;
@@ -29,15 +29,10 @@ class DataGridHelper
         protected DataGridRegistry $dataGridRegistry,
         protected RoutingHelper $routingHelper,
         protected FormFactoryInterface $formFactory,
-        protected string $method = 'GET'
+        protected string $method = 'GET',
     ) {
     }
 
-    /**
-     * @param Action $action
-     *
-     * @return string
-     */
     public function getDataGridConfigCode(Action $action): string
     {
         // Check if datagrid code is set in options

@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,18 +12,17 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
+use Sidus\AdminBundle\Attribute\AdminEntity;
 use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Request\RedirectActionResponse;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Form\FormHelper;
 use Sidus\AdminBundle\Routing\RoutingHelper;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 
-/**
- * @Security("is_granted('edit', data)")
- */
+#[AsController]
 class EditAction implements ActionInjectableInterface
 {
     use ActionInjectableTrait;
@@ -36,8 +35,11 @@ class EditAction implements ActionInjectableInterface
     ) {
     }
 
-    public function __invoke(Request $request, mixed $data): ActionResponseInterface
-    {
+    public function __invoke(
+        Request $request,
+        #[AdminEntity]
+        object $data,
+    ): ActionResponseInterface {
         $form = $this->formHelper->getForm($this->action, $request, $data);
 
         $form->handleRequest($request);

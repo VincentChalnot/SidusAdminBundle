@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,13 +12,15 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Twig;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
-use Sidus\AdminBundle\Admin\Admin;
+use Sidus\AdminBundle\Model\Action;
+use Sidus\AdminBundle\Model\Admin;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
+use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
+use Sidus\AdminBundle\Model\PermissionCheck;
 use Sidus\AdminBundle\Routing\AdminRouter;
-use Sidus\BaseBundle\Translator\TranslatableTrait;
+use Sidus\AdminBundle\Translator\TranslatableTrait;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -37,7 +39,8 @@ class AdminExtension extends AbstractExtension
         protected AdminRegistry $adminRegistry,
         protected AdminEntityMatcher $adminEntityMatcher,
         protected AdminRouter $adminRouter,
-        protected ManagerRegistry $managerRegistry,
+        protected DoctrineHelper $doctrineHelper,
+        protected AuthorizationCheckerInterface $authorizationChecker,
         TranslatorInterface $translator,
     ) {
         $this->translator = $translator;
@@ -51,6 +54,7 @@ class AdminExtension extends AbstractExtension
             new TwigFunction('admin_entity_path', [$this->adminRouter, 'generateAdminEntityPath']),
             new TwigFunction('entity_path', [$this->adminRouter, 'generateEntityPath']),
             new TwigFunction('entity_admin', [$this->adminEntityMatcher, 'getAdminForEntity']),
+            new TwigFunction('is_action_granted', [$this, 'isActionGranted']),
             new TwigFunction('admin', [$this, 'getAdmin']),
             new TwigFunction('tryTrans', [$this, 'tryTrans'], ['is_safe' => ['html']]),
         ];
@@ -98,22 +102,16 @@ class AdminExtension extends AbstractExtension
             return (string) $data;
         }
 
-        $manager = $this->managerRegistry->getManagerForClass($data::class);
-        if (!$manager instanceof EntityManagerInterface) {
-            return $data::class;
-        }
-
-        $classMetadata = $manager->getClassMetadata($data::class);
-        $identifiers = $classMetadata->getIdentifierValues($data);
-        if (1 === count($identifiers)) {
-            return $data::class.'#'.reset($identifiers);
-        }
-
         try {
-            return $data::class.json_encode($identifiers, JSON_THROW_ON_ERROR);
+            return $this->doctrineHelper->entityToString($data);
         } catch (\Exception) {
             return $data::class;
         }
+    }
+
+    public function isActionGranted(Action $action, ?object $entity = null): bool
+    {
+        return $this->authorizationChecker->isGranted(null, new PermissionCheck($action, $entity));
     }
 
     public function getName(): string

@@ -11,8 +11,7 @@
     "authors": [
         {
             "name": "Vincent Chalnot",
-            "email": "vincent@sidus.fr",
-            "homepage": "https://sidus.fr",
+            "homepage": "https://github.com/VincentChalnot",
             "role": "Developer"
         }
     ],
@@ -22,20 +21,16 @@
         }
     },
     "require": {
-        "php": ">=8.0",
-        "doctrine/orm": "~2.3",
-        "symfony/framework-bundle": ">=4.0",
-        "sensio/framework-extra-bundle": ">=4.0",
-        "symfony/security-bundle": ">=4.0",
-        "symfony/expression-language": ">=4.0",
-        "symfony/yaml": ">=4.0",
-        "symfony/form": ">=4.0",
-        "symfony/translation": ">=4.0",
-        "symfony/twig-bundle": ">=4.0",
-        "sidus/datagrid-bundle": "3.1.*|dev-v3.1-dev",
-        "sidus/base-bundle": "~1.0"
-    },
-    "suggest": {
-        "cleverage/permission-bundle": "Configure entities permissions easily"
+        "php": ">=8.1",
+        "symfony/event-dispatcher": ">=6.3",
+        "symfony/form": ">=6.3",
+        "symfony/http-foundation": ">=6.3",
+        "symfony/http-kernel": ">=6.3",
+        "symfony/routing": ">=6.3",
+        "symfony/security-core": ">=6.3",
+        "symfony/translation-contracts": ">=3.0",
+        "symfony/yaml": ">=6.3",
+        "twig/twig": ">=3.0",
+        "sidus/datagrid-bundle": "~4.0"
     }
 }

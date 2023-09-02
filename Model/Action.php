@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace Sidus\AdminBundle\Admin;
+namespace Sidus\AdminBundle\Model;
 
 use LogicException;
 use Symfony\Component\Routing\Route;
@@ -41,6 +41,8 @@ class Action
 
     protected ?string $baseTemplate;
 
+    protected array $permissions;
+
     public function __construct(string $code, Admin $admin, array $c)
     {
         $this->code = $code;
@@ -51,6 +53,7 @@ class Action
         $this->template = $c['template'];
         $this->templateParameters = $c['template_parameters'];
         $this->baseTemplate = $c['base_template'];
+        $this->permissions = $c['permissions'];
 
         if (empty($c['defaults']['_controller_pattern']) && empty($c['defaults']['_controller'])) {
             if (count($admin->getControllerPattern()) > 0) {
@@ -143,5 +146,10 @@ class Action
     public function getBaseTemplate(): string
     {
         return $this->baseTemplate;
+    }
+
+    public function getPermissions(): array
+    {
+        return $this->permissions;
     }
 }

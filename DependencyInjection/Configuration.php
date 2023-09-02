@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace Sidus\AdminBundle\DependencyInjection;
 
 use RuntimeException;
-use Sidus\AdminBundle\Admin\Action;
-use Sidus\AdminBundle\Admin\Admin;
+use Sidus\AdminBundle\Model\Action;
+use Sidus\AdminBundle\Model\Admin;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -27,22 +27,11 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    /** @var string */
-    protected $root;
-
-    /**
-     * @param string $root
-     */
-    public function __construct($root = 'sidus_admin')
-    {
-        $this->root = $root;
+    public function __construct(
+        protected string $root = 'sidus_admin',
+    ) {
     }
 
-
-    /**
-     * {@inheritdoc}
-     * @throws RuntimeException
-     */
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder($this->root);
@@ -59,11 +48,6 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @throws RuntimeException
-     *
-     * @return NodeDefinition
-     */
     protected function getAdminConfigTreeBuilder(): NodeDefinition
     {
         $builder = new TreeBuilder('configurations');
@@ -83,9 +67,6 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    /**
-     * @param NodeBuilder $adminDefinition
-     */
     protected function appendAdminDefinition(NodeBuilder $adminDefinition): void
     {
         $actionDefinition = $adminDefinition
@@ -98,6 +79,7 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('action_class')->end()
             ->scalarNode('form_type')->defaultNull()->end()
             ->variableNode('options')->defaultValue([])->end()
+            ->variableNode('permissions')->defaultValue([])->end()
             ->arrayNode('actions')
             ->useAttributeAsKey('code')
             ->prototype('array')
@@ -111,9 +93,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $actionDefinition
-     */
     protected function appendActionDefinition(NodeBuilder $actionDefinition): void
     {
         $actionDefinition
@@ -123,6 +102,7 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('base_template')->defaultNull()->end()
             ->scalarNode('template')->defaultNull()->end()
             ->variableNode('template_parameters')->defaultValue([])->end()
+            ->variableNode('permissions')->defaultValue([])->end()
             // Default route parameters
             ->scalarNode('path')->isRequired()->cannotBeEmpty()->end()
             ->variableNode('defaults')->defaultValue([])->end()

@@ -2,7 +2,7 @@
 /*
  * This file is part of the Sidus/AdminBundle package.
  *
- * Copyright (c) 2015-2021 Vincent Chalnot
+ * Copyright (c) 2015-2023 Vincent Chalnot
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,15 +10,17 @@
 
 declare(strict_types=1);
 
-namespace Sidus\AdminBundle\Admin;
+namespace Sidus\AdminBundle\Model;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use UnexpectedValueException;
 
 /**
- * The admin serves as an action holder and is attached to a Doctrine entity
+ * The admin serves as an action holder and is attached to an entity
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
+#[AutoconfigureTag('sidus.admin')]
 class Admin
 {
     protected string $code;
@@ -41,6 +43,8 @@ class Admin
 
     protected ?Action $currentAction;
 
+    protected array $permissions;
+
     public function __construct(string $code, array $adminConfiguration)
     {
         $this->code = $code;
@@ -51,6 +55,7 @@ class Admin
         $this->entity = $adminConfiguration['entity'];
         $this->formType = $adminConfiguration['form_type'];
         $this->options = $adminConfiguration['options'];
+        $this->permissions = $adminConfiguration['permissions'];
 
         $actionClass = $adminConfiguration['action_class'];
         foreach ((array) $adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
@@ -159,5 +164,10 @@ class Admin
     public function getBaseTemplate(): ?string
     {
         return $this->baseTemplate;
+    }
+
+    public function getPermissions(): array
+    {
+        return $this->permissions;
     }
 }

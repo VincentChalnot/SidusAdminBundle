@@ -1,8 +1,0 @@
-services:
-    Sidus\AdminBundle\Event\:
-        resource: '../../../Event'
-        autowire: true
-        public: false
-        autoconfigure: true
-        bind:
-            $controllerResolver: '@controller_resolver'
