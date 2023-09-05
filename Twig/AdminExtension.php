@@ -19,9 +19,9 @@ use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
 use Sidus\AdminBundle\Model\PermissionCheck;
 use Sidus\AdminBundle\Routing\AdminRouter;
-use Sidus\AdminBundle\Translator\TranslatableTrait;
+use Sidus\AdminBundle\Templating\ActionLinkHelper;
+use Sidus\AdminBundle\Translator\TranslatorHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -33,17 +33,15 @@ use Twig\TwigFunction;
  */
 class AdminExtension extends AbstractExtension
 {
-    use TranslatableTrait;
-
     public function __construct(
         protected AdminRegistry $adminRegistry,
         protected AdminEntityMatcher $adminEntityMatcher,
         protected AdminRouter $adminRouter,
         protected DoctrineHelper $doctrineHelper,
         protected AuthorizationCheckerInterface $authorizationChecker,
-        TranslatorInterface $translator,
+        protected ActionLinkHelper $actionLinkHelper,
+        protected TranslatorHelper $translatorHelper,
     ) {
-        $this->translator = $translator;
     }
 
     public function getFunctions(): array
@@ -56,7 +54,9 @@ class AdminExtension extends AbstractExtension
             new TwigFunction('entity_admin', [$this->adminEntityMatcher, 'getAdminForEntity']),
             new TwigFunction('is_action_granted', [$this, 'isActionGranted']),
             new TwigFunction('admin', [$this, 'getAdmin']),
-            new TwigFunction('tryTrans', [$this, 'tryTrans'], ['is_safe' => ['html']]),
+            new TwigFunction('tryTrans', [$this->translatorHelper, 'tryTranslate'], ['is_safe' => ['html']]),
+            new TwigFunction('action_link', [$this->actionLinkHelper, 'renderActionLink'], ['is_safe' => ['html']]),
+            new TwigFunction('action_link_fallback', [$this, 'renderActionLinkFallback'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -112,6 +112,18 @@ class AdminExtension extends AbstractExtension
     public function isActionGranted(Action $action, ?object $entity = null): bool
     {
         return $this->authorizationChecker->isGranted(null, new PermissionCheck($action, $entity));
+    }
+
+    public function renderActionLinkFallback(array $defaultOptions, ...$optionsCollection): string
+    {
+        foreach ($optionsCollection as $options) {
+            $result = $this->actionLinkHelper->renderActionLink(array_merge($defaultOptions, $options));
+            if ($result) {
+                return $result;
+            }
+        }
+
+        return '';
     }
 
     public function getName(): string

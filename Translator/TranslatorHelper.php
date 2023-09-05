@@ -21,19 +21,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-trait TranslatableTrait
+class TranslatorHelper
 {
-    protected TranslatorInterface $translator;
-
-    public function setTranslator(TranslatorInterface $translator): void
-    {
-        $this->translator = $translator;
+    public function __construct(
+        protected TranslatorInterface $translator,
+    ) {
     }
 
     /**
      * Will check the translator for the provided keys and humanize the code if no translation is found
      */
-    protected function tryTranslate(
+    public function tryTranslate(
         string|array $tIds,
         array $parameters = [],
         ?string $fallback = null,

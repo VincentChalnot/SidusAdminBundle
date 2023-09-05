@@ -28,6 +28,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Special type to create a link inside a form.
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
+ * @deprecated Use ActionType instead
  */
 class AdminLinkType extends AbstractType
 {
@@ -39,6 +40,13 @@ class AdminLinkType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
+        trigger_deprecation(
+            'sidus/admin-bundle',
+            '4.3',
+            'The "%s" class is deprecated, use "%s" instead',
+            __CLASS__,
+            LinkType::class
+        );
         $view->vars['admin'] = $options['admin'];
         $view->vars['admin_action'] = $options['admin_action'];
     }
@@ -96,7 +104,7 @@ class AdminLinkType extends AbstractType
                     return $this->adminRouter->generateAdminPath(
                         $options['admin'],
                         $options['admin_action']->getCode(),
-                        $options['route_parameters']
+                        $options['route_params']
                     );
                 }
 
