@@ -104,7 +104,7 @@ class AdminLinkType extends AbstractType
                     return $this->adminRouter->generateAdminPath(
                         $options['admin'],
                         $options['admin_action']->getCode(),
-                        $options['route_params']
+                        $options['route_parameters']
                     );
                 }
 
