@@ -23,6 +23,7 @@ use Sidus\AdminBundle\Templating\ActionLinkHelper;
 use Sidus\AdminBundle\Translator\TranslatorHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Extension\AbstractExtension;
+use Twig\Markup;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 

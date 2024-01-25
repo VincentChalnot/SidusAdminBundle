@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Templating;
 
+use Psr\Log\LoggerInterface;
 use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Sidus\AdminBundle\Model\Action;
 use Sidus\AdminBundle\Model\Admin;
@@ -38,6 +39,7 @@ class ActionLinkHelper
         protected AdminRouter $adminRouter,
         protected TranslatorHelper $translatorHelper,
         protected Environment $environment,
+        protected LoggerInterface $logger,
         protected array $defaultOptions = [],
     ) {
         $this->defaultOptions = array_merge(self::DEFAULTS, $this->defaultOptions);
@@ -48,6 +50,8 @@ class ActionLinkHelper
         try {
             $actionLink = $this->getActionLink($options);
         } catch (\Exception $e) {
+            $this->logger->debug($e->getMessage(), ['exception' => $e]);
+
             return '';
         }
         $subject = new PermissionCheck($actionLink->action, $actionLink->entity);
@@ -87,11 +91,11 @@ class ActionLinkHelper
         $resolver->setAllowedTypes('admin', ['null', 'string', Admin::class]);
         $resolver->setAllowedTypes('action', ['string', Action::class]);
         $resolver->setAllowedTypes('entity', ['null', 'object']);
-        $resolver->setAllowedTypes('label', ['null', 'string']);
-        $resolver->setAllowedTypes('icon', ['bool', 'string']);
-        $resolver->setAllowedTypes('icon_template', ['string']);
-        $resolver->setAllowedTypes('title', ['bool', 'string']);
-        $resolver->setAllowedTypes('content', ['bool', 'string']);
+        $resolver->setAllowedTypes('label', ['null', 'string', \Stringable::class]);
+        $resolver->setAllowedTypes('icon', ['bool', 'string', \Stringable::class]);
+        $resolver->setAllowedTypes('icon_template', ['string', \Stringable::class]);
+        $resolver->setAllowedTypes('title', ['bool', 'string', \Stringable::class]);
+        $resolver->setAllowedTypes('content', ['bool', 'string', \Stringable::class]);
         $resolver->setAllowedTypes('class', ['null', 'string']);
         $resolver->setAllowedTypes('attr', ['array']);
         $resolver->setAllowedTypes('url', ['null', 'string']);
@@ -128,9 +132,9 @@ class ActionLinkHelper
 
         $resolver->addNormalizer(
             'label',
-            function (OptionsResolver $resolver, ?string $label) {
+            function (OptionsResolver $resolver, \Stringable|string|null $label) {
                 if (null !== $label) {
-                    return $label;
+                    return (string) $label;
                 }
                 /** @var Action $action */
                 $action = $resolver->offsetGet('action');
@@ -148,7 +152,7 @@ class ActionLinkHelper
 
         $resolver->addNormalizer(
             'title',
-            function (OptionsResolver $resolver, bool|string $title) {
+            function (OptionsResolver $resolver,  \Stringable|string|bool $title) {
                 if (false === $title) {
                     return false;
                 }
@@ -156,13 +160,13 @@ class ActionLinkHelper
                     return $resolver->offsetGet('label');
                 }
 
-                return $title;
+                return (string) $title;
             }
         );
 
         $resolver->addNormalizer(
             'icon',
-            function (OptionsResolver $resolver, bool|string $icon) {
+            function (OptionsResolver $resolver, \Stringable|string|bool $icon) {
                 if (false === $icon) {
                     return false;
                 }
@@ -170,7 +174,7 @@ class ActionLinkHelper
                     return strtolower($resolver->offsetGet('action')->getCode());
                 }
 
-                return $icon;
+                return (string) $icon;
             }
         );
 
@@ -193,7 +197,7 @@ class ActionLinkHelper
 
         $resolver->addNormalizer(
             'content',
-            function (OptionsResolver $resolver, bool|string $content) {
+            function (OptionsResolver $resolver, \Stringable|string|bool $content) {
                 $finalContent = [];
                 $icon = $resolver->offsetGet('icon');
                 if ($icon) {
@@ -202,7 +206,7 @@ class ActionLinkHelper
                 if (true === $content) {
                     $finalContent[] = $resolver->offsetGet('label');
                 } elseif (false !== $content) {
-                    $finalContent[] = $content;
+                    $finalContent[] = (string) $content;
                 }
 
                 return implode(" ", $finalContent);

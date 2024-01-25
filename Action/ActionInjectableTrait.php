@@ -21,6 +21,9 @@ use Sidus\AdminBundle\Model\Action;
  */
 trait ActionInjectableTrait
 {
+    /**
+     * @psalm-suppress PropertyNotSetInConstructor
+     */
     protected Action $action;
 
     public function setAction(Action $action): void
