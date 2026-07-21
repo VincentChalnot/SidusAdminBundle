@@ -53,7 +53,7 @@ class DataGridHelper
     public function bindDataGridRequest(
         Action $action,
         Request $request,
-        DataGrid $dataGrid = null,
+        ?DataGrid $dataGrid = null,
         array $formOptions = []
     ): DataGrid {
         $dataGrid = $this->buildDataGridForm($action, $request, $dataGrid, $formOptions);
@@ -65,7 +65,7 @@ class DataGridHelper
     public function buildDataGridForm(
         Action $action,
         Request $request,
-        DataGrid $dataGrid = null,
+        ?DataGrid $dataGrid = null,
         array $formOptions = []
     ): DataGrid {
         if (null === $dataGrid) {

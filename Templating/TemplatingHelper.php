@@ -61,7 +61,7 @@ class TemplatingHelper
 
     public function getViewParameters(
         Action $action,
-        FormInterface $form = null,
+        ?FormInterface $form = null,
         object|array|null $data = null,
         array $listRouteParameters = []
     ): array {

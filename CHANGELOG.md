@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.6] - 2026-07-21
+
+### Fixed
+
+- PHP 8.4 deprecates typed parameters defaulting to `null` without an explicit `?` prefix.
+  Fixed in `TemplatingHelper`, `FlashHelper`, `AdminRouteLoader`, `DoctrineHelper` and
+  `DataGridHelper`.
+
+### Note
+
+- The above fix was originally released as `5.0.5`. Its tag was mistakenly force-moved after
+  publication (a `git commit --amend` to add this changelog entry, then a re-tag) to attach
+  it, which Packagist correctly rejected: stable tags are immutable once published. `v5.0.5`
+  has been restored to its originally-published commit (`a1b1f23`, no changelog entry for
+  this fix), and this changelog entry is released as `5.0.6` instead. No code changed between
+  `5.0.5` and `5.0.6` - `5.0.6` only adds this entry.
+
 ## [5.0.4] - 2026-07-21
 
 ### Fixed
