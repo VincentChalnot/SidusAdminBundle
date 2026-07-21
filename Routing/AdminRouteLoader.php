@@ -27,12 +27,12 @@ class AdminRouteLoader extends Loader
 
     public function __construct(
         protected AdminRegistry $adminRegistry,
-        string $env = null,
+        ?string $env = null,
     ) {
         parent::__construct($env);
     }
 
-    public function load(mixed $resource, string $type = null): RouteCollection
+    public function load(mixed $resource, ?string $type = null): RouteCollection
     {
         if (true === $this->isLoaded) {
             throw new \RuntimeException('Do not add the "sidus_admin" loader twice');
@@ -50,7 +50,7 @@ class AdminRouteLoader extends Loader
         return $routes;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'sidus_admin' === $type;
     }

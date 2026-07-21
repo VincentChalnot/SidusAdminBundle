@@ -15,7 +15,7 @@ class FlashHelper
     ) {
     }
 
-    public function addFlash(Action $action, SessionInterface $session = null): void
+    public function addFlash(Action $action, ?SessionInterface $session = null): void
     {
         if (!$session instanceof Session) {
             return;

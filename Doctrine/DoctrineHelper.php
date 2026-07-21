@@ -45,7 +45,7 @@ class DoctrineHelper
         return $entityManager;
     }
 
-    public function saveEntity(Action $action, object $entity, SessionInterface $session = null): void
+    public function saveEntity(Action $action, object $entity, ?SessionInterface $session = null): void
     {
         if (!$this->managerRegistry) {
             throw new InvalidArgumentException('Doctrine is not enabled for Sidus/AdminBundle');
@@ -57,7 +57,7 @@ class DoctrineHelper
         $this->flashHelper->addFlash($action, $session);
     }
 
-    public function deleteEntity(Action $action, object $entity, SessionInterface $session = null): void
+    public function deleteEntity(Action $action, object $entity, ?SessionInterface $session = null): void
     {
         if (!$this->managerRegistry) {
             throw new InvalidArgumentException('Doctrine is not enabled for Sidus/AdminBundle');
