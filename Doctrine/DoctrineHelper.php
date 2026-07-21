@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Doctrine;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Proxy;
 use InvalidArgumentException;
 use Sidus\AdminBundle\Session\FlashHelper;
 use Sidus\AdminBundle\Model\Action;
@@ -36,7 +36,7 @@ class DoctrineHelper
         if (!$this->managerRegistry) {
             throw new InvalidArgumentException('Doctrine is not enabled for Sidus/AdminBundle');
         }
-        $class = ClassUtils::getClass($entity);
+        $class = $entity instanceof Proxy ? get_parent_class($entity) : $entity::class;
         $entityManager = $this->managerRegistry->getManagerForClass($class);
         if (!$entityManager instanceof EntityManagerInterface) {
             throw new InvalidArgumentException("No manager found for class {$class}");
