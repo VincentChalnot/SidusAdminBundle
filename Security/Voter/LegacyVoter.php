@@ -17,6 +17,7 @@ use Sidus\AdminBundle\Model\PermissionCheck;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 
 class LegacyVoter implements CacheableVoterInterface
 {
@@ -43,7 +44,7 @@ class LegacyVoter implements CacheableVoterInterface
         }
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {
         // Trigger deprecation error:
         trigger_deprecation(

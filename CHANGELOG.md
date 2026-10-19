@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Symfony 8 compatibility: `EntityVoter::vote()` and `LegacyVoter::vote()` now accept the optional
+  `?Vote $vote = null` argument added to `VoterInterface::vote()` (Symfony 7.3+, mandatory in 8.0).
+  Without it PHP raised a fatal "Declaration must be compatible" error as soon as the container was built.
+  Still compatible with Symfony 6.4 and 7.4 (the extra argument is optional and ignored).
+
 ## [5.0.6] - 2026-07-21
 
 ### Fixed
