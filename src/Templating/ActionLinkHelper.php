@@ -4,28 +4,32 @@ declare(strict_types=1);
 namespace Sidus\AdminBundle\Templating;
 
 use Psr\Log\LoggerInterface;
-use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Sidus\AdminBundle\Model\Action;
-use Sidus\AdminBundle\Model\Admin;
 use Sidus\AdminBundle\Model\ActionLink;
+use Sidus\AdminBundle\Model\Admin;
 use Sidus\AdminBundle\Model\PermissionCheck;
+use Sidus\AdminBundle\Registry\AdminRegistry;
+use Sidus\AdminBundle\Request\AdminContext;
 use Sidus\AdminBundle\Routing\AdminRouter;
 use Sidus\AdminBundle\Translator\TranslatorHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Twig\Environment;
 
-class ActionLinkHelper
+/**
+ * Builds and renders links to actions, only when the current user is granted the action. Stateless: the options are
+ * resolved for each call, the defaults come from the `sidus_admin.action_link` configuration.
+ */
+final class ActionLinkHelper
 {
-    private const DEFAULTS = [
-        'admin' => null,
+    private const array DEFAULTS = [
+        'admin' => null, // The current admin when null
         'entity' => null,
         'label' => null, // This will propagate to the title and the content by default
         'content' => true,
         'title' => true,
-        'icon' => true,
-        'icon_template' => '<i class="fas fa-{icon}"></i>',
+        'icon' => false,
+        'icon_template' => '<span data-icon="{icon}" aria-hidden="true"></span>',
         'class' => null,
         'attr' => [],
         'url' => null,
@@ -33,16 +37,22 @@ class ActionLinkHelper
         'route_reference_type' => UrlGeneratorInterface::ABSOLUTE_PATH,
     ];
 
+    /** @var array<string, mixed> */
+    private readonly array $defaultOptions;
+
+    /**
+     * @param array<string, mixed> $defaultOptions
+     */
     public function __construct(
-        protected AdminRegistry $adminRegistry,
-        protected AuthorizationCheckerInterface $authorizationChecker,
-        protected AdminRouter $adminRouter,
-        protected TranslatorHelper $translatorHelper,
-        protected Environment $environment,
-        protected LoggerInterface $logger,
-        protected array $defaultOptions = [],
+        private readonly AdminRegistry $adminRegistry,
+        private readonly AdminContext $adminContext,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+        private readonly AdminRouter $adminRouter,
+        private readonly TranslatorHelper $translatorHelper,
+        private readonly ?LoggerInterface $logger = null,
+        array $defaultOptions = [],
     ) {
-        $this->defaultOptions = array_merge(self::DEFAULTS, $this->defaultOptions);
+        $this->defaultOptions = array_merge(self::DEFAULTS, $defaultOptions);
     }
 
     public function renderActionLink(array $options): string
@@ -50,7 +60,7 @@ class ActionLinkHelper
         try {
             $actionLink = $this->getActionLink($options);
         } catch (\Exception $e) {
-            $this->logger->debug($e->getMessage(), ['exception' => $e]);
+            $this->logger?->debug($e->getMessage(), ['exception' => $e]);
 
             return '';
         }
@@ -112,7 +122,7 @@ class ActionLinkHelper
                     return $admin;
                 }
 
-                return $this->adminRegistry->getAdmin($admin);
+                return $this->adminRegistry->get($admin);
             },
         );
 
@@ -122,8 +132,9 @@ class ActionLinkHelper
                 if ($action instanceof Action) {
                     return $action;
                 }
-                if (null === $admin = $resolver->offsetGet('admin')) {
-                    throw new \UnexpectedValueException('Admin is required');
+                $admin = $resolver->offsetGet('admin') ?? $this->adminContext->getAdmin();
+                if (null === $admin) {
+                    throw new \UnexpectedValueException("The admin is required to resolve the action '{$action}': pass the 'admin' option, an Action object, or use the link in an admin request");
                 }
 
                 return $admin->getAction($action);

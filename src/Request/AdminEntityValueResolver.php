@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use UnexpectedValueException;
 
 /**
@@ -29,7 +28,6 @@ use UnexpectedValueException;
 class AdminEntityValueResolver implements ValueResolverInterface
 {
     public function __construct(
-        protected AuthorizationCheckerInterface $authorizationChecker,
         protected ?ManagerRegistry $managerRegistry = null,
     ) {
     }
@@ -53,7 +51,7 @@ class AdminEntityValueResolver implements ValueResolverInterface
             return;
         }
 
-        yield $this->getArgumentValue($entityClass, $entityManager, $request);;
+        yield $this->getArgumentValue($entityClass, $entityManager, $request);
     }
 
     protected function getArgumentValue(

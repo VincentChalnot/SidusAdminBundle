@@ -11,10 +11,10 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ActionSecurityVoterSubscriber implements EventSubscriberInterface
+final readonly class ActionSecurityVoterSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        protected readonly AuthorizationCheckerInterface $authorizationChecker,
+        private AuthorizationCheckerInterface $authorizationChecker,
     ) {
     }
 

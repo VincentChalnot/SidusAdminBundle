@@ -1,12 +1,4 @@
 <?php
-/*
- * This file is part of the Sidus/AdminBundle package.
- *
- * Copyright (c) 2015-2023 Vincent Chalnot
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 declare(strict_types=1);
 
@@ -18,14 +10,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Represents a redirection to an admin action
  */
-class RedirectActionResponse implements ActionResponseInterface
+final readonly class RedirectActionResponse implements ActionResponseInterface
 {
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function __construct(
-        protected Action $action,
-        protected ?object $entity = null,
-        protected array $parameters = [],
-        protected int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
-        protected int $status = 302
+        private Action $action,
+        private ?object $entity = null,
+        private array $parameters = [],
+        private int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
+        private int $status = 302,
     ) {
     }
 
@@ -39,6 +34,9 @@ class RedirectActionResponse implements ActionResponseInterface
         return $this->entity;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getParameters(): array
     {
         return $this->parameters;
@@ -56,9 +54,6 @@ class RedirectActionResponse implements ActionResponseInterface
 
     public function withAction(Action $action): self
     {
-        $new = clone $this;
-        $new->action = $action;
-
-        return $new;
+        return new self($action, $this->entity, $this->parameters, $this->referenceType, $this->status);
     }
 }

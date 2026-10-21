@@ -1,12 +1,4 @@
 <?php
-/*
- * This file is part of the Sidus/AdminBundle package.
- *
- * Copyright (c) 2015-2023 Vincent Chalnot
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 declare(strict_types=1);
 
@@ -14,11 +6,17 @@ namespace Sidus\AdminBundle\Request;
 
 use Sidus\AdminBundle\Model\Action;
 
-class ActionResponse implements ActionResponseInterface
+/**
+ * Asks to render the template of an action with these parameters
+ */
+final readonly class ActionResponse implements ActionResponseInterface
 {
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function __construct(
-        protected Action $action,
-        protected array $parameters,
+        private Action $action,
+        private array $parameters,
     ) {
     }
 
@@ -27,6 +25,9 @@ class ActionResponse implements ActionResponseInterface
         return $this->action;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getParameters(): array
     {
         return $this->parameters;

@@ -12,25 +12,23 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Templating;
 
-use LogicException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Sidus\AdminBundle\Model\Action;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\TemplateWrapper;
-use function count;
 
 /**
  * Resolve templates based on admin configuration
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class TemplateResolver implements TemplateResolverInterface
+readonly class TemplateResolver implements TemplateResolverInterface
 {
     public function __construct(
         protected Environment $twig,
-        protected LoggerInterface $logger
+        protected ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -40,11 +38,6 @@ class TemplateResolver implements TemplateResolverInterface
         if ($action->getTemplate()) {
             // If the template was specified, use this one
             return $this->twig->load($action->getTemplate());
-        }
-
-        // Priority to new template_pattern system:
-        if (count($admin->getTemplatePattern()) === 0) {
-            throw new LogicException("No template configured for action {$admin->getCode()}.{$action->getCode()}");
         }
 
         foreach ($admin->getTemplatePattern() as $templatePattern) {
@@ -61,7 +54,7 @@ class TemplateResolver implements TemplateResolverInterface
             try {
                 return $this->twig->load($template);
             } catch (LoaderError $mainError) {
-                $this->logger->debug("Unable to load template '{$template}': {$mainError->getMessage()}");
+                $this->logger?->debug("Unable to load template '{$template}': {$mainError->getMessage()}");
                 continue;
             }
         }

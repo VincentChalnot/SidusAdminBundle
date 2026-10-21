@@ -24,7 +24,7 @@ use UnexpectedValueException;
 /**
  * Provides a simple way to access form utilities from a controller or an action
  */
-class FormHelper
+readonly class FormHelper
 {
     public function __construct(
         protected RoutingHelper $routingHelper,

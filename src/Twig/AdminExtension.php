@@ -1,89 +1,72 @@
 <?php
-/*
- * This file is part of the Sidus/AdminBundle package.
- *
- * Copyright (c) 2015-2023 Vincent Chalnot
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Twig;
 
-use Sidus\AdminBundle\Model\Action;
-use Sidus\AdminBundle\Model\Admin;
-use Sidus\AdminBundle\Configuration\AdminRegistry;
 use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Entity\AdminEntityMatcher;
+use Sidus\AdminBundle\Model\Action;
+use Sidus\AdminBundle\Model\Admin;
 use Sidus\AdminBundle\Model\PermissionCheck;
+use Sidus\AdminBundle\Registry\AdminRegistry;
+use Sidus\AdminBundle\Request\AdminContext;
 use Sidus\AdminBundle\Routing\AdminRouter;
 use Sidus\AdminBundle\Templating\ActionLinkHelper;
 use Sidus\AdminBundle\Translator\TranslatorHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Extension\AbstractExtension;
-use Twig\Markup;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 /**
- * Adds a few useful routing functions to twig templates
+ * Adds a few useful routing functions to twig templates. Stateless: `current_admin()` and `current_action()` read the
+ * current request each time they are called.
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class AdminExtension extends AbstractExtension
+final class AdminExtension extends AbstractExtension
 {
     public function __construct(
-        protected AdminRegistry $adminRegistry,
-        protected AdminEntityMatcher $adminEntityMatcher,
-        protected AdminRouter $adminRouter,
-        protected DoctrineHelper $doctrineHelper,
-        protected AuthorizationCheckerInterface $authorizationChecker,
-        protected ActionLinkHelper $actionLinkHelper,
-        protected TranslatorHelper $translatorHelper,
+        private readonly AdminRegistry $adminRegistry,
+        private readonly AdminContext $adminContext,
+        private readonly AdminEntityMatcher $adminEntityMatcher,
+        private readonly AdminRouter $adminRouter,
+        private readonly DoctrineHelper $doctrineHelper,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+        private readonly ActionLinkHelper $actionLinkHelper,
+        private readonly TranslatorHelper $translatorHelper,
     ) {
     }
 
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('get_admins', [$this->adminRegistry, 'getAdmins']),
-            new TwigFunction('admin_path', [$this->adminRouter, 'generateAdminPath']),
-            new TwigFunction('admin_entity_path', [$this->adminRouter, 'generateAdminEntityPath']),
-            new TwigFunction('entity_path', [$this->adminRouter, 'generateEntityPath']),
-            new TwigFunction('entity_admin', [$this->adminEntityMatcher, 'getAdminForEntity']),
-            new TwigFunction('is_action_granted', [$this, 'isActionGranted']),
-            new TwigFunction('admin', [$this, 'getAdmin']),
-            new TwigFunction('tryTrans', [$this->translatorHelper, 'tryTranslate'], ['is_safe' => ['html']]),
-            new TwigFunction('action_link', [$this->actionLinkHelper, 'renderActionLink'], ['is_safe' => ['html']]),
-            new TwigFunction('action_link_fallback', [$this, 'renderActionLinkFallback'], ['is_safe' => ['html']]),
+            new TwigFunction('get_admins', $this->adminRegistry->all(...)),
+            new TwigFunction('admin_path', $this->adminRouter->generateAdminPath(...)),
+            new TwigFunction('admin_entity_path', $this->adminRouter->generateAdminEntityPath(...)),
+            new TwigFunction('entity_path', $this->adminRouter->generateEntityPath(...)),
+            new TwigFunction('entity_admin', $this->adminEntityMatcher->getAdminForEntity(...)),
+            new TwigFunction('is_action_granted', $this->isActionGranted(...)),
+            new TwigFunction('admin', $this->getAdmin(...)),
+            new TwigFunction('current_admin', $this->adminContext->getAdmin(...)),
+            new TwigFunction('current_action', $this->adminContext->getAction(...)),
+            new TwigFunction('tryTrans', $this->translatorHelper->tryTranslate(...), ['is_safe' => ['html']]),
+            new TwigFunction('action_link', $this->actionLinkHelper->renderActionLink(...), ['is_safe' => ['html']]),
+            new TwigFunction('action_link_fallback', $this->renderActionLinkFallback(...), ['is_safe' => ['html']]),
         ];
     }
 
     public function getFilters(): array
     {
         return [
-            new TwigFilter('tostring', [$this, 'toString']),
+            new TwigFilter('tostring', $this->toString(...)),
         ];
     }
 
-    public function getAdmin($code): Admin
+    public function getAdmin(Admin|string $code): Admin
     {
-        if ($code instanceof Admin) {
-            return $code;
-        }
-
-        return $this->adminRegistry->getAdmin($code);
-    }
-
-    public function tryTrans(
-        string|array $tIds,
-        array $parameters = [],
-        ?string $fallback = null,
-        bool $humanizeFallback = true
-    ): ?string {
-        return $this->tryTranslate($tIds, $parameters, $fallback, $humanizeFallback);
+        return $code instanceof Admin ? $code : $this->adminRegistry->get($code);
     }
 
     public function toString(mixed $data): string
@@ -115,7 +98,13 @@ class AdminExtension extends AbstractExtension
         return $this->authorizationChecker->isGranted(null, new PermissionCheck($action, $entity));
     }
 
-    public function renderActionLinkFallback(array $defaultOptions, ...$optionsCollection): string
+    /**
+     * Renders the first of the links that is rendered (the ones the user is granted)
+     *
+     * @param array<string, mixed> $defaultOptions
+     * @param array<string, mixed> ...$optionsCollection
+     */
+    public function renderActionLinkFallback(array $defaultOptions, array ...$optionsCollection): string
     {
         foreach ($optionsCollection as $options) {
             $result = $this->actionLinkHelper->renderActionLink(array_merge($defaultOptions, $options));
@@ -125,10 +114,5 @@ class AdminExtension extends AbstractExtension
         }
 
         return '';
-    }
-
-    public function getName(): string
-    {
-        return 'sidus_admin';
     }
 }

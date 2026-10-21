@@ -21,10 +21,10 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
 /**
  * Renders the action
  */
-class ActionRendererSubscriber implements EventSubscriberInterface
+final readonly class ActionRendererSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        protected TemplateResolverInterface $templateResolver,
+        private TemplateResolverInterface $templateResolver,
     ) {
     }
 

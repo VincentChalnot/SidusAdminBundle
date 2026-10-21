@@ -1,12 +1,4 @@
 <?php
-/*
- * This file is part of the Sidus/AdminBundle package.
- *
- * Copyright (c) 2015-2023 Vincent Chalnot
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 declare(strict_types=1);
 
@@ -15,17 +7,18 @@ namespace Sidus\AdminBundle\Event;
 use LogicException;
 use Sidus\AdminBundle\Model\Action;
 use Sidus\AdminBundle\Model\Admin;
-use Sidus\AdminBundle\Configuration\AdminRegistry;
+use Sidus\AdminBundle\Registry\AdminRegistry;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use UnexpectedValueException;
 
 /**
- * Resolve the _admin and _action request attributes to real objects
+ * Resolves the `_admin` and `_action` request attributes (codes from the route defaults) to the real objects. This is
+ * the only source of truth of "the current admin and action": nothing else is stored, anywhere.
  */
-class AdminResolverSubscriber implements EventSubscriberInterface
+final readonly class AdminResolverSubscriber implements EventSubscriberInterface
 {
-    public function __construct(protected AdminRegistry $adminRegistry)
+    public function __construct(private AdminRegistry $adminRegistry)
     {
     }
 
@@ -44,17 +37,16 @@ class AdminResolverSubscriber implements EventSubscriberInterface
         }
         $admin = $request->attributes->get('_admin');
         if (!$admin instanceof Admin) {
-            $admin = $this->adminRegistry->getAdmin($admin);
+            $admin = $this->adminRegistry->get((string) $admin);
             $request->attributes->set('_admin', $admin);
         }
-        $this->adminRegistry->setCurrentAdmin($admin);
 
         if (!$request->attributes->has('_action')) {
-            throw new UnexpectedValueException('Missing _action request attribute');
+            throw new UnexpectedValueException('Missing _action request attribute, it is required when _admin is set');
         }
         $action = $request->attributes->get('_action');
         if (!$action instanceof Action) {
-            $action = $admin->getAction($action);
+            $action = $admin->getAction((string) $action);
             $request->attributes->set('_action', $action);
         }
 

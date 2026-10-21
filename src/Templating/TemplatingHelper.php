@@ -22,7 +22,7 @@ use Symfony\Component\Form\FormInterface;
 /**
  * Provides a simple way to access rendering utilities from a controller or an action
  */
-class TemplatingHelper
+readonly class TemplatingHelper
 {
     public function __construct(
         protected RoutingHelper $routingHelper,

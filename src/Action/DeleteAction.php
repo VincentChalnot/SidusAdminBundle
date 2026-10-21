@@ -1,52 +1,44 @@
 <?php
-/*
- * This file is part of the Sidus/AdminBundle package.
- *
- * Copyright (c) 2015-2023 Vincent Chalnot
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Action;
 
-use Sidus\AdminBundle\Attribute\AdminEntity;
 use Sidus\AdminBundle\Doctrine\DoctrineHelper;
 use Sidus\AdminBundle\Form\FormHelper;
+use Sidus\AdminBundle\Model\Action;
 use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Request\RedirectActionResponse;
-use Sidus\AdminBundle\Routing\RoutingHelper;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 
+/**
+ * Asks for a confirmation then deletes the entity and redirects to the action of the `redirect_action` option of the
+ * action (`list` by default).
+ */
 #[AsController]
-class DeleteAction extends AbstractEmptyFormAction
+readonly class DeleteAction extends AbstractEmptyFormAction
 {
     public function __construct(
         FormHelper $formHelper,
         TemplatingHelper $templatingHelper,
-        protected RoutingHelper $routingHelper,
-        protected DoctrineHelper $doctrineHelper
+        protected DoctrineHelper $doctrineHelper,
     ) {
         parent::__construct($formHelper, $templatingHelper);
     }
 
     protected function applyAction(
         Request $request,
+        Action $action,
         FormInterface $form,
-        #[AdminEntity]
         object $data,
     ): ActionResponseInterface {
-        $this->doctrineHelper->deleteEntity($this->action, $data, $request->getSession());
+        $this->doctrineHelper->deleteEntity($action, $data, $request->getSession());
 
         return new RedirectActionResponse(
-            action: $this->action->getAdmin()->getAction(
-                $this->action->getOption('redirect_action', 'list')
-            ),
+            action: $action->getAdmin()->getAction($action->getOption('redirect_action', 'list')),
         );
     }
 }

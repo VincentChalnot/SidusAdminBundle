@@ -1,32 +1,28 @@
 <?php
-/*
- * This file is part of the Sidus/AdminBundle package.
- *
- * Copyright (c) 2015-2023 Vincent Chalnot
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Routing;
 
-use Sidus\AdminBundle\Configuration\AdminRegistry;
+use Sidus\AdminBundle\Registry\AdminRegistry;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Loads all routes contained in actions
+ * Loads all routes contained in actions. Stateless: every call builds a new collection of new Route objects from the
+ * immutable admins, so it can be called as many times as the router needs (cache refresh in a long-running worker).
+ *
+ *     # config/routes/admin.yaml
+ *     sidus_admin:
+ *         resource: .
+ *         type: sidus_admin
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class AdminRouteLoader extends Loader
+final class AdminRouteLoader extends Loader
 {
-    protected bool $isLoaded = false;
-
     public function __construct(
-        protected AdminRegistry $adminRegistry,
+        private readonly AdminRegistry $adminRegistry,
         ?string $env = null,
     ) {
         parent::__construct($env);
@@ -34,18 +30,13 @@ class AdminRouteLoader extends Loader
 
     public function load(mixed $resource, ?string $type = null): RouteCollection
     {
-        if (true === $this->isLoaded) {
-            throw new \RuntimeException('Do not add the "sidus_admin" loader twice');
-        }
-
         $routes = new RouteCollection();
 
-        foreach ($this->adminRegistry->getAdmins() as $admin) {
+        foreach ($this->adminRegistry->all() as $admin) {
             foreach ($admin->getActions() as $action) {
-                $routes->add($action->getRouteName(), $action->getRoute());
+                $routes->add($action->getRouteName(), $action->createRoute());
             }
         }
-        $this->isLoaded = true;
 
         return $routes;
     }

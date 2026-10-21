@@ -21,10 +21,10 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
 /**
  * Redirects to the proper action
  */
-class ActionRedirectionSubscriber implements EventSubscriberInterface
+final readonly class ActionRedirectionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        protected AdminRouter $adminRouter,
+        private AdminRouter $adminRouter,
     ) {
     }
 

@@ -8,7 +8,7 @@ use Sidus\AdminBundle\Translator\TranslatorHelper;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class FlashHelper
+readonly class FlashHelper
 {
     public function __construct(
         protected TranslatorHelper $translatorHelper,

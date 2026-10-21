@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * Provides a simple way to access Doctrine utilities from a controller or an action
  */
-class DoctrineHelper
+readonly class DoctrineHelper
 {
     public function __construct(
         protected FlashHelper $flashHelper,

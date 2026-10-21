@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class TranslatorHelper
+readonly class TranslatorHelper
 {
     public function __construct(
         protected TranslatorInterface $translator,

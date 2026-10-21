@@ -23,7 +23,7 @@ use UnexpectedValueException;
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class CacheSubscriber implements EventSubscriberInterface
+final readonly class CacheSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

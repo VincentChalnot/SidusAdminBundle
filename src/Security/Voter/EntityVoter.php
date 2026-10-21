@@ -1,12 +1,4 @@
 <?php
-/*
- * This file is part of the Sidus/AdminBundle package.
- *
- * Copyright (c) 2015-2023 Vincent Chalnot
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 declare(strict_types=1);
 
@@ -20,10 +12,14 @@ use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class EntityVoter implements CacheableVoterInterface
+/**
+ * Decides on {@see PermissionCheck} subjects: every permission of the admin and of the action must be granted on the
+ * entity (or on the entity class when the check has no entity).
+ */
+final readonly class EntityVoter implements CacheableVoterInterface
 {
     public function __construct(
-        protected readonly AccessDecisionManagerInterface $accessDecisionManager,
+        private AccessDecisionManagerInterface $accessDecisionManager,
     ) {
     }
 
@@ -34,7 +30,7 @@ class EntityVoter implements CacheableVoterInterface
 
     public function supportsType(string $subjectType): bool
     {
-        return $subjectType === PermissionCheck::class;
+        return PermissionCheck::class === $subjectType;
     }
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
@@ -47,17 +43,9 @@ class EntityVoter implements CacheableVoterInterface
         return $this->doVote($token, $subject->action, $voteSubject);
     }
 
-    protected function doVote(
-        TokenInterface $token,
-        Action $action,
-        object|string|null $subject
-    ): int {
-        foreach ($action->getAdmin()->getPermissions() as $permission) {
-            if (!$this->accessDecisionManager->decide($token, [$permission], $subject)) {
-                return VoterInterface::ACCESS_DENIED;
-            }
-        }
-        foreach ($action->getPermissions() as $permission) {
+    private function doVote(TokenInterface $token, Action $action, object|string $subject): int
+    {
+        foreach ([...$action->getAdmin()->getPermissions(), ...$action->getPermissions()] as $permission) {
             if (!$this->accessDecisionManager->decide($token, [$permission], $subject)) {
                 return VoterInterface::ACCESS_DENIED;
             }
