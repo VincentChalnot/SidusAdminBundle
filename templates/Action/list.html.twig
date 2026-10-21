@@ -1,6 +1,22 @@
+{#
+    The list action: the datagrid of the action, rendered with the theme of the datagrid (see the datagrid bundle).
+
+    Variables: action, admin, datagrid, listPath
+#}
 {# @var action \Sidus\AdminBundle\Model\Action #}
 {% extends action.baseTemplate %}
 
+{% block title -%}
+    {{ tryTrans(
+        [
+            'sidus.admin.'~admin.code~'.action.'~action.code~'.title',
+            'sidus.admin.action.'~action.code~'.title'
+        ], {},
+        admin.code|humanize~' - '~action.code|humanize,
+        false
+    ) }}
+{%- endblock %}
+
 {% block container %}
-    {{ render_datagrid(datagrid, {action: action, admin: action.admin}) }}
+    {{ render_datagrid(datagrid, {action: action, admin: admin}) }}
 {% endblock %}

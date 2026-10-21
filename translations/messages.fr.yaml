@@ -1,11 +1,31 @@
 sidus:
-    datagrid:
-        reset:
-            label: Réinitialiser
-        submit:
-            label: Filtrer
-        results:
-            label: 'Affichage de %length% sur %count% résultats'
-        boolean:
-            yes: Oui
-            no: Non
+    admin:
+        action:
+            list:
+                label: Liste
+            read:
+                label: Consulter
+            create:
+                label: Créer
+            edit:
+                label: Modifier
+            clone:
+                label: Dupliquer
+            delete:
+                label: Supprimer
+                message: "Êtes-vous sûr de vouloir supprimer l'entité '%entity%' ?"
+                button:
+                    submit: Supprimer
+        flash:
+            create:
+                success: L'entité a été créée
+            edit:
+                success: L'entité a été enregistrée
+            clone:
+                success: L'entité a été dupliquée
+            delete:
+                success: L'entité a été supprimée
+        button:
+            submit: Valider
+            close: Fermer
+            back: Retour

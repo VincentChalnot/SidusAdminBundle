@@ -1,0 +1,40 @@
+{#
+    The default layout of the actions (see the base_template option): plain HTML5, no CSS framework.
+
+    Override it with your own layout (same block names), the only requirement is a "container" block.
+
+    Blocks:
+        title        content of <title>
+        stylesheets  in <head>
+        body         the whole <body>
+          flashes    the flash messages of the session
+          main       the <main> element
+            container the content of the action
+        javascripts  at the end of <body>
+#}
+<!DOCTYPE html>
+<html lang="{{ app.request ? app.request.locale : 'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %}</title>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+{% block body %}
+    {% block flashes %}
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <p class="sidus-admin-flash" data-type="{{ type }}" role="status">{{ message }}</p>
+            {% endfor %}
+        {% endfor %}
+    {% endblock %}
+    {% block main %}
+        <main>
+            {% block container %}{% endblock %}
+        </main>
+    {% endblock %}
+{% endblock %}
+{% block javascripts %}{% endblock %}
+</body>
+</html>

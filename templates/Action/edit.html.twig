@@ -1,31 +1,56 @@
+{#
+    The form of the create, edit, clone and read actions: neutral, semantic HTML, override the blocks to style it
+    (or enable a theme, see the "theme" option).
+
+    Variables: action, admin, form, data, listPath (null when the admin has no list action).
+    Optional variables, the CSS class of an element: form_container_class, message_class, back_class, submit_class.
+
+    Blocks:
+        title         content of <title> (from base_template)
+        container     the section of the action
+          heading     the <h1>
+            heading_text   its text
+          form        the <form>
+            message   the optional message above the fields
+            form_actions   the buttons
+              back_button
+              submit_button
+#}
 {# @var action \Sidus\AdminBundle\Model\Action #}
 {% extends action.baseTemplate %}
 
+{% block title %}{{ block('heading_text') }}{% endblock %}
+
 {% block container %}
-    <div class="row">
-        <div class="{{ form_container_class|default('col-lg-4') }}">
-            {{ block('title') }}
-            {{ form_start(form) }}
-            {{ block('message') }}
-            {{ form_widget(form) }}
-            {{ block('form_actions') }}
-            {{ form_end(form) }}
-        </div>
-    </div>
+    <section class="sidus-admin-action{% if form_container_class is defined %} {{ form_container_class }}{% endif %}" data-admin="{{ admin.code }}" data-action="{{ action.code }}">
+        {{ block('heading') }}
+        {{ block('form') }}
+    </section>
 {% endblock %}
 
-{% block title %}
-    <h2>
-        {{ tryTrans(
-            [
-                'sidus.admin.'~admin.code~'.action.'~action.code~'.title',
-                'sidus.admin.action.'~action.code~'.title'
-            ], {
-                '%entity%': data is defined ? data|tostring
-            },
-            admin.code|humanize~' - '~action.code|humanize
-        ) }}
-    </h2>
+{% block heading %}
+    <h1>{{ block('heading_text') }}</h1>
+{% endblock %}
+
+{% block heading_text -%}
+    {{ tryTrans(
+        [
+            'sidus.admin.'~admin.code~'.action.'~action.code~'.title',
+            'sidus.admin.action.'~action.code~'.title'
+        ], {
+            '%entity%': data is defined ? data|tostring
+        },
+        admin.code|humanize~' - '~action.code|humanize,
+        false
+    ) }}
+{%- endblock %}
+
+{% block form %}
+    {{ form_start(form) }}
+        {{ block('message') }}
+        {{ form_widget(form) }}
+        {{ block('form_actions') }}
+    {{ form_end(form) }}
 {% endblock %}
 
 {% block message %}
@@ -38,22 +63,22 @@
         }
     ) %}
     {% if message %}
-        <div class="{{ message_class|default('alert alert-info') }}">
+        <p class="sidus-admin-message{% if message_class is defined %} {{ message_class }}{% endif %}" role="{{ message_role|default('status') }}"{% if severity is defined %} data-severity="{{ severity }}"{% endif %}>
             {{ message }}
-        </div>
+        </p>
     {% endif %}
 {% endblock %}
 
 {% block form_actions %}
-    <div class="btn-group pull-right">
+    <p class="sidus-admin-actions">
         {{ block('back_button') }}
         {{ block('submit_button') }}
-    </div>
+    </p>
 {% endblock %}
 
 {% block back_button %}
     {% if listPath|default(false) %}
-        <a href="{{ listPath }}" class="{{ back_class|default('btn btn-default') }}">
+        <a href="{{ listPath }}"{% if back_class is defined %} class="{{ back_class }}"{% endif %}>
             {{ tryTrans(
                 [
                     'sidus.admin.'~admin.code~'.action.'~action.code~'.button.back',
@@ -61,14 +86,15 @@
                     'sidus.admin.button.back',
                 ],
                 {},
-                'Back'
+                'Back',
+                false
             ) }}
         </a>
     {% endif %}
 {% endblock %}
 
 {% block submit_button %}
-    <button type="submit" class="{{ submit_class|default('btn btn-primary') }}">
+    <button type="submit"{% if submit_class is defined %} class="{{ submit_class }}"{% endif %}{% if severity is defined %} data-severity="{{ severity }}"{% endif %}>
         {{ tryTrans(
             [
                 'sidus.admin.'~admin.code~'.action.'~action.code~'.button.submit',
@@ -76,7 +102,8 @@
                 'sidus.admin.button.submit',
             ],
             {},
-            'Submit'
+            'Submit',
+            false
         ) }}
     </button>
 {% endblock %}

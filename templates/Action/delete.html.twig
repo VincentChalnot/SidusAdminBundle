@@ -1,3 +1,4 @@
-{% set message_class = 'alert alert-danger' %}
-{% set submit_class = 'btn btn-danger' %}
+{# The confirmation of the delete action: the edit template with a danger severity (data-severity="danger") #}
+{% set severity = 'danger' %}
+{% set message_role = 'alert' %}
 {% extends '@SidusAdmin/Action/edit.html.twig' %}

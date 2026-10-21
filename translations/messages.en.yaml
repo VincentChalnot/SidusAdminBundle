@@ -1,14 +1,30 @@
 sidus:
     admin:
         action:
+            list:
+                label: List
+            read:
+                label: Read
             create:
                 label: Create
             edit:
                 label: Edit
+            clone:
+                label: Clone
             delete:
                 label: Delete
                 message: Are you sure you want to delete the entity '%entity%'?
-
+                button:
+                    submit: Delete
+        flash:
+            create:
+                success: The entity was created
+            edit:
+                success: The entity was saved
+            clone:
+                success: The entity was cloned
+            delete:
+                success: The entity was deleted
         button:
             submit: Submit
             close: Close
