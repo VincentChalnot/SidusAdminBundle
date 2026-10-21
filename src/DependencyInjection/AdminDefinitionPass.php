@@ -19,7 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 final class AdminDefinitionPass implements CompilerPassInterface
 {
     public const string RAW_PARAMETER = 'sidus_admin.raw_configuration';
-    public const string ADMIN_TAG = 'sidus_admin.admin';
 
     public function process(ContainerBuilder $container): void
     {
@@ -41,8 +40,7 @@ final class AdminDefinitionPass implements CompilerPassInterface
             $id = 'sidus_admin.admin.'.$code;
             $container->register($id, Admin::class)
                 ->setArguments($arguments)
-                ->setPublic(false)
-                ->addTag(self::ADMIN_TAG);
+                ->setPublic(false);
             $references[$code] = new Reference($id);
         }
         $container->getDefinition(AdminRegistry::class)->setArgument('$admins', $references);
