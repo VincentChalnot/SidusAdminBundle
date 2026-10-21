@@ -19,4 +19,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class SidusAdminBundle extends Bundle
 {
+    /**
+     * Sources live in src/: the bundle root (templates/, translations/, config/) is one level up.
+     */
+    public function getPath(): string
+    {
+        return \dirname(__DIR__);
+    }
 }
