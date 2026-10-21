@@ -74,6 +74,8 @@
         "symfony/browser-kit": "^8.1",
         "symfony/css-selector": "^8.1",
         "symfony/dom-crawler": "^8.1",
+        "symfony/error-handler": "^8.1.4",
+        "symfony/event-dispatcher-contracts": "^3.6",
         "symfony/filesystem": "^8.1",
         "symfony/validator": "^8.1"
     },
