@@ -1,69 +1,53 @@
 <?php
-/*
- * This file is part of the Sidus/AdminBundle package.
- *
- * Copyright (c) 2015-2023 Vincent Chalnot
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Model;
 
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use UnexpectedValueException;
 
 /**
- * The admin serves as an action holder and is attached to an entity
+ * The admin serves as an action holder and is attached to an entity. Immutable: built once from the compiled
+ * configuration, it holds no request state (the current admin and action are request attributes, see AdminContext).
+ *
+ * The admin builds its own actions in its constructor and hands them a reference to itself: this is how the
+ * Admin <-> Action cross reference exists without any setter. The consequence: an Action constructor must only read
+ * the admin properties that are promoted below (all initialized before the actions are built) and never call
+ * getActions()/getAction()/hasAction()/hasRoute().
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-#[AutoconfigureTag('sidus.admin')]
-class Admin
+final readonly class Admin
 {
-    protected string $code;
+    /** @var array<string, Action> */
+    private array $actions;
 
-    protected array $controllerPattern = [];
-
-    protected string $baseTemplate;
-
-    protected array $templatePattern = [];
-
-    protected ?string $prefix;
-
-    protected array $actions = [];
-
-    protected array $options = [];
-
-    protected ?string $entity;
-
-    protected ?string $formType;
-
-    protected ?Action $currentAction;
-
-    protected array $permissions;
-
-    public function __construct(string $code, array $adminConfiguration)
-    {
-        $this->code = $code;
-        $this->controllerPattern = $adminConfiguration['controller_pattern'];
-        $this->baseTemplate = $adminConfiguration['base_template'];
-        $this->templatePattern = $adminConfiguration['template_pattern'];
-        $this->prefix = $adminConfiguration['prefix'];
-        $this->entity = $adminConfiguration['entity'];
-        $this->formType = $adminConfiguration['form_type'];
-        $this->options = $adminConfiguration['options'];
-        $this->permissions = $adminConfiguration['permissions'];
-
-        $actionClass = $adminConfiguration['action_class'];
-        foreach ((array) $adminConfiguration['actions'] as $actionCode => $actionConfiguration) {
-            if (!isset($actionConfiguration['base_template'])) {
-                $actionConfiguration['base_template'] = $adminConfiguration['base_template'];
-            }
-            $this->actions[$actionCode] = new $actionClass($actionCode, $this, $actionConfiguration);
+    /**
+     * @param list<string>                         $controllerPattern
+     * @param list<string>                         $templatePattern
+     * @param array<string, mixed>                 $options
+     * @param list<string>                         $permissions
+     * @param array<string, array<string, mixed>>  $actions            normalized action configuration by code, the
+     *                                                                 named arguments of {@see Action::__construct()}
+     *                                                                 but the code and the admin
+     */
+    public function __construct(
+        private string $code,
+        private string $entity,
+        private string $prefix,
+        private ?string $formType,
+        private string $baseTemplate,
+        private array $controllerPattern,
+        private array $templatePattern,
+        private array $options,
+        private array $permissions,
+        array $actions,
+    ) {
+        $built = [];
+        foreach ($actions as $actionCode => $actionConfiguration) {
+            $built[$actionCode] = new Action(...$actionConfiguration, code: (string) $actionCode, admin: $this);
         }
+        $this->actions = $built;
     }
 
     public function getCode(): string
@@ -71,23 +55,29 @@ class Admin
         return $this->code;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getControllerPattern(): array
     {
         return $this->controllerPattern;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getTemplatePattern(): array
     {
         return $this->templatePattern;
     }
 
-    public function getPrefix(): ?string
+    public function getPrefix(): string
     {
         return $this->prefix;
     }
 
     /**
-     * @return Action[]
+     * @return array<string, Action>
      */
     public function getActions(): array
     {
@@ -96,21 +86,19 @@ class Admin
 
     public function getAction(string $code): Action
     {
-        if (!$this->hasAction($code)) {
-            throw new UnexpectedValueException("No action with code: '{$code}' for admin '{$this->getCode()}'");
-        }
-
-        return $this->actions[$code];
+        return $this->actions[$code] ?? throw new UnexpectedValueException(
+            "No action with code '{$code}' for admin '{$this->code}', available actions: ".implode(', ', array_keys($this->actions))
+        );
     }
 
     public function hasAction(string $code): bool
     {
-        return !empty($this->actions[$code]);
+        return isset($this->actions[$code]);
     }
 
     public function hasRoute(string $route): bool
     {
-        foreach ($this->getActions() as $action) {
+        foreach ($this->actions as $action) {
             if ($action->getRouteName() === $route) {
                 return true;
             }
@@ -119,7 +107,12 @@ class Admin
         return false;
     }
 
-    public function getEntity(): ?string
+    /**
+     * Class (or interface) name of the entity
+     *
+     * @return class-string
+     */
+    public function getEntity(): string
     {
         return $this->entity;
     }
@@ -129,18 +122,17 @@ class Admin
         return $this->formType;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;
     }
 
-    public function getOption(string $option, mixed $default = null)
+    public function getOption(string $option, mixed $default = null): mixed
     {
-        if (!$this->hasOption($option)) {
-            return $default;
-        }
-
-        return $this->options[$option];
+        return $this->options[$option] ?? $default;
     }
 
     public function hasOption(string $option): bool
@@ -148,24 +140,14 @@ class Admin
         return array_key_exists($option, $this->options);
     }
 
-    public function getCurrentAction(): ?Action
-    {
-        return $this->currentAction;
-    }
-
-    public function setCurrentAction($action): void
-    {
-        if (!$action instanceof Action) {
-            $action = $this->getAction($action);
-        }
-        $this->currentAction = $action;
-    }
-
-    public function getBaseTemplate(): ?string
+    public function getBaseTemplate(): string
     {
         return $this->baseTemplate;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getPermissions(): array
     {
         return $this->permissions;

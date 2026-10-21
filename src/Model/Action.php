@@ -1,88 +1,101 @@
 <?php
-/*
- * This file is part of the Sidus/AdminBundle package.
- *
- * Copyright (c) 2015-2023 Vincent Chalnot
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Model;
 
-use LogicException;
 use Symfony\Component\Routing\Route;
-use function count;
 
 /**
- * Holds information about an action and it's related route and template
+ * Holds information about an action and its related route and template. Immutable: the route is described by plain
+ * values and a new Route object is built on demand (see createRoute()), so that nothing that mutates a Route (route
+ * collection prefixes, compilation cache...) can ever alter the action.
+ *
+ * Do not instantiate it directly, it is built by its admin (see {@see Admin}): the constructor must not call anything
+ * on the admin but the getters of its scalar properties.
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class Action
+final readonly class Action
 {
-    protected string $code;
+    /** @var list<string> */
+    private array $routeVariables;
 
-    protected Route $route;
+    /** @var array<string, mixed> */
+    private array $routeDefaults;
 
-    protected Admin $admin;
-
-    protected array $options;
-
-    protected ?string $formType;
-
-    protected array $formOptions;
-
-    protected ?string $template;
-
-    protected array $templateParameters;
-
-    protected ?string $baseTemplate;
-
-    protected array $permissions;
-
-    public function __construct(string $code, Admin $admin, array $c)
-    {
-        $this->code = $code;
-        $this->admin = $admin;
-        $this->options = $c['options']; // Warning, options are used both here and for the route definition
-        $this->formType = $c['form_type'];
-        $this->formOptions = $c['form_options'];
-        $this->template = $c['template'];
-        $this->templateParameters = $c['template_parameters'];
-        $this->baseTemplate = $c['base_template'];
-        $this->permissions = $c['permissions'];
-
-        if (empty($c['defaults']['_controller_pattern']) && empty($c['defaults']['_controller'])) {
-            if (count($admin->getControllerPattern()) > 0) {
-                $c['defaults']['_controller_pattern'] = $admin->getControllerPattern();
-            } else {
-                $m = "You must configure either the 'defaults._controller' option in the action ";
-                $m .= "or the 'controller_pattern' option in the admin";
-                throw new LogicException($m);
-            }
-        }
-
-        $c['defaults']['_admin'] = $admin->getCode();
-        $c['defaults']['_action'] = $code;
-
-        $this->route = new Route(
-            $this->getAdmin()->getPrefix().$c['path'],
-            $c['defaults'],
-            $c['requirements'],
-            $c['options'], // Consider removing this as it might conflict with our options
-            $c['host'],
-            $c['schemes'],
-            $c['methods'],
-            $c['condition']
-        );
+    /**
+     * @param array<string, mixed>  $defaults           route defaults, `_admin` and `_action` are added
+     * @param array<string, string> $requirements
+     * @param array<string, mixed>  $routeOptions
+     * @param list<string>          $schemes
+     * @param list<string>          $methods
+     * @param array<string, mixed>  $formOptions
+     * @param array<string, mixed>  $templateParameters
+     * @param list<string>          $permissions
+     * @param array<string, mixed>  $options            your own options for the action, not related to the route
+     */
+    public function __construct(
+        private string $code,
+        private Admin $admin,
+        private string $path,
+        array $defaults,
+        private array $requirements,
+        private array $routeOptions,
+        private string $host,
+        private array $schemes,
+        private array $methods,
+        private ?string $condition,
+        private ?string $formType,
+        private array $formOptions,
+        private ?string $template,
+        private array $templateParameters,
+        private string $baseTemplate,
+        private array $permissions,
+        private array $options,
+    ) {
+        $this->routeDefaults = [...$defaults, '_admin' => $admin->getCode(), '_action' => $code];
+        $this->routeVariables = $this->createRoute()->compile()->getVariables();
     }
 
     public function getRouteName(): string
     {
-        return "sidus_admin.{$this->getAdmin()->getCode()}.{$this->getCode()}";
+        return "sidus_admin.{$this->admin->getCode()}.{$this->code}";
+    }
+
+    /**
+     * A new Route each call: it is yours to alter.
+     */
+    public function createRoute(): Route
+    {
+        return new Route(
+            $this->admin->getPrefix().$this->path,
+            $this->routeDefaults,
+            $this->requirements,
+            $this->routeOptions,
+            $this->host,
+            $this->schemes,
+            $this->methods,
+            $this->condition,
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getRouteDefaults(): array
+    {
+        return $this->routeDefaults;
+    }
+
+    /**
+     * The placeholders of the route path
+     *
+     * @return list<string>
+     */
+    public function getRouteVariables(): array
+    {
+        return $this->routeVariables;
     }
 
     public function getCode(): string
@@ -90,28 +103,22 @@ class Action
         return $this->code;
     }
 
-    public function getRoute(): Route
-    {
-        return $this->route;
-    }
-
     public function getAdmin(): Admin
     {
         return $this->admin;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;
     }
 
-    public function getOption(string $option, mixed $default = null)
+    public function getOption(string $option, mixed $default = null): mixed
     {
-        if (!$this->hasOption($option)) {
-            return $default;
-        }
-
-        return $this->options[$option];
+        return $this->options[$option] ?? $default;
     }
 
     public function hasOption(string $option): bool
@@ -119,15 +126,17 @@ class Action
         return array_key_exists($option, $this->options);
     }
 
+    /**
+     * The form type of the action, the one of the admin when the action has none.
+     */
     public function getFormType(): ?string
     {
-        if (!$this->formType) {
-            return $this->getAdmin()->getFormType();
-        }
-
         return $this->formType;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFormOptions(): array
     {
         return $this->formOptions;
@@ -138,6 +147,9 @@ class Action
         return $this->template;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getTemplateParameters(): array
     {
         return $this->templateParameters;
@@ -148,6 +160,9 @@ class Action
         return $this->baseTemplate;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getPermissions(): array
     {
         return $this->permissions;

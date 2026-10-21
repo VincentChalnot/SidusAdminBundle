@@ -1,10 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Model;
 
-class ActionLink
+final readonly class ActionLink
 {
+    /**
+     * @param array<string, string> $attr
+     */
     public function __construct(
         public Action $action,
         public string $url,
