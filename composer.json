@@ -40,30 +40,38 @@
         "symfony/dependency-injection": "^8.1",
         "symfony/event-dispatcher": "^8.1",
         "symfony/form": "^8.1",
+        "symfony/framework-bundle": "^8.1",
         "symfony/http-foundation": "^8.1",
         "symfony/http-kernel": "^8.1",
         "symfony/options-resolver": "^8.1",
         "symfony/property-access": "^8.1",
         "symfony/routing": "^8.1",
+        "symfony/security-bundle": "^8.1",
         "symfony/security-core": "^8.1",
         "symfony/translation": "^8.1",
         "symfony/translation-contracts": "^3.6",
+        "symfony/twig-bundle": "^8.1",
         "symfony/yaml": "^8.1",
         "twig/twig": "^3.21"
     },
     "require-dev": {
+        "doctrine/dbal": "^4.0",
         "doctrine/doctrine-bundle": "^3.0",
-        "doctrine/orm": "^3.0",
-        "doctrine/persistence": "^4.0",
+        "doctrine/orm": "^3.3",
+        "doctrine/persistence": "^3.3 || ^4.0",
         "phpunit/phpunit": "^12.0",
-        "symfony/framework-bundle": "^8.1",
-        "symfony/security-bundle": "^8.1",
-        "symfony/twig-bundle": "^8.1"
+        "sidus/doctrine-filter-bundle": "^1.0",
+        "symfony/browser-kit": "^8.1",
+        "symfony/css-selector": "^8.1",
+        "symfony/dom-crawler": "^8.1",
+        "symfony/filesystem": "^8.1",
+        "symfony/validator": "^8.1"
     },
     "suggest": {
-        "doctrine/orm": "Enables DoctrineHelper and the admin entity value resolver",
-        "doctrine/persistence": "Enables DoctrineHelper and the admin entity value resolver (ManagerRegistry)",
-        "symfony/twig-bundle": "Renders the shipped @SidusAdmin templates"
+        "doctrine/doctrine-bundle": "Required by the built-in Read, Create, Edit, Clone and Delete actions and by the admin entity value resolver (Doctrine ORM entities)",
+        "doctrine/orm": "Required by the built-in Read, Create, Edit, Clone and Delete actions (Doctrine ORM entities)",
+        "sidus/doctrine-filter-bundle": "Doctrine provider for the lists rendered by the built-in List action",
+        "symfony/validator": "Validation of the admin forms"
     },
     "config": {
         "sort-packages": true
