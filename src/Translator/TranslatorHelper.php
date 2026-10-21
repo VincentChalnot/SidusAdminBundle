@@ -61,6 +61,6 @@ readonly class TranslatorHelper
         }
         $pattern = '/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]|\d{1,}/';
 
-        return str_replace('_', ' ', preg_replace($pattern, ' $0', $fallback));
+        return trim(str_replace('_', ' ', preg_replace($pattern, ' $0', $fallback)));
     }
 }

@@ -153,7 +153,7 @@ final class ActionLinkHelper
                 return $this->translatorHelper->tryTranslate(
                     [
                         "sidus.admin.{$action->getAdmin()->getCode()}.action.{$action->getCode()}.label",
-                        "sidus.admin.{$action->getCode()}.label",
+                        "sidus.admin.action.{$action->getCode()}.label",
                     ],
                     [],
                     ucfirst($action->getCode())
