@@ -2,14 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [Unreleased] - 6.0
+
+Mechanical foundation only: no class renamed, no behaviour change. Requires `sidus/datagrid-bundle` 5.0.
+
+### Changed
+
+- **BC break**: requires PHP >= 8.4, Symfony `^8.1` components and `sidus/datagrid-bundle` `^5.0`.
+- **BC break**: PHP sources moved to `src/` (PSR-4 `Sidus\AdminBundle\` => `src/`).
+- **BC break**: `Resources/views/*` moved to `templates/*` (sub-directories and file names unchanged, the `@SidusAdmin` Twig namespace is unchanged).
+- **BC break**: `Resources/translations/messages.{en,fr}.yml` moved to `translations/messages.{en,fr}.yaml`.
+- `Resources/config/services.yaml` moved to `config/services.yaml`; its `resource`/`exclude` paths and the extension `FileLocator` updated.
+- `SidusAdminBundle::getPath()` returns the bundle root (not `src/`) so that templates and translations are discovered.
+- `composer.json`: `type` is `symfony-bundle`, `support` links, `config.sort-packages`, `scripts.test`, `autoload-dev`, `exclude-from-classmap`; all imported packages are declared (`psr/log`, `symfony/config`, `dependency-injection`, `options-resolver`, `property-access`, `translation`...). Doctrine (`doctrine/orm`, `doctrine/persistence`) stays optional (`suggest` + `require-dev`).
+
+### Added
+
+- `.gitattributes`, `.gitignore` (including `.idea/`), `phpunit.xml.dist` (PHPUnit 12) and a GitHub Actions CI workflow (PHP 8.4/8.5 x Symfony 8.1.*/8.* x lowest/highest).
+
+### Removed
+
+- Unused `use Sidus\BaseBundle\Utilities\TranslatorUtility` import in `TranslatorHelper`.
 
 ### Fixed
 
 - Symfony 8 compatibility: `EntityVoter::vote()` and `LegacyVoter::vote()` now accept the optional
   `?Vote $vote = null` argument added to `VoterInterface::vote()` (Symfony 7.3+, mandatory in 8.0).
   Without it PHP raised a fatal "Declaration must be compatible" error as soon as the container was built.
-  Still compatible with Symfony 6.4 and 7.4 (the extra argument is optional and ignored).
 
 ## [5.0.6] - 2026-07-21
 

@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Sidus\AdminBundle\Translator;
 
-use Sidus\BaseBundle\Utilities\TranslatorUtility;
 use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

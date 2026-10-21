@@ -6,7 +6,11 @@
         "action"
     ],
     "homepage": "https://github.com/VincentChalnot/SidusAdminBundle",
-    "type": "library",
+    "support": {
+        "issues": "https://github.com/VincentChalnot/SidusAdminBundle/issues",
+        "source": "https://github.com/VincentChalnot/SidusAdminBundle"
+    },
+    "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
         {
@@ -17,20 +21,54 @@
     ],
     "autoload": {
         "psr-4": {
-            "Sidus\\AdminBundle\\": ""
+            "Sidus\\AdminBundle\\": "src/"
+        },
+        "exclude-from-classmap": [
+            "/tests/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sidus\\AdminBundle\\Tests\\": "tests/"
         }
     },
     "require": {
-        "php": ">=8.1",
-        "symfony/event-dispatcher": ">=6.3",
-        "symfony/form": ">=6.3",
-        "symfony/http-foundation": ">=6.3",
-        "symfony/http-kernel": ">=6.3",
-        "symfony/routing": ">=6.3",
-        "symfony/security-core": ">=6.3",
-        "symfony/translation-contracts": ">=3.0",
-        "symfony/yaml": ">=6.3",
-        "twig/twig": ">=3.0",
-        "sidus/datagrid-bundle": "~4.0"
+        "php": ">=8.4",
+        "psr/log": "^3.0",
+        "sidus/datagrid-bundle": "^5.0",
+        "symfony/config": "^8.1",
+        "symfony/dependency-injection": "^8.1",
+        "symfony/event-dispatcher": "^8.1",
+        "symfony/form": "^8.1",
+        "symfony/http-foundation": "^8.1",
+        "symfony/http-kernel": "^8.1",
+        "symfony/options-resolver": "^8.1",
+        "symfony/property-access": "^8.1",
+        "symfony/routing": "^8.1",
+        "symfony/security-core": "^8.1",
+        "symfony/translation": "^8.1",
+        "symfony/translation-contracts": "^3.6",
+        "symfony/yaml": "^8.1",
+        "twig/twig": "^3.21"
+    },
+    "require-dev": {
+        "doctrine/doctrine-bundle": "^3.0",
+        "doctrine/orm": "^3.0",
+        "doctrine/persistence": "^4.0",
+        "phpunit/phpunit": "^12.0",
+        "symfony/framework-bundle": "^8.1",
+        "symfony/security-bundle": "^8.1",
+        "symfony/twig-bundle": "^8.1"
+    },
+    "suggest": {
+        "doctrine/orm": "Enables DoctrineHelper and the admin entity value resolver",
+        "doctrine/persistence": "Enables DoctrineHelper and the admin entity value resolver (ManagerRegistry)",
+        "symfony/twig-bundle": "Renders the shipped @SidusAdmin templates"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit"
     }
 }
