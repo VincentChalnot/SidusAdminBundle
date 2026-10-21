@@ -38,8 +38,6 @@ final class TestKernel extends Kernel
 {
     use MicroKernelTrait;
 
-    public const array USERS = ['admin', 'editor', 'viewer', 'nobody'];
-
     private const array POSTS_LIST = [
         'list' => [
             'provider' => 'doctrine',
@@ -62,6 +60,9 @@ final class TestKernel extends Kernel
         private readonly string $id = 'default',
     ) {
         parent::__construct('test', true);
+        // Every kernel has its own directory (cache, logs, database): remove it when the run is over
+        $directory = $this->directory();
+        register_shutdown_function(static fn () => new Filesystem()->remove($directory));
     }
 
     /**
