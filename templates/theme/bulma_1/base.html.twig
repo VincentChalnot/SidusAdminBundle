@@ -1,0 +1,29 @@
+{#
+    The Bulma 1 layout of the actions (sidus_admin.theme: bulma_1).
+
+    It does NOT load Bulma: add the stylesheet yourself, either by overriding the "stylesheets" block of your own
+    base_template (extending this one), or in your application layout, e.g.
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1/css/bulma.min.css">
+    Same for the form layout, which is opt-in too: twig.form_themes: ['@SidusAdmin/form/bulma_1_layout.html.twig'].
+#}
+{% extends '@SidusAdmin/base.html.twig' %}
+
+{% block flashes %}
+    {% for type, messages in app.flashes %}
+        {% set flash_class = type == 'success' ? 'is-success' : (type in ['error', 'danger'] ? 'is-danger' : (type == 'warning' ? 'is-warning' : 'is-info')) %}
+        {% for message in messages %}
+            <div class="notification {{ flash_class }}" data-type="{{ type }}" role="status">
+                <button type="button" class="delete" aria-label="Close" onclick="this.parentNode.remove()"></button>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}
+
+{% block main %}
+    <section class="section">
+        <div class="container">
+            {{ block('container') }}
+        </div>
+    </section>
+{% endblock %}

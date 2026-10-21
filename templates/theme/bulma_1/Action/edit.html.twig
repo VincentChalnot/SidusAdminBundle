@@ -1,0 +1,76 @@
+{#
+    The Bulma 1 form of the create, edit, clone and read actions (sidus_admin.theme: bulma_1): the neutral template
+    with Bulma markup, the same blocks and variables (form_container_class, message_class, back_class, submit_class,
+    severity).
+#}
+{% extends '@SidusAdmin/Action/edit.html.twig' %}
+
+{% block container %}
+    <div class="columns">
+        <div class="{{ form_container_class|default('column is-6') }}" data-admin="{{ admin.code }}" data-action="{{ action.code }}">
+            {{ block('heading') }}
+            {{ block('form') }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block heading %}
+    <h1 class="title is-4">{{ block('heading_text') }}</h1>
+{% endblock %}
+
+{% block message %}
+    {% set message = tryTrans(
+        [
+            'sidus.admin.'~admin.code~'.action.'~action.code~'.message',
+            'sidus.admin.action.'~action.code~'.message',
+        ], {
+            '%entity%': data is defined ? data|tostring
+        }
+    ) %}
+    {% if message %}
+        <div class="notification {{ message_class|default((severity|default('')) == 'danger' ? 'is-danger' : 'is-info') }}" role="{{ message_role|default('status') }}"{% if severity is defined %} data-severity="{{ severity }}"{% endif %}>
+            {{ message }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block form_actions %}
+    <div class="field is-grouped">
+        {{ block('back_button') }}
+        {{ block('submit_button') }}
+    </div>
+{% endblock %}
+
+{% block back_button %}
+    {% if listPath|default(false) %}
+        <div class="control">
+            <a href="{{ listPath }}" class="{{ back_class|default('button is-light') }}">
+                {{ tryTrans(
+                    [
+                        'sidus.admin.'~admin.code~'.action.'~action.code~'.button.back',
+                        'sidus.admin.action.'~action.code~'.button.back',
+                        'sidus.admin.button.back',
+                    ],
+                    {},
+                    'Back'
+                ) }}
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block submit_button %}
+    <div class="control">
+        <button type="submit" class="{{ submit_class|default((severity|default('')) == 'danger' ? 'button is-danger' : 'button is-primary') }}"{% if severity is defined %} data-severity="{{ severity }}"{% endif %}>
+            {{ tryTrans(
+                [
+                    'sidus.admin.'~admin.code~'.action.'~action.code~'.button.submit',
+                    'sidus.admin.action.'~action.code~'.button.submit',
+                    'sidus.admin.button.submit',
+                ],
+                {},
+                'Submit'
+            ) }}
+        </button>
+    </div>
+{% endblock %}

@@ -1,0 +1,230 @@
+{#
+    Symfony form layout for Bulma 1 (https://bulma.io/documentation/form/).
+
+    OPT-IN: this layout is never registered by the bundle. Add it yourself to the form themes of your application,
+    config/packages/twig.yaml:
+
+        twig:
+            form_themes:
+                - '@SidusAdmin/form/bulma_1_layout.html.twig'
+
+    It is independent of the "theme" option of the bundle (sidus_admin.theme: bulma_1, which styles the action
+    templates), you may enable one, the other, or both. Bulma itself is NOT loaded by this file.
+
+    Based on form_div_layout.html.twig, only what needs Bulma markup is overridden:
+        rows            .field > label.label + .control > widget, then errors (p.help.is-danger) and help (p.help)
+        errors          the errors of the root form in a .notification.is-danger
+        inputs          .input (+ .is-danger when invalid), .textarea, .select (+ .is-multiple, .is-fullwidth),
+                        .file for the file inputs (pass the variable "file_label" to change the "Choose a file..." text)
+        choices         expanded: .checkboxes / .radios of label.checkbox / label.radio
+        checkbox/radio  the label is rendered inside label.checkbox / label.radio (no separate label in the row)
+        date and time   choice widgets as a .field.is-grouped of .select
+        buttons         .button, submit: .button.is-primary, reset: .button.is-light (unless you set a Bulma color class)
+#}
+{% use 'form_div_layout.html.twig' %}
+
+{# Rows #}
+
+{%- block form_row_render -%}
+    {%- set row_attr = row_attr|merge({class: (row_attr.class|default('') ~ ' field')|trim}) -%}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        {%- if 'checkbox' not in block_prefixes and 'radio' not in block_prefixes -%}
+            {{- form_label(form) -}}
+        {%- endif -%}
+        <div class="control">
+            {{- form_widget(form, widget_attr) -}}
+        </div>
+        {{- form_errors(form) -}}
+        {{- form_help(form) -}}
+    </div>
+{%- endblock form_row_render -%}
+
+{%- block button_row -%}
+    {%- set row_attr = row_attr|merge({class: (row_attr.class|default('') ~ ' field')|trim}) -%}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        <div class="control">
+            {{- form_widget(form) -}}
+        </div>
+    </div>
+{%- endblock button_row -%}
+
+{# Labels #}
+
+{%- block form_label -%}
+    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' label')|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_label -%}
+
+{# Help and errors #}
+
+{%- block form_help -%}
+    {%- if help -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help')|trim}) -%}
+        <p id="{{ id }}_help"{% with {attr: help_attr} %}{{ block('attributes') }}{% endwith %}>
+            {{- block('form_help_content') -}}
+        </p>
+    {%- endif -%}
+{%- endblock form_help -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        {%- if form is rootform -%}
+            <div class="notification is-danger" role="alert">
+                {%- for error in errors -%}
+                    <p id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</p>
+                {%- endfor -%}
+            </div>
+        {%- else -%}
+            {%- for error in errors -%}
+                <p class="help is-danger" id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</p>
+            {%- endfor -%}
+        {%- endif -%}
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{# Inputs #}
+
+{%- block form_widget_simple -%}
+    {%- set type = type|default('text') -%}
+    {%- if type == 'file' -%}
+        {{- block('sidus_file_widget') -}}
+    {%- else -%}
+        {%- if type != 'hidden' and type != 'range' -%}
+            {%- set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) -%}
+        {%- endif -%}
+        {%- if type != 'hidden' and errors|length > 0 -%}
+            {%- set attr = attr|merge({class: (attr.class|default('') ~ ' is-danger')|trim}) -%}
+        {%- endif -%}
+        {{- parent() -}}
+    {%- endif -%}
+{%- endblock form_widget_simple -%}
+
+{%- block sidus_file_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' file-input')|trim}) -%}
+    {%- set file_text = file_label|default('Choose a file…') -%}
+    <div class="file{% if errors|length > 0 %} is-danger{% endif %}">
+        <label class="file-label">
+            <input type="file" {{ block('widget_attributes') }} />
+            <span class="file-cta">
+                <span class="file-label">{{ translation_domain is same as(false) ? file_text : file_text|trans({}, translation_domain) }}</span>
+            </span>
+        </label>
+    </div>
+{%- endblock sidus_file_widget -%}
+
+{%- block textarea_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' textarea' ~ (errors|length > 0 ? ' is-danger' : ''))|trim}) -%}
+    {{- parent() -}}
+{%- endblock textarea_widget -%}
+
+{# Choices #}
+
+{%- block choice_widget_collapsed -%}
+    <div class="select is-fullwidth{% if multiple %} is-multiple{% endif %}{% if errors|length > 0 %} is-danger{% endif %}">
+        {{- parent() -}}
+    </div>
+{%- endblock choice_widget_collapsed -%}
+
+{%- block choice_widget_expanded -%}
+    {%- set attr = attr|merge({class: ((multiple ? 'checkboxes' : 'radios') ~ ' ' ~ attr.class|default(''))|trim}) -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form -%}
+            {{- form_widget(child) -}}
+        {%- endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+
+{%- block checkbox_widget -%}
+    <label class="checkbox{% if disabled %} is-disabled{% endif %}"{% if disabled %} disabled{% endif %}>
+        <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+        {%- if label is not same as(false) %} {{ block('form_label_content') }}{% endif -%}
+    </label>
+{%- endblock checkbox_widget -%}
+
+{%- block radio_widget -%}
+    <label class="radio{% if disabled %} is-disabled{% endif %}"{% if disabled %} disabled{% endif %}>
+        <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+        {%- if label is not same as(false) %} {{ block('form_label_content') }}{% endif -%}
+    </label>
+{%- endblock radio_widget -%}
+
+{# Dates and times: the choice widgets are Bulma selects in a group #}
+
+{%- block datetime_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' field is-grouped is-grouped-multiline')|trim}) -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- form_errors(form.date) -}}
+            {{- form_errors(form.time) -}}
+            <div class="control">{{ form_widget(form.date) }}</div>
+            <div class="control">{{ form_widget(form.time) }}</div>
+        </div>
+    {%- endif -%}
+{%- endblock datetime_widget -%}
+
+{%- block date_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' field is-grouped')|trim}) -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- date_pattern|replace({
+                '{{ year }}': '<div class="control">' ~ form_widget(form.year) ~ '</div>',
+                '{{ month }}': '<div class="control">' ~ form_widget(form.month) ~ '</div>',
+                '{{ day }}': '<div class="control">' ~ form_widget(form.day) ~ '</div>',
+            })|raw -}}
+        </div>
+    {%- endif -%}
+{%- endblock date_widget -%}
+
+{%- block time_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        {%- set vars = widget == 'text' ? {attr: {size: 1}} : {} -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' field is-grouped')|trim}) -%}
+        <div {{ block('widget_container_attributes') }}>
+            <div class="control">{{ form_widget(form.hour, vars) }}</div>
+            {%- if with_minutes -%}<div class="control">{{ form_widget(form.minute, vars) }}</div>{%- endif -%}
+            {%- if with_seconds -%}<div class="control">{{ form_widget(form.second, vars) }}</div>{%- endif -%}
+        </div>
+    {%- endif -%}
+{%- endblock time_widget -%}
+
+{%- block week_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        {%- set vars = widget == 'text' ? {attr: {size: 1}} : {} -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' field is-grouped')|trim}) -%}
+        <div {{ block('widget_container_attributes') }}>
+            <div class="control">{{ form_widget(form.year, vars) }}</div>
+            <div class="control">{{ form_widget(form.week, vars) }}</div>
+        </div>
+    {%- endif -%}
+{%- endblock week_widget -%}
+
+{# Buttons #}
+
+{%- block button_widget -%}
+    {%- if 'button' not in attr.class|default('')|split(' ') -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' button')|trim}) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock button_widget -%}
+
+{%- block submit_widget -%}
+    {%- if not (attr.class|default('') matches '/\\bis-(primary|link|info|success|warning|danger|light|dark|white|black|text|ghost)\\b/') -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' button is-primary')|trim}) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock submit_widget -%}
+
+{%- block reset_widget -%}
+    {%- if not (attr.class|default('') matches '/\\bis-(primary|link|info|success|warning|danger|light|dark|white|black|text|ghost)\\b/') -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' button is-light')|trim}) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock reset_widget -%}
