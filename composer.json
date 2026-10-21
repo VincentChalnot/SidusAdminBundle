@@ -10,16 +10,6 @@
         "issues": "https://github.com/VincentChalnot/SidusAdminBundle/issues",
         "source": "https://github.com/VincentChalnot/SidusAdminBundle"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../SidusDataGridBundle"
-        },
-        {
-            "type": "path",
-            "url": "../SidusDoctrineFilterBundle"
-        }
-    ],
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
