@@ -28,8 +28,6 @@ jobs:
             - name: Validate composer.json
               run: composer validate --strict
 
-            # Until sidus/datagrid-bundle 5.0 (and sidus/doctrine-filter-bundle 1.0, a dev dependency) are tagged, this step
-            # needs their VCS repository / dev-branch.
             - name: Install dependencies
               run: >
                   composer update --no-interaction --no-progress
