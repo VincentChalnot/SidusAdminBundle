@@ -25,7 +25,7 @@ use UnexpectedValueException;
 /**
  * Uses the admin configuration to convert an entity id to a real doctrine entity
  */
-class AdminEntityValueResolver implements ValueResolverInterface
+readonly class AdminEntityValueResolver implements ValueResolverInterface
 {
     public function __construct(
         protected ?ManagerRegistry $managerRegistry = null,

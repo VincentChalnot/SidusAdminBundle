@@ -23,10 +23,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class ActionLinkType extends AbstractType
+final class ActionLinkType extends AbstractType
 {
     public function __construct(
-        protected ActionLinkHelper $actionLinkHelper,
+        private readonly ActionLinkHelper $actionLinkHelper,
     ) {
     }
 
